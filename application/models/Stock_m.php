@@ -190,6 +190,28 @@ class Stock_m extends CI_Model
         $this->db->insert('t_stock', $params);
     }
 
+    public function insert_stock_out_produksi($post, $id_produksi)
+    {
+        $item_code = $post['item_produksi'];
+        $qty = $post['qty_item_produksi'];
+        $exp_date = $post['exp_date'];
+        $item_id = $this->db->query("select item_id from p_item where item_code ='$item_code'")->row()->item_id;
+        $barcode = $this->db->query("select barcode from p_item where item_id = '$item_id'")->row()->barcode;
+        $params = array(
+            'item_code' => $item_code,
+            'item_id' => $item_id,
+            'barcode' => $barcode,
+            'id_item_produksi' => $id_produksi,
+            'type' => 'in',
+            'detail' => 'stock in',
+            'info' => 'stock in produksi',
+            'qty' => $qty,
+            'expired_date' => $exp_date,
+            'user_id' => $this->session->userdata('userid'),
+        );
+        $this->db->insert('t_stock', $params);
+    }
+
     // public function get_stock_in_data(){
     //     $sql = "select t1.*, t2.name as item_name from t_stock t1
     //     inner join p_item t2 on t1.item_id = t2.item_id

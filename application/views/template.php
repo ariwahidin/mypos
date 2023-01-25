@@ -144,7 +144,19 @@
 							<a href="<?= site_url('stockout') ?>"><i class="fa fa-circle-o"></i> <span>Stock Out</span></a>
 						</li>
 						<li>
-							<a href="<?= site_url('produksi') ?>"><i class="fa fa-circle-o"></i> <span>Produksi</span></a>
+							<a href="<?= site_url('transfer') ?>"><i class="fa fa-circle-o"></i> <span>Transfer Stock Out</span></a>
+						</li>
+						<li>
+							<a href="<?= site_url('transfer/in') ?>"><i class="fa fa-circle-o"></i> <span>Transfer Stock In</span></a>
+						</li>
+						<li>
+							<a href="<?= site_url('produksi') ?>"><i class="fa fa-circle-o"></i> <span>Produksi (Buat Baru)</span></a>
+						</li>
+						<li>
+							<a href="<?= site_url('produksi/ready') ?>"><i class="fa fa-circle-o"></i> <span>Produksi (Item Exists)</span></a>
+						</li>
+						<li>
+							<a href="<?= site_url('bonus') ?>"><i class="fa fa-circle-o"></i> <span>Setting Bonus</span></a>
 						</li>
 						<li <?= $this->uri->segment(1) == 'user' ? 'class="active"' : '' ?>>
 							<a href="<?= site_url('user') ?>"><i class="fa fa-circle-o"></i> <span>Users</span></a>

@@ -6,7 +6,7 @@ if ($receipt->num_rows() < 1) {
     <html moznomarginboxes mozdisallowselectionprint>
 
     <head>
-        <title>Print Nota</title>
+        <title>POS - Print Nota</title>
         <style type="text/css">
             html {
                 font-family: Tahoma, Verdana, Segoe, sans-serif;

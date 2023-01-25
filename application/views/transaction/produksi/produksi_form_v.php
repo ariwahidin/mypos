@@ -5,6 +5,7 @@
     <h1>
         Produksi
     </h1>
+    <span>Buat Baru</span>
 </section>
 <section class="content">
     <div class="row">
@@ -14,18 +15,22 @@
                 <div class="box-body">
                     <div class="form-group">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <label for="">Item Produksi</label>
-                                <select name="" id="" class="form-control">
+                                <select name="" id="item_produksi" class="form-control">
                                     <option value="">--Pilih Item Produksi--</option>
                                     <?php foreach ($item_produksi->result() as $produksi) { ?>
                                         <option value="<?= $produksi->item_code ?>"><?= $produksi->item_name ?></option>
                                     <?php } ?>
                                 </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <label for="qty_item">Qty</label>
-                                <input type="number" id="qty" class="form-control">
+                                <input type="number" id="qty_item_produksi" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="qty_item">Exp Date</label>
+                                <input type="date" id="exp_date" class="form-control">
                             </div>
                         </div>
                     </div>
@@ -59,7 +64,7 @@
                     </table>
                 </div>
                 <div class="box-footer">
-                    <button type="button" class="btn btn-flat btn-success pull-right" data-toggle="modal" data-target="">Proses Produksi</button>
+                    <button type="button" class="btn btn-flat btn-success pull-right" id="btn_proses_produksi">Proses Produksi</button>
                 </div>
             </div>
         </div>
@@ -221,6 +226,21 @@
         }
     })
 
+    $(document).on('click', '#btn_proses_produksi', function() {
+        var item_produksi = $('#item_produksi').val()
+        var qty_item_produksi = $('#qty_item_produksi').val()
+        var exp_date = $('#exp_date').val()
+        var params = []
+        params.push(item_produksi, qty_item_produksi,exp_date);
+
+        if (item_produksi == '' || qty_item_produksi == '' || qty_item_produksi < 1 || exp_date == '') {
+            alert('Item Produksi atau Qty kosong')
+        } else {
+            proses_produksi(params)
+        }
+
+    })
+
     function delete_item_cart(id_cart) {
         $.ajax({
             type: 'POST',
@@ -281,6 +301,31 @@
                     alert('Stock Tidak cukup');
                 } else {
                     alert('Gagal tambah item cart')
+                }
+            }
+        });
+    }
+
+    function proses_produksi(params) {
+        $.ajax({
+            type: 'POST',
+            url: '<?= site_url('produksi/process') ?>',
+            data: {
+                'proses_produksi': true,
+                'item_produksi': params[0],
+                'qty_item_produksi': params[1],
+                'exp_date': params[2]
+            },
+            dataType: 'json',
+
+            success: function(result) {
+                if (result.success == true) {
+                    alert('Produksi berhasil disimpan');
+                    window.location.href = '<?=base_url('produksi')?>';
+                } else if (result.success == false && result.cart == 0) {
+                    alert('Bahan Baku Belum dibuat');
+                } else {
+                    alert('Gagal Produksi')
                 }
             }
         });

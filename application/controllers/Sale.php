@@ -33,7 +33,7 @@ class Sale extends CI_Controller
 
 	function check_event()
 	{
-		$check_event = $this->db->query("select * from tb_event where now() > start_periode and now() < end_periode ");
+		$check_event = $this->db->query("select * from tb_event where now() > start_periode and now() < end_periode and is_active = 'y'");
 		if ($check_event->num_rows() > 0) {
 			$id_event = $check_event->row()->id_event;
 			$check_item_bonus = $this->db->query("select item_code from tb_item_bonus where id_event = '$id_event'");

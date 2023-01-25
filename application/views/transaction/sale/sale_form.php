@@ -691,7 +691,6 @@
 
 
     $(document).on('click', '#del_cart', function() {
-
         Swal.fire({
             title: 'Apakah anda yakin?',
             // text: "You won't be able to revert this!",
@@ -722,9 +721,6 @@
                 })
             }
         })
-
-
-
     })
 
     $(document).on('click', '#update_cart', function() {
