@@ -25,15 +25,16 @@ class Transfer extends CI_Controller
     }
 
     function in(){
+        $delete_cart = $this->transfer_m->delete_cart_transfer_stockin();
         if(isset($_POST['cari'])){
-            $this->get_item_transfer($_POST);
-        }else{
-            $toko = $this->db->query("select * from t_toko where is_active = 'y'");
-            $data = array(
-                'toko' => $toko
-            );
-            $this->template->load('template', 'transaction/transfer/form_transfer_stockin', $data);
+            $item_transfer = $this->get_item_transfer($_POST);
+            $data['whs_code'] = $_POST['whs_code'];
+            $data['docnum'] = $_POST['docnum'];
         }
+
+        $data['item'] = $this->transfer_m->get_cart_transfer_stockin();
+        $data['toko'] = $this->db->query("select * from t_toko where is_active = 'y'");
+        $this->template->load('template', 'transaction/transfer/form_transfer_stockin', $data);
 
     }
 
@@ -55,11 +56,20 @@ class Transfer extends CI_Controller
         );
 
         $context  = stream_context_create($options);
-        $response = file_get_contents('http://119.110.68.194:8099/pandurasa-whs/item/gettransferstock', false, $context);
+        $response = file_get_contents(my_api().'item/gettransferstock', false, $context);
         $result = json_decode($response);
         
-        var_dump($result);
+        if(isset($result->data)){
+            $insert_cart = $this->transfer_m->insert_cart($result->data);
+            $return = $this->db->affected_rows();
+        }else{
+            $return = $this->db->affected_rows();
+        }
+
+        return $return;
     }
+
+    
 
     function process()
     {
@@ -117,7 +127,7 @@ class Transfer extends CI_Controller
                 // var_dump($post);
                 $id = $this->transfer_m->insert_transfer($post);
                 $docnum = $this->db->query("select docnum from tb_transfer_stock where id = '$id'")->row()->docnum;
-                // var_dump($id); 
+                $stock_id = $this->stock_m->stock_doc_id();
 
                 foreach ($item_cart->result() as $value) {
                     $params = array(
@@ -134,6 +144,7 @@ class Transfer extends CI_Controller
                     $this->transfer_m->insert_transfer_detail($params);
 
                     $params_stockout = array(
+                        'doc_id' => $stock_id,
                         'item_code' => $value->item_code,
                         'item_id' => $value->item_id,
                         'item_id_detail' => $value->item_id_detail,
@@ -149,7 +160,6 @@ class Transfer extends CI_Controller
 
                     //stok out
                     $this->stockout_m->insert_stock_out($params_stockout);
-
 
                     $params_update_min = array(
                         'qty' => $value->qty,
@@ -224,7 +234,7 @@ class Transfer extends CI_Controller
         );
 
         $context  = stream_context_create($options);
-        $response = file_get_contents('http://119.110.68.194:8099/pandurasa-whs/item/transferstock', false, $context);
+        $response = file_get_contents(my_api().'item/transferstock', false, $context);
         $result = json_decode($response);
 
         // var_dump($result);

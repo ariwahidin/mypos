@@ -59,7 +59,7 @@ class Upload extends CI_Controller
         );
 
         $context  = stream_context_create($options);
-        $response = file_get_contents('http://119.110.68.194:8099/pandurasa-whs/item/save_sale_detail', false, $context);
+        $response = file_get_contents(my_api().'item/save_sale_detail', false, $context);
         $result = json_decode($response);
         if($result->status == 1){
             $this->session->set_flashdata('success',$result->messages);

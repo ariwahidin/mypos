@@ -80,7 +80,6 @@ class Produksi_m extends CI_Model
 
     function insert_tb_item_produksi_detail($params)
     {
-        // var_dump($params);
         $this->db->insert('tb_item_produksi_detail', $params);
     }
 
@@ -101,6 +100,7 @@ class Produksi_m extends CI_Model
             'created_by' => $this->session->userdata('userid'),
         );
         $this->db->insert('p_item_detail', $params);
+        // var_dump($this->db->error());
     }
 
     function update_qty_p_item_detail($params)

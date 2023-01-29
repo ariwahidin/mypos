@@ -30,41 +30,6 @@ class Mypos_Api extends CI_Controller
         echo json_encode($response);
     }
 
-
-    // function insert_karyawan()
-    // {
-    //     global $connect;
-    //     $check = array('id' => '', 'nama' => '', 'jenis_kelamin' => '', 'alamat' => '');
-    //     $check_match = count(array_intersect_key($_POST, $check));
-    //     if ($check_match == count($check)) {
-
-    //         $result = mysqli_query($connect, "INSERT INTO karyawan SET
-    //            id = '$_POST[id]',
-    //            nama = '$_POST[nama]',
-    //            jenis_kelamin = '$_POST[jenis_kelamin]',
-    //            alamat = '$_POST[alamat]'");
-
-    //         if ($result) {
-    //             $response = array(
-    //                 'status' => 1,
-    //                 'message' => 'Insert Success'
-    //             );
-    //         } else {
-    //             $response = array(
-    //                 'status' => 0,
-    //                 'message' => 'Insert Failed.'
-    //             );
-    //         }
-    //     } else {
-    //         $response = array(
-    //             'status' => 0,
-    //             'message' => 'Wrong Parameter'
-    //         );
-    //     }
-    //     header('Content-Type: application/json');
-    //     echo json_encode($response);
-    // }
-
     function stock_in()
     {
         // var_dump($_POST);
@@ -96,7 +61,7 @@ class Mypos_Api extends CI_Controller
         );
 
         $context  = stream_context_create($options);
-        $response = file_get_contents('http://119.110.68.194:8099/pandurasa-whs/item/get_item_transfer', false, $context);
+        $response = file_get_contents(my_api().'item/get_item_transfer', false, $context);
         $result = json_decode($response);
 
         $data = array(
@@ -104,8 +69,6 @@ class Mypos_Api extends CI_Controller
             'result' => $result,
             'input_search' => $post
         );
-
-        // var_dump($result);
 
         $this->template->load('template', 'transaction/stock_in/data_transfer', $data);
     }

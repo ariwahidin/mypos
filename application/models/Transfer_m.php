@@ -149,6 +149,64 @@ class Transfer_m extends CI_Model
         $this->db->query($sql);
     }
 
+    public function insert_cart($data){
+        $row = array();
+        foreach($data as $p){
+            $params = array(
+                'docnum' => $p->docnum,
+                'whs_code_send' => $p->whs_code_send,
+                'whs_code_rec' => $p->whs_code_rec,
+                'item_code' => $p->item_code,
+                'barcode' => $p->barcode,
+                'exp_date' => $p->exp_date,
+                'qty' => $p->qty,
+                'created_by' => $p->created_by,
+                'created_at' => $p->created,
+                'user_id' => $this->session->userdata('userid')
+            );
+            array_push($row, $params);
+        }
+        $query = $this->db->insert_batch('t_cart_transfer_stockin', $row);
+    }
+
+    public function get_cart_transfer_stockin(){
+        $user_id = $this->session->userdata('userid');
+        $query = $this->db->query("select * from t_cart_transfer_stockin where user_id = '$user_id'");
+        return $query;
+    }
+
+    public function delete_cart_transfer_stockin(){
+        $user_id = $this->session->userdata('userid');
+        $query = $this->db->query("delete from t_cart_transfer_stockin where user_id = '$user_id'");
+        return $query;
+    }
+
+    public function add_stock_in($post)
+    {
+        // var_dump($post);
+        // die;
+        $params = array();
+        for ($i = 0; $i < count($post['item_code']); $i++) {
+            $item_code = $post['item_code'][$i];
+            $params = [
+                'docnum' => $post['docnum'][$i],
+                'whs_code' => $post['whs_code'][$i],
+                'item_id' => $this->db->query("select item_id from p_item where item_code = '$item_code'")->row()->item_id,
+                'barcode' => $post['barcode'][$i],
+                'item_code' => $item_code,
+                'type' => 'in',
+                'detail' => 'stock in',
+                'qty' => $post['qty_ed'][$i],
+                'expired_date' => $post['exp_date'][$i],
+                'user_id' => $this->session->userdata('userid'),
+            ];
+            //var_dump($params);
+            $this->db->insert('t_stock', $params);
+        };
+        // die;
+    }
+
+
     // public function update_qty_min_p_item_detail($params){
     //     $item_id_detail = $params['item_id_detail'];
     //     $qty = $params['qty'];

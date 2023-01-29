@@ -2,45 +2,6 @@
 
 class Stockout_m extends CI_Model
 {
-    public function stock_in_code()
-    {
-        $sql = "SELECT MAX(MID(stock_code,15,4)) AS stock_code 
-        FROM t_header_stock 
-        WHERE MID(stock_code,9,6) = DATE_FORMAT(CURDATE(),'%y%m%d')";
-        $query = $this->db->query($sql);
-
-        if ($query->num_rows() > 0) {
-            $row = $query->row();
-            $n = ((int)$row->stock_code) + 1;
-            $no = sprintf("%'.04d", $n);
-        } else {
-            $no = "0001";
-        }
-        
-        $kode_toko = $this->db->query("SELECT code_store FROM t_toko WHERE is_active = 'y'")->row()->code_store;
-        $stock_code = $kode_toko . '-IN-'. date('ymd') . $no;
-        return $stock_code;
-    }
-
-    public function stock_out_code()
-    {
-        $sql = "SELECT MAX(MID(stock_code,16,4)) AS stock_code 
-        FROM t_header_stock 
-        WHERE MID(stock_code,10,6) = DATE_FORMAT(CURDATE(),'%y%m%d')";
-        $query = $this->db->query($sql);
-
-        if ($query->num_rows() > 0) {
-            $row = $query->row();
-            $n = ((int)$row->stock_code) + 1;
-            $no = sprintf("%'.04d", $n);
-        } else {
-            $no = "0001";
-        }
-
-        $kode_toko = $this->db->query("SELECT code_store FROM t_toko WHERE is_active = 'y'")->row()->code_store;
-        $stock_code = $kode_toko . '-OUT-'. date('ymd') . $no;
-        return $stock_code;
-    }
 
     public function add_cart_stockout($post)
     {
@@ -113,7 +74,7 @@ class Stockout_m extends CI_Model
 
     public function insert_stock_out($params)
     {
-        $this->db->insert('t_stock', $params);
+        $this->db->insert('t_stock', $params);;
     }
 
     public function update_qty_min_p_item_detail($params){

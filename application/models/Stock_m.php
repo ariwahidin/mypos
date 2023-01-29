@@ -3,6 +3,26 @@
 class Stock_m extends CI_Model
 {
 
+
+    public function stock_doc_id()
+    {
+        $sql = "SELECT MAX(MID(doc_id,11,4)) AS doc_id 
+        FROM t_stock 
+        WHERE MID(doc_id,3,8) = DATE_FORMAT(CURDATE(),'%Y%m%d')";
+        $query = $this->db->query($sql);
+
+        if ($query->num_rows() > 0) {
+            $row = $query->row();
+            $n = ((int)$row->doc_id) + 1;
+            $no = sprintf("%'.04d", $n);
+        } else {
+            $no = "0001";
+        }
+
+        $doc_id = 'ST' . date('Ymd') . $no;
+        return $doc_id;
+    }
+
     public function get($id = null)
     {
         $this->db->from('t_stock');
@@ -96,12 +116,12 @@ class Stock_m extends CI_Model
 
     public function add_stock_in($post)
     {
-        // var_dump($post);
-        // die;
-        $params = array();
+        $row = array();
+        $doc_id = $this->stock_doc_id();
         for ($i = 0; $i < count($post['item_code']); $i++) {
             $item_code = $post['item_code'][$i];
             $params = [
+                'doc_id' => $doc_id,
                 'docnum' => $post['docnum'][$i],
                 'whs_code' => $post['whs_code'][$i],
                 'item_id' => $this->db->query("select item_id from p_item where item_code = '$item_code'")->row()->item_id,
@@ -113,10 +133,9 @@ class Stock_m extends CI_Model
                 'expired_date' => $post['exp_date'][$i],
                 'user_id' => $this->session->userdata('userid'),
             ];
-            //var_dump($params);
-            $this->db->insert('t_stock', $params);
+            array_push($row, $params);
         };
-        // die;
+        $this->db->insert_batch('t_stock', $row);
     }
 
     public function simpan_item_detail($post)
@@ -197,7 +216,9 @@ class Stock_m extends CI_Model
         $exp_date = $post['exp_date'];
         $item_id = $this->db->query("select item_id from p_item where item_code ='$item_code'")->row()->item_id;
         $barcode = $this->db->query("select barcode from p_item where item_id = '$item_id'")->row()->barcode;
+        $doc_id = $this->stock_doc_id();
         $params = array(
+            'doc_id' => $doc_id,
             'item_code' => $item_code,
             'item_id' => $item_id,
             'barcode' => $barcode,

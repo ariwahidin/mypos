@@ -140,3 +140,8 @@ function barcode_is_exits($barcode)
         return false;
     }
 }
+
+function my_api(){
+    $api_address = "http://localhost:8080/pandurasa-whs/";
+    return $api_address;
+}

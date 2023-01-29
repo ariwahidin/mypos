@@ -80,9 +80,10 @@ class Stockout extends CI_Controller
 
             $item_cart = $this->stockout_m->get_cart_stockout();
             if ($item_cart->num_rows() > 0) {
-
+                $doc_id = $this->stock_m->stock_doc_id();
                 foreach ($item_cart->result() as $value) {
                     $params = array(
+                        'doc_id' => $doc_id,
                         'item_code' => $value->item_code,
                         'type' => 'out',
                         'detail' => 'stock out',

@@ -14,12 +14,12 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <label for="">Whs Code:</label>
-                                    <input type="text" name="whs_code" class="form-control">
+                                    <input type="text" name="whs_code" class="form-control" value="<?= isset($whs_code) ? $whs_code : '' ?>">
                                     <input type="hidden" name="cari">
                                 </div>
                                 <div class="col-md-4">
                                     <label for="">Docnum:</label>
-                                    <input type="text" name="docnum" class="form-control">
+                                    <input type="text" name="docnum" class="form-control" value="<?= isset($docnum) ? $docnum : '' ?>">
                                 </div>
                                 <div class="col-md-4">
                                     <br>
@@ -45,15 +45,31 @@
                         <thead>
                             <tr>
                                 <th>#</th>
+                                <th>Docnum</th>
                                 <th>Barcode</th>
                                 <th>Desc</th>
                                 <th>Qty</th>
                                 <th>Exp Date</th>
-                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="cart_tranfer">
-
+                            <?php if ($item->num_rows() > 0) { ?>
+                                <?php $no = 1;
+                                foreach ($item->result() as $data) { ?>
+                                    <tr>
+                                        <td><?= $no++ ?></td>
+                                        <td><?= $data->docnum ?></td>
+                                        <td><?= $data->barcode ?></td>
+                                        <td><?= $data->item_code ?></td>
+                                        <td><?= $data->qty ?></td>
+                                        <td><?= $data->exp_date ?></td>
+                                    </tr>
+                                <?php } ?>
+                            <?php } else { ?>
+                                <tr>
+                                    <td colspan="6" style="text-align:center">Tidak Ada Data</td>
+                                </tr>
+                            <?php } ?>
                         </tbody>
                     </table>
                 </div>

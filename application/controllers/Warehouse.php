@@ -22,7 +22,7 @@ class Warehouse extends CI_Controller
         $post_parameter['store_name'] = $toko->nama_toko;
 
         // var_dump($post_parameter);
-        $curl_handle = curl_init('http://119.110.68.194:8099/pandurasa-whs/item/get_item_harga');
+        $curl_handle = curl_init(my_api().'item/get_item_harga');
         curl_setopt($curl_handle, CURLOPT_POSTFIELDS, $post_parameter);
         curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
 
@@ -41,15 +41,13 @@ class Warehouse extends CI_Controller
 
     public function item_harga()
     {
-        $url = "http://119.110.68.194:8099/pandurasa-whs/item/item_harga";
+        $url = my_api()."item/item_harga";
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $output = curl_exec($ch);
 
         if (empty($output)) {
-            // some kind of an error happened
-            // die(curl_error($ch));
             die("Tidak dapat terhubung ke server pusat");
             curl_close($ch); // close cURL handler
         } else {
@@ -59,12 +57,6 @@ class Warehouse extends CI_Controller
             if (empty($info['http_code'])) {
                 die("No HTTP code was returned");
             } else {
-                // load the HTTP codes
-                // $http_codes = parse_ini_file("path/to/the/ini/file/I/pasted/above");
-
-                // echo results
-                // echo "The server responded: <br />";
-                // echo $info['http_code'];
 
                 $data = array(
                     'item_harga' => json_decode($output),
@@ -168,7 +160,7 @@ class Warehouse extends CI_Controller
 
     public function setting_harga()
     {
-        $url = "http://119.110.68.194:8099/pandurasa-whs/item/get_harga";
+        $url = my_api()."item/get_harga";
         $toko = $this->db->query("SELECT * FROM t_toko WHERE is_active = 'y'")->row();
         $post = array(
             'kode_seller' => $toko->kode_seller,
@@ -197,7 +189,7 @@ class Warehouse extends CI_Controller
     {
         // var_dump($_SESSION);
         // die;
-        $url = "http://119.110.68.194:8099/pandurasa-whs/item/update_harga_item";
+        $url = my_api()."item/update_harga_item";
         $_POST['username'] = $_SESSION['username'];
         $_POST['date'] = international_date_time();
         $options = array(
@@ -234,7 +226,7 @@ class Warehouse extends CI_Controller
     public function get_master_item()
     {
 
-        $curl_handle = curl_init('http://119.110.68.194:8099/pandurasa-whs/item/get_master_item');
+        $curl_handle = curl_init(my_api().'item/get_master_item');
         curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
         $curl_response = curl_exec($curl_handle);
         curl_close($curl_handle);
@@ -261,7 +253,7 @@ class Warehouse extends CI_Controller
             'created_date' => international_date_time(),
             'created_by' => $this->session->userdata('username'),
         );
-        $curl_handle = curl_init('http://119.110.68.194:8099/pandurasa-whs/item/add_new_item_to_counter');
+        $curl_handle = curl_init(my_api().'item/add_new_item_to_counter');
         curl_setopt($curl_handle, CURLOPT_POSTFIELDS, $post_parameter);
         curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
         $curl_response = curl_exec($curl_handle);
@@ -282,15 +274,13 @@ class Warehouse extends CI_Controller
 
     public function ajax_setting_harga()
     {
-        $url = "http://119.110.68.194:8099/pandurasa-whs/item/get_harga";
+        $url = my_api()."item/get_harga";
         $toko = $this->db->query("SELECT * FROM t_toko WHERE is_active = 'y'")->row();
         $post = array(
             'kode_seller' => $toko->kode_seller,
             'kode_area' => $toko->kode_area,
             'kode_counter' => $toko->code_store,
         );
-        // var_dump($post);
-        // die;
         $options = array(
             "http" => array(
                 "method" => "POST",

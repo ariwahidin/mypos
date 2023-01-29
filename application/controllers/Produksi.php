@@ -75,6 +75,8 @@ class Produksi extends CI_Controller
             $user_id = $this->session->userdata('userid');
             $delete_cart = $this->db->query("delete from t_cart_produksi where created_by = '$user_id'");
             $this->produksi_m->insert_into_cart($post);
+            // var_dump($this->db->error());
+            // var_dump($this->db->last_query());
             if ($this->db->affected_rows() > 0) {
                 $response = array('success' => true);
                 echo json_encode($response);
@@ -100,12 +102,12 @@ class Produksi extends CI_Controller
             $user_id = $this->session->userdata('userid');
             $cart = $this->db->query("select * from t_cart_produksi where created_by = '$user_id'");
             if ($cart->num_rows() > 0) {
-
+                $stock_id = $this->stock_m->stock_doc_id();
                 // validasi stock
                 foreach ($cart->result() as $ct) {
                     $cart_id = $ct->id;
                     $row_complete =  $this->db->query("select * from t_cart_produksi where id = '$cart_id'");
-                    if (is_null($row_complete->row()->item_id_detail)) {
+                    if (is_null($row_complete->row()->item_id_detail) || $row_complete->row()->item_id_detail == 0) {
                         $response = array(
                             'success' => false,
                             'complete' => false,
@@ -116,12 +118,13 @@ class Produksi extends CI_Controller
                     }
                 }
 
-                // var_dump($post);
+                // var_dump($post); 
 
                 // proses stock out
                 $item_cart = $this->produksi_m->get_cart_produksi();
                 foreach ($item_cart->result() as $v) {
                     $params_stockout = array(
+                        'doc_id' => $stock_id,
                         'item_code' => $v->item_code,
                         'item_id' => $v->item_id,
                         'item_id_detail' => $v->item_id_detail,
@@ -134,7 +137,6 @@ class Produksi extends CI_Controller
                         'qty' => $v->qty,
                         'user_id' => $this->session->userdata('userid')
                     );
-                    // var_dump($params_stockout);
 
                     //stok out
                     $this->stockout_m->insert_stock_out($params_stockout);
@@ -143,6 +145,7 @@ class Produksi extends CI_Controller
                         'qty' => $v->qty,
                         'id_item_detail' => $v->item_id_detail
                     );
+                    
                     //upadate qty min p_item_detail
                     $this->produksi_m->update_qty_p_item_detail($params_update_min);
                 }
@@ -180,6 +183,8 @@ class Produksi extends CI_Controller
                 );
                 echo json_encode($response);
             }
+
+            // var_dump($this->db->error());
         }
     }
 
@@ -236,6 +241,7 @@ class Produksi extends CI_Controller
             $item_cart = $this->produksi_m->get_cart_produksi();
             if ($item_cart->num_rows() > 0) {
                 $id = $this->produksi_m->insert_tb_item_produksi($post);
+                $stock_id = $this->stock_m->stock_doc_id();
 
                 foreach ($item_cart->result() as $value) {
                     $params = array(
@@ -249,6 +255,7 @@ class Produksi extends CI_Controller
                     );
 
                     $params_stockout = array(
+                        'doc_id' => $stock_id,
                         'item_code' => $value->item_code,
                         'item_id' => $value->item_id,
                         'item_id_detail' => $value->item_id_detail,
