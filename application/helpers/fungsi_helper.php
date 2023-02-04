@@ -142,6 +142,6 @@ function barcode_is_exits($barcode)
 }
 
 function my_api(){
-    $api_address = "http://localhost:8080/pandurasa-whs/";
+    $api_address = "http://103.135.26.106:23407/pandurasa-whs/";
     return $api_address;
 }

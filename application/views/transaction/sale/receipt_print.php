@@ -48,7 +48,7 @@
     </style>
 </head>
 
-<body onload="window.print(); window.onafterprint = function(event) { window.location.href = '<?= $_SERVER['HTTP_REFERER'] ?>'};">
+<body onload="printReceipt()">
     <?php for ($i = 0; $i < 1; $i++) { ?>
         <div class="content" style="margin-bottom:10px">
             <div class="title">
@@ -117,7 +117,7 @@
                         </tr>
                         <?php if ($value->discount_item > 0) { ?>
                             <tr>
-                                <td></td>
+                                <td>Disc. <?= ($value->discount_item / $value->price) * 100 ?>%</td>
                                 <td colspan="" style="text-align:right"></td>
                                 <td></td>
                                 <td style="text-align:right; width:60px" ;"><?= '-' . number_format($value->discount_item) ?>&nbsp;</td>
@@ -145,7 +145,7 @@
                         <td style="padding-top:5px"> Disc. Item </td>
                         <td colspan="2"></td>
                         <td style="text-align:right; padding-top:5px">
-                            &nbsp;<?= '-'.number_format($total_discount_item) ?>&nbsp;
+                            &nbsp;<?= '-' . number_format($total_discount_item) ?>&nbsp;
                         </td>
                     </tr>
                     <?php if ($sale->discount > 0) { ?>
@@ -199,5 +199,12 @@
         </div>
     <?php } ?>
 </body>
-
+<script>
+    function printReceipt(){
+        window.print();
+        console.log(); 
+        window.print();
+        window.onafterprint = function(event) { window.location.href = '<?= $_SERVER['HTTP_REFERER'] ?>'};
+    }
+</script>
 </html>

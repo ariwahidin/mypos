@@ -14,7 +14,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <label for="">Whs Code:</label>
-                                    <input type="text" name="whs_code" class="form-control" value="<?= isset($whs_code) ? $whs_code : '' ?>">
+                                    <input type="text" name="whs_code" class="form-control" value="<?= isset($whs_code) ? $whs_code : '' ?>" readonly>
                                     <input type="hidden" name="cari">
                                 </div>
                                 <div class="col-md-4">
@@ -38,7 +38,9 @@
             <div class="box">
                 <div class="box-header">
                     <!-- <button type="button" class="btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-item">Daftar Item</button> -->
-                    <button type="button" id="btn_proccess" class="btn btn-flat btn-success pull-right">Process Transfer Stock In</button>
+                    <?php if ($item->num_rows() > 0) { ?>
+                        <button type="button" id="btn_proccess" class="btn btn-flat btn-success pull-right">Process Transfer Stock In</button>
+                    <?php } ?>
                 </div>
                 <div class="box-body table-responsive">
                     <table class="table table-bordered table-striped">
@@ -60,7 +62,7 @@
                                         <td><?= $no++ ?></td>
                                         <td><?= $data->docnum ?></td>
                                         <td><?= $data->barcode ?></td>
-                                        <td><?= $data->item_code ?></td>
+                                        <td><?= $data->item_name  ?></td>
                                         <td><?= $data->qty ?></td>
                                         <td><?= $data->exp_date ?></td>
                                     </tr>
@@ -78,3 +80,29 @@
     </div>
     </div>
 </section>
+<script>
+    $(document).on('click', '#btn_proccess', function() {
+        // alert("proses");
+        simpan_stockin()
+    })
+
+    function simpan_stockin() {
+        $.ajax({
+            type: 'POST',
+            url: '<?= site_url('transfer/proses_simpan_stockin') ?>',
+            data: {
+                'simpan': true,
+            },
+            dataType: 'json',
+
+            success: function(result) {
+                if (result.success == true) {
+                    alert('Data Berhasil disimpan')
+                    window.location.href = "<?=base_url('transfer/data_transfer_in')?>"
+                }else {
+                    alert('Gagal Simpan Data')
+                }
+            }
+        });
+    }
+</script>

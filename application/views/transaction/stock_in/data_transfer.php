@@ -1,8 +1,3 @@
-<?php
-// var_dump($input_search);
-// var_dump($_SESSION);
-// var_dump($_POST);
-?>
 <section class="content-header">
     <h1>
         Stock In
@@ -34,7 +29,7 @@
             </div>
         </div>
     </div>
-    <?php if ($result->kode == 1) { ?>
+    <?php if ($result->kode > 0) { ?>
         <div class="row">
             <div class="col-md-12">
                 <div class="box">

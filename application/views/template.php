@@ -48,19 +48,17 @@
 						<li class="dropdown user user-menu">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 								<img src="<?= base_url() ?>assets/dist/img/user1234.png" class="user-image">
-								<span class="hidden-xs"><?= $this->fungsi->user_login()->username ?></span>
-								<span class="hidden-xs"> / <?= get_counter()->code_store ?></span>
+								<span class="hidden-xs"><?= $this->fungsi->user_login()->name ?></span>
+								<span class="hidden-xs"> / <?= get_counter()->nama_toko ?></span>
 							</a>
 							<ul class="dropdown-menu">
 								<li class="user-header">
 									<img src="<?= base_url() ?>assets/dist/img/user1234.png" class="img-circle">
 									<p><?= $this->fungsi->user_login()->name ?>
-										<small><?= $this->fungsi->user_login()->address ?></small>
 									</p>
 								</li>
 								<li class="user-footer">
 									<div class="pull-left">
-										<a href="#" class="btn btn-default btn-flat">Profile</a>
 									</div>
 									<div class="pull-right">
 										<a href="<?= site_url('auth/logout') ?>" class="btn btn-flat bg-red">Sign out</a>
@@ -115,7 +113,7 @@
 							<li <?= $this->uri->segment(1) == 'report' && $this->uri->segment(2) == 'sale' ? 'class="active"' : '' ?>>
 								<a href="<?= site_url('report/sale') ?>"><i class="fa fa-circle-o"></i> Sales</a>
 							</li>
-							<li <?= $this->uri->segment(1) == 'report' && $this->uri->segment(2) == 'stock' ? 'class="active"' : '' ?>>
+							<li <?= $this->uri->segment(2) == 'stock_detail' ? 'class="active"' : '' ?>>
 								<a href="<?= site_url('stock/stock_detail') ?>"><i class="fa fa-circle-o"></i> Stock Detail</a>
 							</li>
 							<li <?= $this->uri->segment(1) == 'stock' && $this->uri->segment(2) == 'in' ? 'class="active"' : '' ?>>
@@ -127,48 +125,89 @@
 							<li <?= $this->uri->segment(1) == 'upload' ? 'class="active"' : '' ?>>
 								<a href="<?= site_url('upload') ?>"><i class="fa fa-circle-o"></i> Upload Data</a>
 							</li>
-							<li <?= $this->uri->segment(1) == 'sale' ? 'class="active"' : '' ?>>
-								<a href="<?= site_url('sale/print_receipt_today') ?>"><i class="fa fa-circle-o"></i> Print Sales Daily</a>
+							<li <?= $this->uri->segment(2) == 'daily' ? 'class="active"' : '' ?>>
+								<a href="<?= site_url('report/daily')?>">
+									<i class="fa fa-circle-o"></i> Sales Daily
+								</a>
 							</li>
 						</ul>
 					</li>
 					<?php if ($this->fungsi->user_login()->level == 1) { ?>
 						<li class="header">SETTINGS</li>
-						<li>
-							<a href="<?= site_url('item') ?>"><i class="fa fa-circle-o"></i> <span>Items</span></a>
+
+						<li class="treeview <?= $this->uri->segment(1) == 'transfer' ? 'active' : '' ?>">
+							<a href=" #">
+								<i class="fa fa-folder"></i> <span>Transfer Stock</span>
+								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+							</a>
+							<ul class="treeview-menu">
+								<li <?= $this->uri->segment(2) == 'data_transfer_out' || $this->uri->segment(2) == '' ? 'class="active"' : '' ?>>
+									<a href="<?= site_url('transfer/data_transfer_out') ?>"><i class="fa fa-circle-o"></i> <span>Transfer Stock Out</span></a>
+								</li>
+								<li <?= $this->uri->segment(2) == 'data_transfer_in' || $this->uri->segment(2) == 'in' ? 'class="active"' : '' ?>>
+									<a href="<?= site_url('transfer/data_transfer_in') ?>"><i class="fa fa-circle-o"></i> <span>Transfer Stock In</span></a>
+								</li>
+							</ul>
 						</li>
-						<li>
-							<a href="<?= site_url('mypos_api/stock_in') ?>"><i class="fa fa-circle-o"></i> <span>Stock In</span></a>
+
+						<li class="treeview <?= $this->uri->segment(1) == 'produksi' ? 'active' : '' ?>">
+							<a href="#">
+								<i class="fa fa-folder"></i> <span>Produksi</span>
+								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+							</a>
+							<ul class="treeview-menu">
+								<li <?= $this->uri->segment(2) == '' ? 'class="active"' : '' ?>>
+									<a href="<?= site_url('produksi') ?>"><i class="fa fa-circle-o"></i> <span>Produksi (Buat Baru)</span></a>
+								</li>
+								<li <?= $this->uri->segment(2) == 'ready' ? 'class="active"' : '' ?>>
+									<a href="<?= site_url('produksi/ready') ?>"><i class="fa fa-circle-o"></i> <span>Produksi (Item Exists)</span></a>
+								</li>
+							</ul>
 						</li>
-						<li>
-							<a href="<?= site_url('stockout') ?>"><i class="fa fa-circle-o"></i> <span>Stock Out</span></a>
+
+						<li class="treeview">
+							<a href="#">
+								<i class="fa fa-folder"></i> <span>Stock</span>
+								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+							</a>
+							<ul class="treeview-menu">
+								<li>
+									<a href="<?= site_url('item') ?>"><i class="fa fa-circle-o"></i> <span>Data Stock</span></a>
+								</li>
+								<li>
+									<a href="<?= site_url('mypos_api/stock_in') ?>"><i class="fa fa-circle-o"></i> <span>Stock In</span></a>
+								</li>
+								<li>
+									<a href="<?= site_url('stockout') ?>"><i class="fa fa-circle-o"></i> <span>Stock Out</span></a>
+								</li>
+							</ul>
 						</li>
-						<li>
-							<a href="<?= site_url('transfer') ?>"><i class="fa fa-circle-o"></i> <span>Transfer Stock Out</span></a>
-						</li>
-						<li>
-							<a href="<?= site_url('transfer/in') ?>"><i class="fa fa-circle-o"></i> <span>Transfer Stock In</span></a>
-						</li>
-						<li>
-							<a href="<?= site_url('produksi') ?>"><i class="fa fa-circle-o"></i> <span>Produksi (Buat Baru)</span></a>
-						</li>
-						<li>
-							<a href="<?= site_url('produksi/ready') ?>"><i class="fa fa-circle-o"></i> <span>Produksi (Item Exists)</span></a>
-						</li>
-						<li>
-							<a href="<?= site_url('bonus') ?>"><i class="fa fa-circle-o"></i> <span>Setting Bonus</span></a>
-						</li>
-						<li <?= $this->uri->segment(1) == 'user' ? 'class="active"' : '' ?>>
-							<a href="<?= site_url('user') ?>"><i class="fa fa-circle-o"></i> <span>Users</span></a>
-						</li>
-						<!-- <li <?= $this->uri->segment(1) == 'tax' ? 'class="active"' : '' ?>>
-							<a href="<?= site_url('tax') ?>"><i class="fa fa-circle-o"></i> <span>Tax</span></a>
-						</li> -->
-						<li <?= $this->uri->segment(1) == 'toko' ? 'class="active"' : '' ?>>
-							<a href="<?= site_url('toko') ?>"><i class="fa fa-circle-o"></i> <span>Toko</span></a>
-						</li>
-						<li <?= $this->uri->segment(1) == 'type_bayar' ? 'class="active"' : '' ?>>
-							<a href="<?= site_url('payment') ?>"><i class="fa fa-circle-o"></i> <span>Type Bayar</span></a>
+
+						<li class="treeview">
+							<a href="#">
+								<i class="fa fa-folder"></i> <span>Other</span>
+								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+							</a>
+							<ul class="treeview-menu">
+								<li>
+									<a href="<?= site_url('bonus') ?>"><i class="fa fa-circle-o"></i> <span>Setting Bonus</span></a>
+								</li>
+								<li <?= $this->uri->segment(1) == 'user' ? 'class="active"' : '' ?>>
+									<a href="<?= site_url('user') ?>"><i class="fa fa-circle-o"></i> <span>Users</span></a>
+								</li>
+								<li <?= $this->uri->segment(1) == 'tax' ? 'class="active"' : '' ?>>
+									<a href="<?= site_url('tax') ?>"><i class="fa fa-circle-o"></i> <span>Tax</span></a>
+								</li>
+								<li <?= $this->uri->segment(1) == 'toko' ? 'class="active"' : '' ?>>
+									<a href="<?= site_url('toko') ?>"><i class="fa fa-circle-o"></i> <span>Toko</span></a>
+								</li>
+								<li <?= $this->uri->segment(1) == 'type_bayar' ? 'class="active"' : '' ?>>
+									<a href="<?= site_url('payment') ?>"><i class="fa fa-circle-o"></i> <span>Type Bayar</span></a>
+								</li>
+								<li>
+									<a href="<?= site_url('printer') ?>"><i class="fa fa-circle-o"></i> <span>Setting Printer</span></a>
+								</li>
+							</ul>
 						</li>
 					<?php } ?>
 				</ul>

@@ -1,6 +1,6 @@
 <section class="content-header">
     <h1>
-        Transfer Stock Out
+        Form Transfer Stock Out
     </h1>
 </section>
 <section class="content">
@@ -188,15 +188,13 @@
             data: {
                 'proccess_transfer': true,
                 'whs_code': gudang,
-                // 'qty_item_produksi': params[1],
-                // 'exp_date': params[2]
             },
             dataType: 'json',
 
             success: function(result) {
                 if (result.success == true && result.uploaded == true) {
                     alert('Item Transfer berhasil disimpan dan diupload');
-                    window.location.href = '<?= base_url('transfer') ?>';
+                    window.location.href = '<?= base_url('transfer/data_transfer_out') ?>';
                 } else if (result.success == false && result.cart == 0) {
                     alert('Item Tranfser Kosong');
                 } else if(result.success == false && result.uploaded == false){

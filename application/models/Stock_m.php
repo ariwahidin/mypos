@@ -143,11 +143,9 @@ class Stock_m extends CI_Model
         $params = array();
         for ($i = 0; $i < count($post['item_code']); $i++) {
             $item_code = $post['item_code'][$i];
-            $expired_date = $post['exp_date'][$i];
+            $expired_date = date('Y-m-d', strtotime($post['exp_date'][$i]));
             $qty = $post['qty_ed'][$i];
             $params = [
-                // 'docnum' => $post['docnum'][$i],
-                // 'whs_code' => $post['whs_code'][$i],
                 'item_id' => $this->db->query("select item_id from p_item where item_code = '$item_code'")->row()->item_id,
                 'item_code' => $item_code,
                 'barcode' => $post['barcode'][$i],
@@ -155,6 +153,7 @@ class Stock_m extends CI_Model
                 'exp_date' => $expired_date,
             ];
             $cek_expired_date_is_same = $this->db->query("select * from p_item_detail where item_code = '$item_code' and exp_date = '$expired_date'");
+
             if ($cek_expired_date_is_same->num_rows() > 0) {
                 $this->db->query("update p_item_detail set qty = qty + $qty where item_code = '$item_code' and exp_date ='$expired_date'");
             } else {

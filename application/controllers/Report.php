@@ -10,16 +10,6 @@ class Report extends CI_Controller
         $this->load->model(['sale_m', 'item_m', 'supplier_m']);
     }
 
-    // public function stock(){
-    //     $item = $this->item_m->get();
-    //     $supplier = $this->supplier_m->get()->result();
-    //     $data = array(
-    //         'item' =>$item,
-    //         'supplier' => $supplier,
-    //     );
-    //     $this->template->load('template','report/stock_data',$data);
-    // }
-
     public function sale()
     {
         $this->load->model('customer_m');
@@ -136,12 +126,13 @@ class Report extends CI_Controller
         echo json_encode($detail);
     }
 
-    // public function detail()
-    // {
-    //     $detail = $this->sale_m->get_detail_penjualan();
-    //     $data = array(
-    //         'detail' => $detail,
-    //     );
-    //     $this->load->view('report/detail', $data);
-    // }
+    public function daily(){
+        $daily = $this->sale_m->get_sales_daily();
+        $sum_daily = $this->sale_m->get_sum_daily();
+        $data = array(
+            'daily' => $daily,
+            'sum' => $sum_daily
+        );
+        $this->template->load('template', 'report/sales_daily', $data);
+    }
 }

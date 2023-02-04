@@ -220,7 +220,6 @@ class Stock extends CI_Controller
             $this->session->set_flashdata('error', 'Stock In Gagal, Barcode ' . $barcode . ' Tidak Terdaftar Di Toko');
         } else {
             $this->stock_m->add_stock_in($post);
-            // $this->stock_m->update_stock_in($post);
             $this->stock_m->simpan_item_detail($post);
             if ($this->db->affected_rows() > 0) {
                 $this->session->set_flashdata('success', 'Stock In Data Berhasil Disimpan');

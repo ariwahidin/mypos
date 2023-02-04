@@ -32,9 +32,8 @@ class Mypos_Api extends CI_Controller
 
     function stock_in()
     {
-        // var_dump($_POST);
-        // var_dump($_SESSION);
         $whs_code = $this->db->query("select whs_code from t_toko where is_active = 'y'")->row()->whs_code;
+
         if (!empty($_POST)) {
             $post = array(
                 'whs_code' => $_POST['whs_code'],
@@ -52,24 +51,34 @@ class Mypos_Api extends CI_Controller
             );
         }
 
-        $options = array(
-            'http' => array(
-                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method'  => 'POST',
-                'content' => http_build_query($post),
-            ),
-        );
+        $url = my_api() . 'item/get_item_transfer';
+        $client =  curl_init($url);
 
-        $context  = stream_context_create($options);
-        $response = file_get_contents(my_api().'item/get_item_transfer', false, $context);
+        curl_setopt($client, CURLOPT_POST, 1);
+        curl_setopt($client, CURLOPT_POSTFIELDS, http_build_query($post));
+        curl_setopt($client, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($client, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/x-www-form-urlencoded'
+        ));
+        $response = curl_exec($client);
+        $status_code = curl_getinfo($client, CURLINFO_HTTP_CODE);
+
+
         $result = json_decode($response);
 
-        $data = array(
-            'whs_code' => $whs_code,
-            'result' => $result,
-            'input_search' => $post
-        );
+        if ($status_code == 200) {
 
-        $this->template->load('template', 'transaction/stock_in/data_transfer', $data);
+            $data = array(
+                'whs_code' => $whs_code,
+                'result' => $result,
+                'input_search' => $post
+            );
+            $this->template->load('template', 'transaction/stock_in/data_transfer', $data);
+        } else {
+            $data = array(
+                'status_code' => $status_code
+            );
+            $this->template->load('template', 'error_page', $data);
+        }
     }
 }

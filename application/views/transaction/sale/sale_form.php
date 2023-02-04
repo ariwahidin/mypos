@@ -1114,7 +1114,7 @@
                                     denyButtonText: 'Back',
                                 }).then((result) => {
                                     if (result.isConfirmed) {
-                                        window.open('<?= site_url('sale/cetak/') ?>' + hasil.sale_id, '_self')
+                                        window.open('<?= site_url('cetak/cetakStruk/') ?>' + hasil.sale_id, '_self')
                                     } else if (result.isDenied) {
                                         location.href = '<?= site_url('sale') ?>'
                                     }

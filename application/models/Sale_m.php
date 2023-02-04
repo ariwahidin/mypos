@@ -185,15 +185,22 @@ class Sale_m extends CI_Model
 
     public function get_sale($id = null)
     {
-        $this->db->select('*,customer.name as customer_name, user.username as user_name, t_sale.created as sale_created');
-        $this->db->from('t_sale');
-        $this->db->join('customer', 't_sale.customer_id = customer.customer_id', 'left');
-        $this->db->join('user', 't_sale.user_id = user.user_id');
+        $sql = "select t_sale.*,customer.name as customer_name,
+        sum(tsd.qty) as total_item, tb.type_bayar as type_pembayaran,
+        user.username as user_name, user.name as nama_user, t_sale.created as sale_created
+        from t_sale
+        left join customer on t_sale.customer_id = customer.customer_id
+        inner join user on t_sale.user_id = user.user_id
+        inner join type_bayar tb on tb.id = t_sale.type_bayar
+        inner join t_sale_detail tsd on tsd.sale_id = t_sale.sale_id";
+
         if ($id != null) {
-            $this->db->where('sale_id', $id);
+            $sql .= " where t_sale.sale_id = '$id'";
         }
-        $this->db->order_by('date', 'desc');
-        $query = $this->db->get();
+
+        $sql .= " group by sale_id";
+        $sql .= " order by date desc";
+        $query = $this->db->query($sql);
         return $query;
     }
 
@@ -247,7 +254,7 @@ class Sale_m extends CI_Model
     public function get_sales_today_per_user(){
         $user_id = $this->session->userdata('userid');
         $sql = "select nama_toko, toko_cabang, item_name, price, sum(qty) as qty, sum(total_price) total_price, sum(total) as total, sum(discount_item) as discount_item, 
-        sum(discount_item) / sum(total) * 100 as discount_percent, avg(xx.total_service) as total_service, avg(xx.total_discount) as total_discount,
+        sum(discount_item) / sum(total_price) * 100 as discount_percent, avg(xx.total_service) as total_service, avg(xx.total_discount) as total_discount,
         ss.tanggal_transaksi, username, ss.user_id
         from
         (
@@ -369,6 +376,33 @@ class Sale_m extends CI_Model
         $date1 = $_POST['date1'];
         $date2 = date('Y-m-d', strtotime($_POST['date2'] . "+1 days"));
         $sql = "select * from t_sale where created between '$date1' and '$date2'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function get_sales_daily(){
+        $user_id = $this->session->userdata('userid');
+        $sql = "select ss.barcode, ss.name as item_name, sum(ss.qty) as qty , sum(ss.total) as total, ss.tanggal
+        from
+        (select t1.sale_id, t2.barcode, t2.name, t1.qty, t1.total, date(t3.created) as tanggal  
+        from t_sale_detail t1
+        inner join p_item t2 on t1.item_id = t2.item_id 
+        inner join t_sale t3 on t1.sale_id = t3.sale_id 
+        where date(t3.created) = date(now())
+        and t3.user_id = '$user_id'
+        )ss
+        group by ss.barcode";
+
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function get_sum_daily(){
+        $user_id = $this->session->userdata('userid');
+        $sql = "select sum(discount) as total_discount, sum(service) as total_service, user_id, date(created) as tanggal 
+        from t_sale t1
+        where date(t1.created) = date(now()) and user_id = '$user_id'
+        group by date(t1.created)"; 
         $query = $this->db->query($sql);
         return $query;
     }
