@@ -47,24 +47,6 @@ class Item extends CI_Controller
     public function index()
     {
 
-        // $item = new stdClass();
-        // $item->item_code = null;
-        // $item->item_id = null;
-        // $item->barcode = null;
-        // $item->name = null;
-        // $item->price = null;
-        // $item->category_id = null;
-        // $query_category = $this->category_m->get();
-        // $query_unit = $this->unit_m->get();
-
-        // $unit[null] = '- Pilih -';
-        // foreach ($query_unit->result() as $unt) {
-        //     $unit[$unt->unit_id] = $unt->name;
-        // }
-
-
-        // $tax = $this->db->query("SELECT * FROM tax");
-
         $data =  array(
             'item' => $this->item_m->get_item(),
         );

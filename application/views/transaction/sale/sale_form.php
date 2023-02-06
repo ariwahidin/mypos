@@ -1114,12 +1114,18 @@
                                     denyButtonText: 'Back',
                                 }).then((result) => {
                                     if (result.isConfirmed) {
-                                        window.open('<?= site_url('cetak/cetakStruk/') ?>' + hasil.sale_id, '_self')
+                                        // window.open('<?= site_url('cetak/cetakStruk/') ?>' + hasil.sale_id, '_self')
+                                        $.ajax({
+                                            url: '<?= site_url('cetak/cetakStruk/') ?>'+hasil.sale_id,
+                                            type: 'GET',
+                                        }).done(function() {
+                                            location.href = '<?= site_url('sale/prepare') ?>'
+                                        })
                                     } else if (result.isDenied) {
-                                        location.href = '<?= site_url('sale') ?>'
+                                        location.href = '<?= site_url('sale/prepare') ?>'
                                     }
                                     if (result.isDismissed) {
-                                        location.href = '<?= site_url('sale') ?>'
+                                        location.href = '<?= site_url('sale/prepare') ?>'
                                     }
                                 })
                             } else {

@@ -202,6 +202,7 @@ class Item_m extends CI_Model
             'harga_bersih' => $harga_bersih
         );
         $query = $this->db->get_where('p_item', $params);
+        var_dump($this->db->last_query());
         return $query;
     }
 
@@ -248,5 +249,33 @@ class Item_m extends CI_Model
         SET stock = stock - '$qty', updated = '$date', updated_info = 'stock_out' 
         WHERE item_id = '$id'";
         $this->db->query($sql);
+    }
+
+
+    public function singkronisasi()
+    {
+        $item = $this->db->query("select * from t_cart_sync_item");
+        if ($item->num_rows() > 0) {
+            foreach ($item->result() as $data) {
+                $cek_item_code = $this->db->query("select * from p_item where item_code = '$data->item_code'");
+                if ($cek_item_code->num_rows() > 0) {
+                    $sql_update = "update p_item set price = '$data->harga_jual', harga_jual = '$data->harga_jual', harga_bersih = '$data->harga_bersih' where item_code = '$data->item_code'";
+                    $this->db->query($sql_update);
+                } else {
+                    $params =  array(
+                        'item_code' => $data->item_code,
+                        'barcode' => $data->barcode,
+                        'name' => $data->item_name,
+                        'item_name_toko' => $data->item_name,
+                        'category_id' => '15',
+                        'unit_id' => '5',
+                        'price' => $data->harga_jual,
+                        'harga_jual' => $data->harga_jual,
+                        'harga_bersih' => $data->harga_bersih,
+                    );
+                    $this->db->insert('p_item', $params);
+                }
+            }
+        }
     }
 }

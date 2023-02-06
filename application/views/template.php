@@ -126,7 +126,7 @@
 								<a href="<?= site_url('upload') ?>"><i class="fa fa-circle-o"></i> Upload Data</a>
 							</li>
 							<li <?= $this->uri->segment(2) == 'daily' ? 'class="active"' : '' ?>>
-								<a href="<?= site_url('report/daily')?>">
+								<a href="<?= site_url('report/daily') ?>">
 									<i class="fa fa-circle-o"></i> Sales Daily
 								</a>
 							</li>
@@ -165,25 +165,25 @@
 							</ul>
 						</li>
 
-						<li class="treeview">
+						<li class="treeview <?= $this->uri->segment(1) == 'item' || $this->uri->segment(1) == 'mypos_api' || $this->uri->segment(1) == 'stockout' ? 'active' : '' ?>">
 							<a href="#">
 								<i class="fa fa-folder"></i> <span>Stock</span>
 								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
 							</a>
 							<ul class="treeview-menu">
-								<li>
+								<li class="<?= $this->uri->segment(1) == 'item' ? 'active' : '' ?>">
 									<a href="<?= site_url('item') ?>"><i class="fa fa-circle-o"></i> <span>Data Stock</span></a>
 								</li>
-								<li>
+								<li class="<?= $this->uri->segment(2) == 'stock_in' ? 'active' : '' ?>">
 									<a href="<?= site_url('mypos_api/stock_in') ?>"><i class="fa fa-circle-o"></i> <span>Stock In</span></a>
 								</li>
-								<li>
+								<li class="<?= $this->uri->segment(1) == 'stockout' ? 'active' : '' ?>">
 									<a href="<?= site_url('stockout') ?>"><i class="fa fa-circle-o"></i> <span>Stock Out</span></a>
 								</li>
 							</ul>
 						</li>
 
-						<li class="treeview">
+						<li class="treeview <?= $this->uri->segment(1) == 'bonus' || $this->uri->segment(1) == 'user' || $this->uri->segment(1) == 'tax' || $this->uri->segment(1) == 'toko' || $this->uri->segment(1) == 'payment' || $this->uri->segment(1) == 'printer' ? 'active' : '' ?>">
 							<a href="#">
 								<i class="fa fa-folder"></i> <span>Other</span>
 								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>

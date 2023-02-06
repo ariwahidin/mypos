@@ -18,6 +18,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Nama Printer</th>
+                                <th>Jumlah Print</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -28,12 +29,18 @@
                                     <tr>
                                         <td><?= $no++ ?></td>
                                         <td>
-                                            <input type="text" class="form-control" name="printer_name" value="<?= $data->printer_name ?>" required>
+                                            <input type="text" class="form-control" id="printer_name" name="printer_name" value="<?= $data->printer_name ?>" required readonly>
                                             <input type="hidden" name="id" value="<?= $data->id ?>">
                                         </td>
+                                        <td width="20%">
+                                            <input type="number" class="form-control" id="jumlah_print" name="jumlah_print" value="<?= $data->jumlah_print ?>" required readonly>
+                                        </td>
                                         <td>
-                                            <button type="submit" class="btn btn-primary btn-sm" id="btn_edit" data-id="<?= $data->id ?>">Edit</button>
-                                            <a href="<?=base_url('cetak')?>" class="btn btn-info btn-sm">Test Print</a>
+                                            <button type="button" class="btn btn-primary btn-sm" id="btn-edit">Edit</button>
+                                            <button type="submit" class="btn btn-success btn-sm" id="btn_save" data-id="<?= $data->id ?>">
+                                                Save
+                                            </button>
+                                            <button type="button" class="btn btn-info btn-info btn-sm" id="btn-test">Test Print</button>
                                         </td>
                                     </tr>
                                 </form>
@@ -45,3 +52,19 @@
         </div>
     </div>
 </section>
+<script>
+    $(document).on('click', '#btn-edit', function() {
+        $('#printer_name').removeAttr('readonly')
+        $('#jumlah_print').removeAttr('readonly')
+    })
+
+    $(document).on('click', '#btn-test', function() {
+        $.ajax({
+            type: "GET",
+            url: "<?= base_url('cetak') ?>",
+            success: function(data) {
+                // do something with the returned data
+            }
+        });
+    })
+</script>

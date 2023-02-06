@@ -9,16 +9,14 @@
  * This software is distributed under the terms of the MIT license. See LICENSE.md
  * for details.
  */
+namespace Escpos\CapabilityProfiles;
 
-namespace Escpos;
+use Escpos\CapabilityProfile;
 
-use Escpos\EscposImage;
-
-/**
- * Implementation of EscposImage using only native PHP.
- * TODO: wbmp, pbm, bmp files.
- */
-class NativeEscposImage extends EscposImage
+class SimpleCapabilityProfile
 {
-
+    public static function getInstance()
+    {
+        return CapabilityProfile::load('simple');
+    }
 }

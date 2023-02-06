@@ -12,6 +12,9 @@ class Warehouse extends CI_Controller
 
     public function get_harga_item()
     {
+        $user_id = $this->session->userdata('userid');
+        $delete_cart_sync = $this->db->query("delete from t_cart_sync_item where user_id = '$user_id'");
+
         $toko = $this->db->query("SELECT * FROM t_toko WHERE is_active = 'y'")->row();
         $post_parameter = array(
             'kode_seller' => $toko->kode_seller,
@@ -21,27 +24,39 @@ class Warehouse extends CI_Controller
         );
         $post_parameter['store_name'] = $toko->nama_toko;
 
-        // var_dump($post_parameter);
-        $curl_handle = curl_init(my_api().'item/get_item_harga');
+        $curl_handle = curl_init(my_api() . 'item/get_item_harga');
         curl_setopt($curl_handle, CURLOPT_POSTFIELDS, $post_parameter);
         curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
 
         $curl_response = curl_exec($curl_handle);
         curl_close($curl_handle);
-        // var_dump($curl_response);
-        $data = array(
-            'item_harga' => json_decode($curl_response),
-            'toko' => $post_parameter,
-        );
-
-        $this->template->load('template', 'warehouse/item', $data);
-
-        // var_dump(json_decode($curl_response));
+        $response = json_decode($curl_response);
+        if (count($response->data) > 0) {
+            $row = array();
+            foreach ($response->data as $it) {
+                $params = array(
+                    'whs_code' => $it->whs_code,
+                    'item_code' => $it->item_code,
+                    'barcode' => $it->barcode,
+                    'item_name' => $it->item_name,
+                    'brand_code' => $it->brand_code,
+                    'harga_jual' => $it->harga_jual,
+                    'harga_bersih' => $it->harga_bersih,
+                    'harga_ppn' => $it->harga_ppn,
+                    'percent_ppn' => $it->percent_ppn,
+                    'user_id' => $this->session->userdata('userid')
+                );
+                array_push($row, $params);
+            }
+            $this->db->insert_batch('t_cart_sync_item ', $row);
+            $singkronisasi = $this->item_m->singkronisasi();
+        }
+        redirect('item');
     }
 
     public function item_harga()
     {
-        $url = my_api()."item/item_harga";
+        $url = my_api() . "item/item_harga";
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -70,6 +85,8 @@ class Warehouse extends CI_Controller
     public function add_all_master_item_pos()
     {
         $post = $_POST;
+        var_dump($post);
+        die;
         // $row_before = $this->db->query("SELECT * FROM p_item")->num_rows();
         $row = [];
         $affected_rows = 0;
@@ -107,21 +124,14 @@ class Warehouse extends CI_Controller
 
         $this->item_m->add_all_item($row);
 
-        // var_dump($this->db->affected_rows());
-        // var_dump($affected_rows);
-        // die;
-
         $affected_rows = $affected_rows + $this->db->affected_rows();
 
-        // $row_after = $this->db->query("SELECT * FROM p_item")->num_rows();
-        // $row_inserted = $row_after - $row_before;
-
-        if ($affected_rows > 0) {
-            $this->session->set_flashdata('success', 'Berhasil disesuaikan');
-        } else {
-            $this->session->set_flashdata('error', 'Tidak ada yang disesuaikan');
-        }
-        redirect('Warehouse/get_harga_item');
+        // if ($affected_rows > 0) {
+        //     $this->session->set_flashdata('success', 'Berhasil disesuaikan');
+        // } else {
+        //     $this->session->set_flashdata('error', 'Tidak ada yang disesuaikan');
+        // }
+        // redirect('Warehouse/get_harga_item');
     }
 
     public function add_master_item_pos()
@@ -160,7 +170,7 @@ class Warehouse extends CI_Controller
 
     public function setting_harga()
     {
-        $url = my_api()."item/get_harga";
+        $url = my_api() . "item/get_harga";
         $toko = $this->db->query("SELECT * FROM t_toko WHERE is_active = 'y'")->row();
         $post = array(
             'kode_seller' => $toko->kode_seller,
@@ -189,7 +199,7 @@ class Warehouse extends CI_Controller
     {
         // var_dump($_SESSION);
         // die;
-        $url = my_api()."item/update_harga_item";
+        $url = my_api() . "item/update_harga_item";
         $_POST['username'] = $_SESSION['username'];
         $_POST['date'] = international_date_time();
         $options = array(
@@ -226,7 +236,7 @@ class Warehouse extends CI_Controller
     public function get_master_item()
     {
 
-        $curl_handle = curl_init(my_api().'item/get_master_item');
+        $curl_handle = curl_init(my_api() . 'item/get_master_item');
         curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
         $curl_response = curl_exec($curl_handle);
         curl_close($curl_handle);
@@ -253,7 +263,7 @@ class Warehouse extends CI_Controller
             'created_date' => international_date_time(),
             'created_by' => $this->session->userdata('username'),
         );
-        $curl_handle = curl_init(my_api().'item/add_new_item_to_counter');
+        $curl_handle = curl_init(my_api() . 'item/add_new_item_to_counter');
         curl_setopt($curl_handle, CURLOPT_POSTFIELDS, $post_parameter);
         curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
         $curl_response = curl_exec($curl_handle);
@@ -274,7 +284,7 @@ class Warehouse extends CI_Controller
 
     public function ajax_setting_harga()
     {
-        $url = my_api()."item/get_harga";
+        $url = my_api() . "item/get_harga";
         $toko = $this->db->query("SELECT * FROM t_toko WHERE is_active = 'y'")->row();
         $post = array(
             'kode_seller' => $toko->kode_seller,

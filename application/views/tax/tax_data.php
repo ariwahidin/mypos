@@ -12,39 +12,37 @@
 <section class="content">
     <?php $this->view('messages') ?>
     <!-- <div id="flash" data-flash="<?= $this->session->flashdata('success') ?>"></div> -->
-    <div class="box">
-        <div class="box-header">
-            <h3 class="box-title">Tax</h3>
-        </div>
-        <div class="box-body table-responsive">
-            <table class="table table-bordered table-striped" id="table1">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Tax</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php $no = 1;
-                    foreach ($tax->result() as $data) { ?>
-                    <?php $data->tax = (float)$data->tax * 100 ?>
-                        <td><?= $no++ ?></td>
-                        <td><?= $data->tax ?></td>
-                        <td>
-                            <button class="btn btn-flat btn-primary"
-                            id="edit_tax"
-                            data-toggle="modal"
-                            data-target="#modal-edit-tax"
-                            data-tax="<?=$data->tax?>"
-                            data-tax_id="<?=$data->id?>"
-                            >
-                                Update
-                            </button>
-                        </td>
-                    <?php } ?>
-                </tbody>
-            </table>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Tax</h3>
+                </div>
+                <div class="box-body table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Tax (%)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $no = 1;
+                            foreach ($tax->result() as $data) { ?>
+                                <?php $data->tax = (float)$data->tax * 100 ?>
+                                <td><?= $no++ ?></td>
+                                <td><?= $data->tax ?></td>
+                                <td>
+                                    <button class="btn btn-flat btn-primary" id="edit_tax" data-toggle="modal" data-target="#modal-edit-tax" data-tax="<?= $data->tax ?>" data-tax_id="<?= $data->id ?>">
+                                        Update
+                                    </button>
+                                </td>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </section>

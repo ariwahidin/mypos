@@ -15,7 +15,7 @@
         <div class="box-header">
             <!-- <h3 class="box-title">Data Product Items</h3> -->
             <div class="pull-right">
-                <a class="btn btn-flat btn-primary" href="<?= site_url('Warehouse/get_harga_item') ?>">Check Item PK</a>
+                <a class="btn btn-flat btn-primary" href="<?= site_url('Warehouse/get_harga_item') ?>">Refresh</a>
                 <!-- <button class="btn btn-flat btn-success" data-toggle="modal" data-target="#modal-tambah-item">Tambah Item Baru</button> -->
             </div>
         </div>

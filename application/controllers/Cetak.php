@@ -1,10 +1,4 @@
 <?php
-
-use Mike42\Escpos\CapabilityProfile;
-use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
-use Mike42\Escpos\Printer;
-use Mike42\Escpos\EscposImage;
-
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Cetak extends CI_Controller
@@ -15,66 +9,65 @@ class Cetak extends CI_Controller
         parent::__construct();
         check_not_login();
         $this->load->model(['sale_m']);
+        $this->load->library('escpos');
     }
 
     function index()
     {
-        include APPPATH . 'third_party/Mike42/Escpos/PrintConnectors/WindowsPrintConnector.php';
-        include APPPATH . 'third_party/Mike42/Escpos/CapabilityProfile.php';
-        include APPPATH . 'third_party/Mike42/Escpos/Printer.php';
-        include APPPATH . 'third_party/Mike42/Escpos/EscposImage.php';
+        $profile = Escpos\CapabilityProfile::load("simple");
+        $connector = new Escpos\PrintConnectors\WindowsPrintConnector($this->get_printer()->row()->printer_name);
+        $printer = new Escpos\Printer($connector, $profile);
+        $img = Escpos\EscposImage::load("assets/dist/img/DgChocoGallerys.png", false);
+        $jumlah_print = $this->get_printer()->row()->jumlah_print;
 
-        $profile = CapabilityProfile::load("simple");
-        $connector = new WindowsPrintConnector($this->get_printer());
-        $printer = new Printer($connector, $profile);
+        $printer->initialize();
 
-        $img = EscposImage::load("assets/dist/img/DgChocoGallerys.png", false);
-        $printer->setJustification(Printer::JUSTIFY_CENTER);
-        $printer->bitImage($img, Printer::IMG_DOUBLE_WIDTH | Printer::IMG_DOUBLE_HEIGHT | Printer::JUSTIFY_CENTER);
-        $printer->setJustification(); // Reset
+        for ($i = 0; $i < $jumlah_print; $i++) {
+            $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
+            $printer->bitImage($img, Escpos\Printer::IMG_DOUBLE_WIDTH | Escpos\Printer::IMG_DOUBLE_HEIGHT | Escpos\Printer::JUSTIFY_CENTER);
+            $printer->setJustification(); // Reset
 
+            $printer->text("\n");
+            $printer->text("MALL KELAPA GADING\n");
+            $printer->text("DATE    : " . date('d-m-Y h:i:s') . "\n");
+            $printer->text("ORDER   : F23-2302230001" . "\n");
+            $printer->text("CASHIER : Lina" . "\n");
+            $printer->text("----------------------------------------------\n");
 
-        $printer->text("\n");
-        $printer->text("MALL KELAPA GADING\n");
-        $printer->text("DATE    : " . date('d-m-Y h:i:s') . "\n");
-        $printer->text("ORDER   : F23-2302230001" . "\n");
-        $printer->text("CASHIER : Lina" . "\n");
-        $printer->text("----------------------------------------------\n");
+            $printer->text("TWN - Seasonal (English 50g+WNL 100g)#6x150g" . "\n");
+            $printer->text($this->buatBaris3Kolom("2 PCS", "200.000", "400.000"));
+            $printer->text($this->buatBaris3Kolom("Disc.", "25%", "-100.000"));
+            $printer->text("\n");
 
-        $printer->text("TWN - Seasonal (English 50g+WNL 100g)#6x150g" . "\n");
-        $printer->text($this->buatBaris3Kolom("2 PCS", "200.000", "400.000"));
-        $printer->text($this->buatBaris3Kolom("Disc.", "25%", "-100.000"));
-        $printer->text("\n");
+            $printer->text($this->buatBaris1Kolom("TWN - Seasonal Breakfast Box 714gr # 12 x (50gr+380gr+284gr)"));
+            $printer->text($this->buatBaris3Kolom("2 PCS", "100.000", "200.000"));
+            $printer->text($this->buatBaris3Kolom("Disc.", "25%", "-50.000"));
+            $printer->text("\n");
 
-        $printer->text($this->buatBaris1Kolom("TWN - Seasonal Breakfast Box 714gr # 12 x (50gr+380gr+284gr)"));
-        $printer->text($this->buatBaris3Kolom("2 PCS", "100.000", "200.000"));
-        $printer->text($this->buatBaris3Kolom("Disc.", "25%", "-50.000"));
-        $printer->text("\n");
+            $printer->text($this->buatBaris1Kolom("TWN - Seasonal Breakfast Box 714gr # 12 x (50gr+380gr+284gr)"));
+            $printer->text($this->buatBaris3Kolom("2 PCS", "200.000", "400.000"));
+            $printer->text("\n");
 
-        $printer->text($this->buatBaris1Kolom("TWN - Seasonal Breakfast Box 714gr # 12 x (50gr+380gr+284gr)"));
-        $printer->text($this->buatBaris3Kolom("2 PCS", "200.000", "400.000"));
-        $printer->text("\n");
+            $printer->text($this->buatBaris3Kolom("Service", "", "0"));
+            $printer->text("----------------------------------------------\n");
 
-        $printer->text($this->buatBaris3Kolom("Service", "", "0"));
-        $printer->text("----------------------------------------------\n");
+            $printer->text($this->buatBaris3Kolom("Total", "5 PCS", "450.000"));
+            $printer->text($this->buatBaris3Kolom("Disc Sale", "", "0"));
+            $printer->text($this->buatBaris3Kolom("Grand Total", "", "450.000"));
 
-        $printer->text($this->buatBaris3Kolom("Total", "5 PCS", "450.000"));
-        $printer->text($this->buatBaris3Kolom("Disc Sale", "", "0"));
-        $printer->text($this->buatBaris3Kolom("Grand Total", "", "450.000"));
+            $printer->text("----------------------------------------------\n");
 
-        $printer->text("----------------------------------------------\n");
+            $printer->text($this->buatBaris3Kolom("Type Bayar", "", "Cash"));
+            $printer->text($this->buatBaris3Kolom("Total Bayar", "", "500.000"));
+            $printer->text($this->buatBaris3Kolom("Change", "", "50.000"));
 
-        $printer->text($this->buatBaris3Kolom("Type Bayar", "", "Cash"));
-        $printer->text($this->buatBaris3Kolom("Total Bayar", "", "500.000"));
-        $printer->text($this->buatBaris3Kolom("Change", "", "50.000"));
+            $printer->text("----------------------------------------------\n");
+            $printer->text("                   Thank You                  \n");
+            $printer->text("                  Test Print                  \n");
 
-        $printer->text("----------------------------------------------\n");
-        $printer->text("                   Thank You                  \n");
-        $printer->text("                  Test Print                  \n");
-
-        $printer->feed(2);
-        $printer->cut();
-
+            $printer->feed(2);
+            $printer->cut();
+        }
 
         $printer->close();
         redirect('printer');
@@ -82,31 +75,24 @@ class Cetak extends CI_Controller
 
     function cetakStruk($id)
     {
-        // $id = 169;
         $id_toko = $this->db->query("SELECT id_toko FROM t_sale WHERE sale_id = '$id'")->row()->id_toko;
         $toko = $this->db->query("SELECT * FROM t_toko WHERE id = '$id_toko'")->row();
         $sale = $this->sale_m->get_sale($id)->row();
         $sale_detail = $this->sale_m->get_sale_detail($id)->result();
 
-        var_dump($toko);
-        var_dump($sale);
-        var_dump($sale_detail);
-
-        include APPPATH . 'third_party/Mike42/Escpos/PrintConnectors/WindowsPrintConnector.php';
-        include APPPATH . 'third_party/Mike42/Escpos/CapabilityProfile.php';
-        include APPPATH . 'third_party/Mike42/Escpos/Printer.php';
-        include APPPATH . 'third_party/Mike42/Escpos/EscposImage.php';
-
-        $profile = CapabilityProfile::load("simple");
-        $connector = new WindowsPrintConnector($this->get_printer());
-        $printer = new Printer($connector, $profile);
-
-        for ($i = 0; $i < 1; $i++) {
+        $profile = Escpos\CapabilityProfile::load("simple");
+        $connector = new Escpos\PrintConnectors\WindowsPrintConnector($this->get_printer()->row()->printer_name);
+        $printer = new Escpos\Printer($connector, $profile);
+        $img = Escpos\EscposImage::load("assets/dist/img/DgChocoGallerys.png", false);
+        $jumlah_print = $this->get_printer()->row()->jumlah_print;
 
 
-            $img = EscposImage::load("assets/dist/img/DgChocoGallerys.png", false);
-            $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->bitImage($img, Printer::IMG_DOUBLE_WIDTH | Printer::IMG_DOUBLE_HEIGHT | Printer::JUSTIFY_CENTER);
+        $printer->initialize();
+
+        for ($i = 0; $i < $jumlah_print; $i++) {
+
+            $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
+            $printer->bitImage($img, Escpos\Printer::IMG_DOUBLE_WIDTH | Escpos\Printer::IMG_DOUBLE_HEIGHT | Escpos\Printer::JUSTIFY_CENTER);
             $printer->setJustification(); // Reset
             $printer->text("\n");
 
@@ -144,24 +130,23 @@ class Cetak extends CI_Controller
             $printer->text($this->buatBaris3Kolom("Type Bayar", "", $sale->type_pembayaran));
             $printer->text($this->buatBaris3Kolom("Total Bayar", "", number_format($sale->cash)));
             $printer->text($this->buatBaris3Kolom("Change", "", number_format($sale->remaining)));
+            $printer->text("Harga Sudah Termasuk PPN\n");
 
             $printer->text("----------------------------------------------\n");
             $printer->text("                   Thank You                  \n");
-            
 
             $printer->feed(2);
             $printer->cut();
         }
 
-
         $printer->close();
-        redirect('sale');
+        redirect(base_url('sale'));
     }
 
     function get_printer()
     {
-        $query = $this->db->query("select printer_name from tb_printer");
-        return $query->row()->printer_name;
+        $query = $this->db->query("select * from tb_printer");
+        return $query;
     }
 
     function buatBaris1Kolom($kolom1)

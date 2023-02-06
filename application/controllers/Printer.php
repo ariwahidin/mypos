@@ -16,7 +16,12 @@ class Printer extends CI_Controller
             // var_dump($_POST);
             $id = $_POST['id'];
             $printer_name = $_POST['printer_name'];
-            $this->db->query("update tb_printer set printer_name = '$printer_name' where id = '$id'");
+            $jumlah_print = $_POST['jumlah_print'];
+            $this->db->query("update tb_printer set printer_name = '$printer_name', jumlah_print = '$jumlah_print' where id = '$id'");
+        }
+
+        if($this->db->affected_rows() > 0){
+            $this->session->set_flashdata('success','Data berhasil disimpan');
         }
 
         $printer = $this->db->query("select * from tb_printer");

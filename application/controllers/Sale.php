@@ -13,7 +13,8 @@ class Sale extends CI_Controller
 
 	public function index()
 	{
-		// $delete_cart_sale = $this->db->query("delete from t_cart");
+		$user_id = $this->session->userdata('userid');
+		$delete_cart_sale = $this->db->query("delete from t_cart where user_id = '$user_id'");
 		$customer = $this->customer_m->get()->result();
 		$item = $this->sale_m->get_item_detail()->result();
 		$cart = $this->sale_m->get_cart();
@@ -29,6 +30,10 @@ class Sale extends CI_Controller
 		);
 		// var_dump($this->db->error());
 		$this->template->load('template', 'transaction/sale/sale_form', $data);
+	}
+
+	public function prepare(){
+		$this->template->load('template', 'transaction/sale/prepare');
 	}
 
 	function check_event()

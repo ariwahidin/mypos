@@ -14,19 +14,18 @@
     <div class="box">
         <div class="box-header">
             <h3 class="box-title">Toko</h3>
-            <button class="btn btn-flat btn-primary pull-right" data-toggle="modal" data-target="#modal-tambah-toko">
+            <!-- <button class="btn btn-flat btn-primary pull-right" data-toggle="modal" data-target="#modal-tambah-toko">
                 Tambah toko baru
             </button>
             <button class="btn btn-flat btn-success pull-right" data-toggle="modal" data-target="#modal-pilih-toko" style="margin-right:5px;">
                 Pilih toko
-            </button>
+            </button> -->
         </div>
         <div class="box-body table-responsive">
             <table class="table table-bordered table-striped" id="table1">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Store ID</th>
                         <th>Kode Store</th>
                         <th>Nama Toko</th>
                         <th>Cabang</th>
@@ -39,7 +38,6 @@
                     foreach ($toko->result() as $tk => $data) { ?>
                         <tr>
                             <td><?= $no++ ?></td>
-                            <td><?= $data->store_id ?></td>
                             <td><?= $data->code_store ?></td>
                             <td><?= $data->nama_toko ?></td>
                             <td><?= $data->toko_cabang ?></td>

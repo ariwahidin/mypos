@@ -36,22 +36,6 @@
             </table>
             <div class="">
                 <a href="<?= base_url('item') ?>" class="btn btn-flat btn-warning pull-right">Back to Item Toko</a>
-                <?php if (count($item_harga->data) > 0) { ?>
-                    <form action="<?= base_url('Warehouse/add_all_master_item_pos') ?>" method="POST">
-                        <?php foreach ($item_harga->data as $item) { ?>
-                            <input type="hidden" name="item_code[]" value="<?= $item->item_code ?>">
-                            <input type="hidden" name="barcode[]" value="<?= $item->barcode ?>">
-                            <input type="hidden" name="item_name[]" value="<?= $item->item_name ?>">
-                            <input type="hidden" name="item_name_toko[]" value="<?= $item->item_name_toko ?>">
-                            <input type="hidden" name="harga_jual[]" value="<?= $item->harga_jual ?>">
-                            <input type="hidden" name="harga_bersih[]" value="<?= $item->harga_bersih ?>">
-                            <input type="hidden" name="harga_harga_ppn[]" value="<?= $item->harga_ppn ?>">
-                        <?php } ?>
-                        <button type="submit" name="add" class="btn btn-primary btn-flat pull-right" style="margin-right:5px">
-                            Sesuaikan Semua Items
-                        </button>
-                    </form>
-                <?php } ?>
             </div>
         </div>
         <div class="box-body table-responsive">
