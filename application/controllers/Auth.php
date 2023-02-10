@@ -34,21 +34,34 @@ class Auth extends CI_Controller
 				$params = array(
 					'userid' => $row->user_id,
 					'level' => $row->level,
-					'username' =>$row->username
+					'username' => $row->username
 				);
 				$this->session->set_userdata($params);
 		?>
-				<script>
-					Swal.fire({
-						// position: 'top-end',
-						icon: 'success',
-						title: 'Selamat, login berhasil',
-						showConfirmButton: false,
-						timer: 1500
-					}).then((result) => {
-						window.location = "<?= site_url('dashboard') ?>"
-					})
-				</script>
+
+				<?php if ($this->session->userdata('level') == 1) { ?>
+					<script>
+						Swal.fire({
+							icon: 'success',
+							title: 'Login berhasil',
+							showConfirmButton: false,
+							timer: 1500
+						}).then((result) => {
+							window.location = "<?= site_url('dashboard') ?>"
+						})
+					</script>
+				<?php } else { ?>
+					<script>
+						Swal.fire({
+							icon: 'success',
+							title: 'Login berhasil',
+							showConfirmButton: false,
+							timer: 1500
+						}).then((result) => {
+							window.location = "<?= site_url('sale/prepare') ?>"
+						})
+					</script>
+				<?php } ?>
 			<?php
 			} else {
 			?>
@@ -71,7 +84,7 @@ class Auth extends CI_Controller
 
 	public function logout()
 	{
-		$params = array('userid', 'level','username');
+		$params = array('userid', 'level', 'username');
 		$this->session->unset_userdata($params);
 		redirect('auth/login');
 	}

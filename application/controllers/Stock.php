@@ -159,9 +159,6 @@ class Stock extends CI_Controller
 
         if (isset($_POST['download_stock_out'])) {
 
-            // var_dump($_POST);
-            // die;
-
             if ($stock_out->num_rows() > 0) {
 
                 $data = array(

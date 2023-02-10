@@ -25,13 +25,14 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Docnum</th>
-                        <th>Whs Code</th>
+                        <th>Doc ID</th>
                         <th>Barcode</th>
                         <th>Desc</th>
                         <th>Qty</th>
                         <th>Exp Date</th>
+                        <th>Info</th>
                         <th>Tanggal Stock In</th>
+                        <th>User</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,13 +40,14 @@
                     foreach ($row as $key => $data) { ?>
                         <tr>
                             <td style="width:5%;"><?= $no++ ?>.</td>
-                            <td><?= $data->docnum ?></td>
-                            <td><?= $data->whs_code ?></td>
+                            <td><?= $data->doc_id ?></td>
                             <td><?= $data->barcode ?></td>
                             <td><?= $data->item_name ?></td>
                             <td class="text-right"><?= $data->qty ?></td>
                             <td class="text-right"><?= date('d-m-Y', strtotime($data->expired_date)) ?></td>
+                            <td class="text-right"><?= $data->info?></td>
                             <td class="text-right"><?= date('d-m-Y', strtotime($data->created)) ?></td>
+                            <td class="text-right"><?= $data->user?></td>
                         </tr>
                     <?php
                     } ?>

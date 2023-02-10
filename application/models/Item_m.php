@@ -255,12 +255,15 @@ class Item_m extends CI_Model
     public function singkronisasi()
     {
         $item = $this->db->query("select * from t_cart_sync_item");
+        $total_update = 0;
+        $total_insert = 0;
         if ($item->num_rows() > 0) {
             foreach ($item->result() as $data) {
                 $cek_item_code = $this->db->query("select * from p_item where item_code = '$data->item_code'");
                 if ($cek_item_code->num_rows() > 0) {
-                    $sql_update = "update p_item set price = '$data->harga_jual', harga_jual = '$data->harga_jual', harga_bersih = '$data->harga_bersih' where item_code = '$data->item_code'";
+                    $sql_update = "update p_item set barcode = '$data->barcode', name = '$data->item_name', item_name_toko = '$data->item_name', price = '$data->harga_jual', harga_jual = '$data->harga_jual', harga_bersih = '$data->harga_bersih' where item_code = '$data->item_code'";
                     $this->db->query($sql_update);
+                    $total_update = $total_update + 1;
                 } else {
                     $params =  array(
                         'item_code' => $data->item_code,
@@ -274,8 +277,43 @@ class Item_m extends CI_Model
                         'harga_bersih' => $data->harga_bersih,
                     );
                     $this->db->insert('p_item', $params);
+                    $total_insert = $total_insert + 1;
                 }
             }
+        }
+
+        $result['total_update'] = $total_update;
+        $result['total_insert'] = $total_insert;
+        return $result;
+    }
+
+    function add_stock($post)
+    {
+        // var_dump($post);
+        $item_code = $post['item_code'];
+        $barcode = $post['barcode'];
+        $item_name = $post['item_name'];
+        $stock = $post['stock'];
+        $exp_date = date('Y-m-d', strtotime($post['exp_date']));
+        $user_id = $this->session->userdata('userid');
+        $item_id = $this->db->query("select item_id from p_item where item_code = '$item_code'")->row()->item_id;
+        $cek = $this->db->query("select * from p_item_detail where item_code = '$item_code' and exp_date = '$exp_date'");
+        if ($cek->num_rows() > 0) {
+            // update
+            $sql = "update p_item_detail set qty = qty + '$stock' where item_code = '$item_code'";
+            $this->db->query($sql);
+        } else {
+            // insert
+            $params = array(
+                'item_id' => $item_id,
+                'item_code' => $item_code,
+                'barcode' => $barcode,
+                'name' => $item_name,
+                'qty' => $stock,
+                'exp_date' => $exp_date,
+                'created_by' => $user_id
+            );
+            $this->db->insert('p_item_detail', $params);
         }
     }
 }

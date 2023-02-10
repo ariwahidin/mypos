@@ -26,7 +26,7 @@
                                 <td>1</td>
                                 <td>Upload Data Sales</td>
                                 <td>
-                                    <a href="<?=base_url('upload/upload_data')?>" class="btn btn-primary btn-flat btn-sm">Upload</a>
+                                    <a onclick="showLoading()" href="<?=base_url('upload/upload_data')?>" class="btn btn-primary btn-flat btn-sm">Upload</a>
                                 </td>
                             </tr>
                         </tbody>

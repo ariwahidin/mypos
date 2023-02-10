@@ -1,7 +1,4 @@
 <?php
-// var_dump($summary->result());
-
-// Load plugin PHPExcel nya
 include APPPATH . 'third_party/PHPExcel/Classes/PHPExcel.php';
 
 
@@ -49,16 +46,14 @@ $excel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel
 $excel->setActiveSheetIndex(0)->setCellValue('A3', "NO"); // Set kolom A3 dengan tulisan "NO"
 $excel->setActiveSheetIndex(0)->setCellValue('B3', "INVOICE"); // Set kolom A3 dengan tulisan "NO"
 $excel->setActiveSheetIndex(0)->setCellValue('C3', "NAMA TOKO"); // Set kolom A3 dengan tulisan "NO"
-$excel->setActiveSheetIndex(0)->setCellValue('D3', "CABANG"); // Set kolom A3 dengan tulisan "NO"
-$excel->setActiveSheetIndex(0)->setCellValue('E3', "SUBTOTAL"); // Set kolom A3 dengan tulisan "NO"
-$excel->setActiveSheetIndex(0)->setCellValue('F3', "DISCOUNT"); // Set kolom A3 dengan tulisan "NO"
-$excel->setActiveSheetIndex(0)->setCellValue('G3', "SERVICE"); // Set kolom B3 dengan tulisan "NIS"
-$excel->setActiveSheetIndex(0)->setCellValue('H3', "TAX"); // Set kolom C3 dengan tulisan "NAMA"
-$excel->setActiveSheetIndex(0)->setCellValue('I3', "GRAND TOTAL"); // Set kolom D3 dengan tulisan "JENIS KELAMIN"
-$excel->setActiveSheetIndex(0)->setCellValue('J3', "TYPE BAYAR"); // Set kolom D3 dengan tulisan "JENIS KELAMIN"
-$excel->setActiveSheetIndex(0)->setCellValue('K3', "NOMOR KARTU"); // Set kolom E3 dengan tulisan "ALAMAT"
-$excel->setActiveSheetIndex(0)->setCellValue('L3', "NAMA"); // Set kolom E3 dengan tulisan "ALAMAT"
-$excel->setActiveSheetIndex(0)->setCellValue('M3', "TANGGAL"); // Set kolom E3 dengan tulisan "ALAMAT"
+$excel->setActiveSheetIndex(0)->setCellValue('D3', "SUBTOTAL"); // Set kolom A3 dengan tulisan "NO"
+$excel->setActiveSheetIndex(0)->setCellValue('E3', "DISC SALE"); // Set kolom A3 dengan tulisan "NO"
+$excel->setActiveSheetIndex(0)->setCellValue('F3', "SERVICE"); // Set kolom B3 dengan tulisan "NIS"
+$excel->setActiveSheetIndex(0)->setCellValue('G3', "GRAND TOTAL"); // Set kolom D3 dengan tulisan "JENIS KELAMIN"
+$excel->setActiveSheetIndex(0)->setCellValue('H3', "TYPE BAYAR"); // Set kolom D3 dengan tulisan "JENIS KELAMIN"
+$excel->setActiveSheetIndex(0)->setCellValue('I3', "NOMOR KARTU"); // Set kolom E3 dengan tulisan "ALAMAT"
+$excel->setActiveSheetIndex(0)->setCellValue('J3', "NAMA"); // Set kolom E3 dengan tulisan "ALAMAT"
+$excel->setActiveSheetIndex(0)->setCellValue('K3', "TANGGAL"); // Set kolom E3 dengan tulisan "ALAMAT"
 // Apply style header yang telah kita buat tadi ke masing-masing kolom header
 $excel->getActiveSheet()->getStyle('A3')->applyFromArray($style_col);
 $excel->getActiveSheet()->getStyle('B3')->applyFromArray($style_col);
@@ -71,8 +66,6 @@ $excel->getActiveSheet()->getStyle('H3')->applyFromArray($style_col);
 $excel->getActiveSheet()->getStyle('I3')->applyFromArray($style_col);
 $excel->getActiveSheet()->getStyle('J3')->applyFromArray($style_col);
 $excel->getActiveSheet()->getStyle('K3')->applyFromArray($style_col);
-$excel->getActiveSheet()->getStyle('L3')->applyFromArray($style_col);
-$excel->getActiveSheet()->getStyle('M3')->applyFromArray($style_col);
 
 $no = 1; // Untuk penomoran tabel, di awal set dengan 1
 $numrow = 4; // Set baris pertama untuk isi tabel adalah baris ke 4
@@ -82,16 +75,14 @@ foreach ($summary->result() as $data) {
     $excel->setActiveSheetIndex(0)->setCellValue('A' . $numrow, $no);
     $excel->setActiveSheetIndex(0)->setCellValue('B' . $numrow, $data->invoice);
     $excel->setActiveSheetIndex(0)->setCellValue('C' . $numrow, $data->nama_toko);
-    $excel->setActiveSheetIndex(0)->setCellValue('D' . $numrow, $data->toko_cabang);
-    $excel->setActiveSheetIndex(0)->setCellValue('E' . $numrow, $data->subtotal);
-    $excel->setActiveSheetIndex(0)->setCellValue('F' . $numrow, $data->discount);
-    $excel->setActiveSheetIndex(0)->setCellValue('G' . $numrow, $data->service);
-    $excel->setActiveSheetIndex(0)->setCellValue('H' . $numrow, $data->tax);
-    $excel->setActiveSheetIndex(0)->setCellValue('I' . $numrow, $data->grand_total);
-    $excel->setActiveSheetIndex(0)->setCellValue('J' . $numrow, $data->type_bayar);
-    $excel->setActiveSheetIndex(0)->setCellValue('K' . $numrow, $data->nomor_kartu);
-    $excel->setActiveSheetIndex(0)->setCellValue('L' . $numrow, $data->nama);
-    $excel->setActiveSheetIndex(0)->setCellValue('M' . $numrow, $data->tanggal);
+    $excel->setActiveSheetIndex(0)->setCellValue('D' . $numrow, $data->subtotal);
+    $excel->setActiveSheetIndex(0)->setCellValue('E' . $numrow, $data->discount);
+    $excel->setActiveSheetIndex(0)->setCellValue('F' . $numrow, $data->service);
+    $excel->setActiveSheetIndex(0)->setCellValue('G' . $numrow, $data->grand_total);
+    $excel->setActiveSheetIndex(0)->setCellValue('H' . $numrow, $data->type_bayar);
+    $excel->setActiveSheetIndex(0)->setCellValue('I' . $numrow, $data->nomor_kartu);
+    $excel->setActiveSheetIndex(0)->setCellValue('J' . $numrow, $data->nama);
+    $excel->setActiveSheetIndex(0)->setCellValue('K' . $numrow, $data->tanggal);
 
     // Apply style row yang telah kita buat tadi ke masing-masing baris (isi tabel)
     $excel->getActiveSheet()->getStyle('A' . $numrow)->applyFromArray($style_row);
@@ -105,8 +96,6 @@ foreach ($summary->result() as $data) {
     $excel->getActiveSheet()->getStyle('I' . $numrow)->applyFromArray($style_row);
     $excel->getActiveSheet()->getStyle('J' . $numrow)->applyFromArray($style_row);
     $excel->getActiveSheet()->getStyle('K' . $numrow)->applyFromArray($style_row);
-    $excel->getActiveSheet()->getStyle('L' . $numrow)->applyFromArray($style_row);
-    $excel->getActiveSheet()->getStyle('M' . $numrow)->applyFromArray($style_row);
 
     $excel->getActiveSheet()->getColumnDimension('A')->setWidth(4);
     $excel->getActiveSheet()->getColumnDimension('B')->setWidth(13);
@@ -119,8 +108,6 @@ foreach ($summary->result() as $data) {
     $excel->getActiveSheet()->getColumnDimension('I')->setWidth(13);
     $excel->getActiveSheet()->getColumnDimension('J')->setWidth(9.57);
     $excel->getActiveSheet()->getColumnDimension('K')->setWidth(16.57);
-    $excel->getActiveSheet()->getColumnDimension('L')->setWidth(18);
-    $excel->getActiveSheet()->getColumnDimension('M')->setWidth(18);
 
     $no++; // Tambah 1 setiap kali looping
     $numrow++; // Tambah 1 setiap kali looping

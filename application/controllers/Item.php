@@ -7,7 +7,7 @@ class Item extends CI_Controller
     {
         parent::__construct();
         check_not_login();
-        $this->load->model(['item_m', 'category_m', 'unit_m']);
+        $this->load->model(['item_m', 'category_m', 'unit_m', 'stock_m']);
     }
 
     function get_ajax()
@@ -28,7 +28,7 @@ class Item extends CI_Controller
             $row[] = $item->unit_name;
             $row[] = number_format($item->harga_jual);
             $row[] = number_format($item->harga_bersih);
-            $row[] = '<a href="'.base_url('item/item_stock_detail/').$item->item_code.'">'.$item->stock.'</a>';
+            $row[] = '<a href="' . base_url('item/item_stock_detail/') . $item->item_code . '">' . $item->stock . '</a>';
             // $row[] = $item->image != null ? '<img src="' . base_url('uploads/product/' . $item->image) . '" class="img" style="width:100px">' : null;
             // add html for action
             // $row[] = '<a href="' . site_url('item/del/' . $item->item_id) . '" onclick="return confirm(\'Yakin hapus data?\')"  class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> Delete</a>';
@@ -71,10 +71,10 @@ class Item extends CI_Controller
         foreach ($query_unit->result() as $unt) {
             $unit[$unt->unit_id] = $unt->name;
         }
-        
+
 
         $data = array(
-            
+
             'page' => 'add',
             'row' => $item,
             'category' => $query_category,
@@ -98,7 +98,7 @@ class Item extends CI_Controller
             $tax = $this->db->query("SELECT * FROM tax");
 
             $data = array(
-                'tax' =>$tax,
+                'tax' => $tax,
                 'page' => 'edit',
                 'row' => $item,
                 'category' => $query_category,
@@ -226,15 +226,29 @@ class Item extends CI_Controller
         $this->fungsi->PdfGenerator($html, 'qrcode-' . $data['row']->barcode, 'A4', 'potrait');
     }
 
-    function item_stock_detail($item_code){
+    function item_stock_detail($item_code)
+    {
         $item = $this->db->query("select t1.*, t2.name as item_name 
         from p_item_detail t1
         inner join p_item t2 on t1.item_code = t2.item_code
         where t1.item_code = '$item_code'");
         $data = array(
             'item_code' => $item_code,
-            'item'=>$item 
+            'item' => $item
         );
-        $this->template->load('template', 'product/item/item_stock_detail_v',$data);
+        $this->template->load('template', 'product/item/item_stock_detail_v', $data);
+    }
+
+    function add_stock()
+    {
+        $post = $this->input->post();
+        $this->stock_m->add_stock_manual($post);
+        $this->item_m->add_stock($post);
+        if ($this->db->affected_rows() > 0) {
+            $this->session->set_flashdata('success', 'Stock berhasil ditambah');
+        } else {
+            $this->session->set_flashdata('error', 'Gagal tambah data');
+        }
+        redirect('item');
     }
 }

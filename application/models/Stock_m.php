@@ -63,12 +63,13 @@ class Stock_m extends CI_Model
 
     public function get_stock_in()
     {
-        $this->db->select('t_stock.docnum,t_stock.whs_code, t_stock.stock_id, p_item.barcode,
+        $this->db->select('t_stock.docnum, t_stock.doc_id, t_stock.whs_code, t_stock.stock_id, p_item.barcode,
         p_item.name as item_name, qty, date, detail,
         supplier.name as supplier_name, p_item.item_id, 
-        t_stock.info, t_stock.expired_date, t_stock.created');
+        t_stock.info, t_stock.expired_date, t_stock.created, user.name as user');
         $this->db->from('t_stock');
         $this->db->join('p_item', 't_stock.item_id = p_item.item_id');
+        $this->db->join('user', 't_stock.user_id = user.user_id');
         $this->db->join('supplier', 't_stock.supplier_id = supplier.supplier_id', 'left');
         $this->db->where('type', 'in');
         $this->db->order_by('stock_id', 'desc');
@@ -182,11 +183,12 @@ class Stock_m extends CI_Model
 
     public function get_stock_out()
     {
-        $this->db->select('t_stock.stock_id, p_item.barcode,
+        $this->db->select('t_stock.stock_id, t_stock.doc_id, p_item.barcode,
         p_item.name, qty, date, detail, p_item.item_id, 
-        t_stock.info, t_stock.expired_date, t_stock.created');
+        t_stock.info, t_stock.expired_date, t_stock.created, user.name as user');
         $this->db->from('t_stock');
         $this->db->join('p_item', 't_stock.item_id = p_item.item_id');
+        $this->db->join('user', 't_stock.user_id = user.user_id');
         $this->db->where('type', 'out');
         $this->db->order_by('stock_id', 'desc');
         $query = $this->db->get();
@@ -229,6 +231,34 @@ class Stock_m extends CI_Model
             'expired_date' => $exp_date,
             'user_id' => $this->session->userdata('userid'),
         );
+        $this->db->insert('t_stock', $params);
+    }
+
+    function add_stock_manual($post)
+    {
+        // var_dump($post);
+        $item_code = $post['item_code'];
+        $barcode = $post['barcode'];
+        $item_name = $post['item_name'];
+        $stock = $post['stock'];
+        $exp_date = date('Y-m-d', strtotime($post['exp_date']));
+        $user_id = $this->session->userdata('userid');
+        $item_id = $this->db->query("select item_id from p_item where item_code = '$item_code'")->row()->item_id;
+        $doc_id = $this->stock_doc_id();
+
+        $params = array(
+            'doc_id' => $doc_id,
+            'item_code' => $item_code,
+            'item_id' => $item_id,
+            'barcode' => $barcode,
+            'type' => 'in',
+            'detail' => 'stock in',
+            'info' => 'stock in manual',
+            'qty' => $stock,
+            'expired_date' => $exp_date,
+            'user_id' => $user_id
+        );
+
         $this->db->insert('t_stock', $params);
     }
 

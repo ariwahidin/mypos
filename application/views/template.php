@@ -5,7 +5,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>POS - by Handal Inti Boga</title>
-	<link rel="icon" type="image/x-icon" href="<?= base_url() ?>assets/dist/img/point-of-sale-icon-7.png">
+	<link rel="icon" type="image/x-icon" href="<?= base_url() ?>assets/dist/img/Handal Logo Only.jpg">
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 	<link rel="stylesheet" href="<?= base_url() ?>assets/bower_components/bootstrap/dist/css/bootstrap.min.css">
 	<link rel="stylesheet" href="<?= base_url() ?>assets/bower_components/font-awesome/css/font-awesome.min.css">
@@ -24,14 +24,104 @@
 			font-size: 1.6rem !important;
 		}
 	</style>
+
+	<style>
+		/* Center the loader */
+		#loader {
+			display: block;
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			z-index: 99999;
+			width: 120px;
+			height: 120px;
+			margin: -76px 0 0 -76px;
+			border: 16px solid #f3f3f3;
+			border-radius: 50%;
+			border-top: 16px solid #3498db;
+			-webkit-animation: spin 2s linear infinite;
+			animation: spin 2s linear infinite;
+		}
+
+		#wadah_loader {
+			display: none;
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			margin: 0 !important;
+			padding: 0 !important;
+			background-color: rgba(0, 0, 0, 0.3);
+			z-index: 9999;
+		}
+
+		@-webkit-keyframes spin {
+			0% {
+				-webkit-transform: rotate(0deg);
+			}
+
+			100% {
+				-webkit-transform: rotate(360deg);
+			}
+		}
+
+		@keyframes spin {
+			0% {
+				transform: rotate(0deg);
+			}
+
+			100% {
+				transform: rotate(360deg);
+			}
+		}
+
+		/* Add animation to "page content" */
+		.animate-bottom {
+			position: relative;
+			-webkit-animation-name: animatebottom;
+			-webkit-animation-duration: 1s;
+			animation-name: animatebottom;
+			animation-duration: 1s
+		}
+
+		@-webkit-keyframes animatebottom {
+			from {
+				bottom: -100px;
+				opacity: 0
+			}
+
+			to {
+				bottom: 0px;
+				opacity: 1
+			}
+		}
+
+		@keyframes animatebottom {
+			from {
+				bottom: -100px;
+				opacity: 0
+			}
+
+			to {
+				bottom: 0;
+				opacity: 1
+			}
+		}
+
+		/* #myDiv {
+			display: none;
+			text-align: center;
+		} */
+	</style>
 </head>
 
 <body class="hold-transition skin-purple sidebar-mini <?= $this->uri->segment(1) == 'sale' && $this->uri->segment(2) != 'stock' ? 'sidebar-collapse' : null ?> ">
-
+	<div id="wadah_loader">
+		<div id="loader"></div>
+	</div>
 	<div class="wrapper">
 		<header class="main-header">
 			<a href="<?= base_url('dashboard') ?>" class="logo">
-				<span class="logo-mini"><img src="<?= base_url() ?>assets/dist/img/point-of-sale-icon-7.png" style="max-width:25px" alt=""></span>
+				<span class="logo-mini"><img src="<?= base_url() ?>assets/dist/img/Handal Logo Only.jpg" style="max-width:30px;border-radius: 50%" alt=""></span>
 				<span class="logo-lg"><b>POS</b></span>
 			</a>
 			<nav class="navbar navbar-static-top">
@@ -175,7 +265,7 @@
 									<a href="<?= site_url('item') ?>"><i class="fa fa-circle-o"></i> <span>Data Stock</span></a>
 								</li>
 								<li class="<?= $this->uri->segment(2) == 'stock_in' ? 'active' : '' ?>">
-									<a href="<?= site_url('mypos_api/stock_in') ?>"><i class="fa fa-circle-o"></i> <span>Stock In</span></a>
+									<a onclick="showLoading()" href="<?= site_url('mypos_api/stock_in') ?>"><i class="fa fa-circle-o"></i> <span>Stock In</span></a>
 								</li>
 								<li class="<?= $this->uri->segment(1) == 'stockout' ? 'active' : '' ?>">
 									<a href="<?= site_url('stockout') ?>"><i class="fa fa-circle-o"></i> <span>Stock Out</span></a>
@@ -214,6 +304,11 @@
 			</section>
 		</aside>
 
+		<!-- <div id="loadingIndicator" class="d-none">
+			<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+			<span class="sr-only">Loading...</span>
+		</div> -->
+
 		<script src="<?= base_url() ?>assets/bower_components/jquery/dist/jquery.min.js"></script>
 		<script src="<?= base_url() ?>assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
 		<script src="<?= base_url() ?>assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
@@ -241,6 +336,11 @@
 		$(document).ready(function() {
 			$('#table1').DataTable()
 		})
+	</script>
+	<script>
+		function showLoading() {
+			document.getElementById("wadah_loader").style.display = "block";
+		}
 	</script>
 	<script>
 		var flash = $('#flash').data('flash');

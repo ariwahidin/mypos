@@ -90,13 +90,10 @@
                         <th>#</th>
                         <th>Invoice</th>
                         <th>Date</th>
-                        <th>Customer</th>
-                        <th>Total</th>
-                        <th>Discount</th>
+                        <th>Subtotal</th>
+                        <th>Disc. Sale</th>
                         <th>Service</th>
-                        <th>Tax</th>
                         <th>Grand Total</th>
-                        <!-- <th>Total Bayar</th> -->
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -107,22 +104,16 @@
                             <td style="width:5%;"><?= $no++ ?>.</td>
                             <td><?= $data->invoice ?></td>
                             <td><?= indo_date($data->date) ?></td>
-                            <td><?= $data->customer_id == null ? 'Umum' : $data->customer_name ?></td>
-                            <td class="text-right"><?= indo_currency($data->total_price) ?></td>
+                            <td class="text-right"><?= indo_currency($data->total_item_value) ?></td>
                             <td class="text-right"><?= indo_currency($data->discount) ?></td>
                             <td class="text-right"><?= indo_currency($data->service) ?></td>
-                            <td class="text-right"><?= indo_currency($data->tax) ?></td>
                             <td class="text-right"><?= indo_currency($data->final_price) ?></td>
-                            <!-- <td class="text-right"><?= indo_currency($data->total_bayar) ?></td> -->
                             <td class="text-center" width="200px">
                                 <button id="detail" data-target="#modal-detail" data-toggle="modal" class="btn btn-default btn-xs" width="200px" data-invoice="<?= $data->invoice ?>" data-date="<?= indo_date($data->date) ?>" data-time="<?= substr($data->sale_created, 11, 5) ?>" data-customer="<?= $data->customer_id == null ? "Umum" : $data->customer_name ?>" data-total="<?= indo_currency($data->total_price) ?>" data-discount="<?= indo_currency($data->discount) ?>" data-grandtotal="<?= indo_currency($data->final_price) ?>" data-cash="<?= indo_currency($data->cash) ?>" data-remaining="<?= indo_currency($data->remaining) ?>" data-note="<?= $data->note ?>" data-cashier="<?= ucfirst($data->user_name) ?>" data-saleid="<?= $data->sale_id ?>" data-tax="<?= indo_currency($data->tax) ?>" data-service="<?= indo_currency($data->service) ?>" data-total_bayar="<?= indo_currency($data->total_bayar) ?>" data-type_bayar="<?= $data->type_bayar_name ?>" data-nomor_kartu="<?= $data->nomor_kartu ?>">
                                     <i class="fa fa-eye"></i> Detail
                                 </button>
                                 <a href="<?= site_url('sale/cetak/' . $data->sale_id) ?>" target="_self" class="btn btn-primary btn-xs">
                                     <i class="fa fa-print"></i> Print
-                                </a>
-                                <a href="<?= site_url('sale/del/' . $data->sale_id) ?>" onclick="return confirm('Yakin hapus data?')" class="btn btn-danger btn-xs">
-                                    <i class="fa fa-trash"></i> Delete
                                 </a>
                             </td>
                         </tr>

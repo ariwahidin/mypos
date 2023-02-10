@@ -15,7 +15,7 @@
         <div class="box-header">
             <!-- <h3 class="box-title">Data Product Items</h3> -->
             <div class="pull-right">
-                <a class="btn btn-flat btn-primary" href="<?= site_url('Warehouse/get_harga_item') ?>">Refresh</a>
+                <a onclick="showLoading()" class="btn btn-flat btn-primary" href="<?= site_url('Warehouse/get_harga_item') ?>">Refresh</a>
                 <!-- <button class="btn btn-flat btn-success" data-toggle="modal" data-target="#modal-tambah-item">Tambah Item Baru</button> -->
             </div>
         </div>
@@ -29,101 +29,92 @@
                         <th>Name</th>
                         <th>Harga Jual</th>
                         <th>Stock</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $no=1; foreach($item->result() as $data){ ?>
-                            <tr>
-                                <td><?=$no++?></td>
-                                <td><?=$data->item_code?></td>
-                                <td><?=$data->barcode?></td>
-                                <td><?=$data->name?></td>
-                                <td><?=number_format($data->harga_jual)?></td>
-                                <td>
-                                    <a href="<?=base_url('item/item_stock_detail/').$data->item_code?>"><?=$data->stock?></a>
-                                </td>
-                            </tr>
-                        <?php } ?>
+                    <?php $no = 1;
+                    foreach ($item->result() as $data) { ?>
+                        <tr>
+                            <td><?= $no++ ?></td>
+                            <td><?= $data->item_code ?></td>
+                            <td><?= $data->barcode ?></td>
+                            <td><?= $data->name ?></td>
+                            <td><?= number_format($data->harga_jual) ?></td>
+                            <td>
+                                <a href="<?= base_url('item/item_stock_detail/') . $data->item_code ?>"><?= $data->stock ?></a>
+                            </td>
+                            <td>
+                                <button class="btn btn-flat btn-primary btn-xs" id="btn_edit" data-item-code="<?= $data->item_code ?>" data-item-name="<?= $data->name ?>" data-barcode="<?= $data->barcode ?>">
+                                    <i class="fa fa-plus"></i> Add Stock
+                                </button>
+                            </td>
+                        </tr>
+                    <?php } ?>
                 </tbody>
             </table>
         </div>
     </div>
 </section>
-
+<!-- Modal -->
+<div class="modal flip" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Add Stock</h4>
+            </div>
+            <div class="modal-body">
+                <!-- Form -->
+                <form id="form_add" action="<?= base_url('item/add_stock') ?>" method="POST">
+                    <div class="form-group">
+                        <label for="">Barcode</label>
+                        <input type="hidden" class="form-control" id="item_code" name="item_code" placeholder="">
+                        <input type="text" class="form-control" id="barcode" name="barcode" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="">Item Name</label>
+                        <input type="text" class="form-control" id="item_name" name="item_name" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="">Stock</label>
+                        <input type="number" class="form-control" id="stock" name="stock" placeholder="Masukan Jumlah Stock" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="">Expired Date</label>
+                        <input type="date" class="form-control" id="exp_date" name="exp_date" placeholder="" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" id="btn_simpan" class="btn btn-success">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <script>
-    $(document).ready(function(){
+    $(document).ready(function() {
         $('#table1xx').DataTable();
     })
-    // $(document).ready(function() {
-    //     $('#table1').DataTable({
-    //         "processing": true,
-    //         "serverSide": true,
-    //         "ajax": {
-    //             "url": "",
-    //             "type": "POST"
-    //         },
-    //         "columnDefs": [
-    //             // {
-    //             //     "targets": [5, 6],
-    //             //     "className": 'text-right'
-    //             // },
-    //             // {
-    //             //     "targets": [7, -1],
-    //             //     "className": 'text-center'
-    //             // },
-    //             // {
-    //             //     "targets": [0, -1],
-    //             //     "orderable": false
-    //             // }
-    //         ],
-    //         "order": []
-    //     })
-    // })
 
-    // $(document).on('keydown', '#harga_jual', function(e){
-    //     isNumber(e)
-    // })
+    $(document).on('click', '#btn_edit', function() {
+        var item_code = $(this).data('item-code')
+        var item_name = $(this).data('item-name')
+        var barcode = $(this).data('barcode')
+        $('#myModal').modal('show')
+        $('#item_code').val(item_code)
+        $('#barcode').val(barcode)
+        $('#item_name').val(item_name)
+    })
 
-    // $(document).on('keyup', '#harga_jual', function() {
-    //     var tax = parseFloat('');
-    //     var harga_bersih = ($(this).val() / tax) * 100;
-    //     $('#harga_bersih').val(harga_bersih.toFixed(2));
-    // })
-
-    // $('#modal-tambah-item').on('shown.bs.modal', function(e) {
-    //     $('#item_code').focus();
-    // })
-
-    // function number_with_commas(x) {
-    //     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    // }
-
-
-    // function number_without_commas(x) {
-    //     return x.replace(/,/g, '');
-    // }
-
-    // function isNumber(evt) {
-    //     evt = (evt) ? evt : window.event;
-    //     var charCode = (evt.which) ? evt.which : evt.keyCode;
-    //     if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-    //         return false;
-    //     }
-    //     return true;
-    // }
-
-    // function isMoney(elem) {
-    //     var is_float = parseFloat(number_without_commas(elem.value));
-    //     if (isNaN(is_float)) {
-    //         elem.value = 0;
-    //     } else {
-    //         elem.value = number_with_commas(is_float)
-    //     }
-    // }
-
-    // function is_number(x) {
-    //     return Math.round(parseFloat(x.replace(/,/g, '')));
-    // }
+    $(document).on('click', '#btn_simpan', function() {
+        if ($('#stock').val() == "" || $('#exp_date').val() == "") {
+            alert("Stock dan Expired Date Tidak Boleh Kosong")
+        } else {
+            $('#form_add').submit()
+        }
+    })
 </script>

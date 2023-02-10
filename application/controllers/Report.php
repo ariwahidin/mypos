@@ -29,9 +29,6 @@ class Report extends CI_Controller
 
         if (isset($_POST['summary_sales'])) {
             $summary = $this->sale_m->get_summary_sales($_POST);
-            // $download = true;
-            // var_dump($download);
-            // die;
             if ($summary->num_rows() > 0) {
                 $data = array(
                     'summary' => $summary,
@@ -129,9 +126,11 @@ class Report extends CI_Controller
     public function daily(){
         $daily = $this->sale_m->get_sales_daily();
         $sum_daily = $this->sale_m->get_sum_daily();
+        $tax = $this->db->query("select tax_value from tax")->row()->tax_value / 100;
         $data = array(
             'daily' => $daily,
-            'sum' => $sum_daily
+            'sum' => $sum_daily,
+            'tax' => $tax
         );
         $this->template->load('template', 'report/sales_daily', $data);
     }

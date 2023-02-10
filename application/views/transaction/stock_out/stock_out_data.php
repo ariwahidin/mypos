@@ -19,12 +19,14 @@
                 <thead>
                     <tr>
                         <th>#</th>
+                        <th>Doc ID</th>
                         <th>Barcode</th>
                         <th>Product Item</th>
                         <th>Qty</th>
                         <th>Info</th>
                         <th>Exp Date</th>
                         <th>Tanggal Stock Out</th>
+                        <th>User</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,6 +34,7 @@
                     foreach ($row as $key => $data) { ?>
                         <tr>
                             <td style="width:5%;"><?= $no++ ?>.</td>
+                            <td><?= $data->doc_id?></td>
                             <td><?= $data->barcode ?></td>
                             <td><?= $data->name ?></td>
                             <td class=""><?= $data->qty ?></td>
@@ -41,6 +44,9 @@
                             </td>
                             <td class="text-center" width="160px">
                                 <?= date('d-m-Y', strtotime($data->created)) ?>
+                            </td>
+                            <td>
+                                <?= $data->user?>
                             </td>
                         </tr>
                     <?php
