@@ -53,7 +53,6 @@ class Mypos_Api extends CI_Controller
 
         $url = my_api() . 'item/get_item_transfer';
         $client =  curl_init($url);
-
         curl_setopt($client, CURLOPT_POST, 1);
         curl_setopt($client, CURLOPT_POSTFIELDS, http_build_query($post));
         curl_setopt($client, CURLOPT_RETURNTRANSFER, 1);
@@ -62,8 +61,6 @@ class Mypos_Api extends CI_Controller
         ));
         $response = curl_exec($client);
         $status_code = curl_getinfo($client, CURLINFO_HTTP_CODE);
-
-
         $result = json_decode($response);
 
         if ($status_code == 200) {

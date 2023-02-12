@@ -13,6 +13,11 @@
                     <form action="" method="POST">
                         <table class="table table-bordered">
                             <tr>
+                                <th>Whs Code</th>
+                                <th>Docnum</th>
+                                <th>Action</th>
+                            </tr>
+                            <tr>
                                 <td>
                                     <input type="text" name="whs_code" value="<?=$whs_code?>" class="form-control" placeholder="Whs Code" required readonly>
                                 </td>
@@ -20,7 +25,7 @@
                                     <input type="number" name="surat_jalan" value="<?= empty($_SESSION['surat_jalan']) == true ? $input_search['surat_jalan'] : $_SESSION['surat_jalan'] ?>" class="form-control" class="form-control" placeholder="No Surat Jalan" required>
                                 </td>
                                 <td>
-                                    <button class="btn btn-flat btn-primary btn-block">Cari</button>
+                                    <button onclick="showLoading()" class="btn btn-flat btn-primary btn-block">Cari</button>
                                 </td>
                             </tr>
                         </table>
@@ -100,6 +105,7 @@
     var form_stock_in = document.getElementById("form_stock_in");
     btn_stock_in.addEventListener("click", function() {
         if (confirm("Yakin akan melakukan Stock In?")) {
+            showLoading();
             form_stock_in.submit();
         } else {
             // the user clicked Cancel, so do nothing

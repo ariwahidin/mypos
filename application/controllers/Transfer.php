@@ -15,6 +15,8 @@ class Transfer extends CI_Controller
         $gudang = $this->db->query("select * from master_gudang");
         $item_cart = $this->transfer_m->get_cart();
 
+        // die;
+
         $data = array(
             'item' => $item,
             'gudang' => $gudang,
@@ -55,7 +57,8 @@ class Transfer extends CI_Controller
         $this->load->view('transaction/transfer/modal_transfer_detail_stockout', $data);
     }
 
-    function show_detail_transfer_stockin(){
+    function show_detail_transfer_stockin()
+    {
         $docnum = $_POST['docnum'];
         $sql = "select distinct  
         t4.barcode, t4.name, t1.qty, t1.expired_date as exp_date
@@ -76,6 +79,7 @@ class Transfer extends CI_Controller
     {
         $data['whs_code'] = $this->db->query("select whs_code from t_toko where is_active = 'y'")->row()->whs_code;
         $delete_cart = $this->transfer_m->delete_cart_transfer_stockin();
+
         if (isset($_POST['cari'])) {
             $item_transfer = $this->get_item_transfer($_POST);
             // $data['whs_code'] = $_POST['whs_code'];
@@ -90,13 +94,28 @@ class Transfer extends CI_Controller
     function proses_simpan_stockin()
     {
         $post = $_POST;
+
         $doc_id = $this->stock_m->stock_doc_id();
-        $simpan = $this->transfer_m->simpan_transfer_stockin($doc_id);
-        $update_stock = $this->transfer_m->update_stock_detail($doc_id);
-        if ($this->db->affected_rows() > 0) {
-            $response = array('success' => true);
-        } else {
-            $response = array('success' => false);
+
+        $docnum_transfer = $this->db->query("SELECT docnum FROM t_cart_transfer_stockin");
+
+        if ($docnum_transfer->num_rows() > 0) {
+            $no_transfer = $docnum_transfer->row()->docnum;
+            $cek = $this->db->query("SELECT * FROM t_stock WHERE docnum_transfer = '$no_transfer' AND type = 'in'");
+
+            if ($cek->num_rows() > 0) {
+                $response = array(
+                    'exists' => true,
+                );
+            } else {
+                $simpan = $this->transfer_m->simpan_transfer_stockin($doc_id);
+                $update_stock = $this->transfer_m->update_stock_detail($doc_id);
+                if ($this->db->affected_rows() > 0) {
+                    $response = array('success' => true);
+                } else {
+                    $response = array('success' => false);
+                }
+            }
         }
         echo json_encode($response);
     }
@@ -188,14 +207,41 @@ class Transfer extends CI_Controller
 
             $item_cart = $this->transfer_m->get_cart();
             if ($item_cart->num_rows() > 0) {
-                // var_dump($post);
-                $id = $this->transfer_m->insert_transfer($post);
-                $docnum = $this->db->query("select docnum from tb_transfer_stock where id = '$id'")->row()->docnum;
+
+                // Start Proses kirim data ke server
+
+                $item_transfer = $this->transfer_m->get_cart();
+                $user_id = $this->session->userdata('userid');
+                $user = $this->db->query("select name from user where user_id = '$user_id'")->row()->name;
+                $post_data = array(
+                    "pengirim" => $this->db->query("SELECT whs_code FROM t_toko WHERE is_active = 'y'")->row()->whs_code,
+                    "tujuan" => $post['whs_code'],
+                    "created_by" => $user,
+                    "post_transfer" => $item_transfer->result()
+                );
+
+                $url = my_api() . 'item/transferstock';
+                $client =  curl_init($url);
+                curl_setopt($client, CURLOPT_POST, 1);
+                curl_setopt($client, CURLOPT_POSTFIELDS, http_build_query($post_data));
+                curl_setopt($client, CURLOPT_RETURNTRANSFER, 1);
+                curl_setopt($client, CURLOPT_HTTPHEADER, array(
+                    'Content-Type: application/x-www-form-urlencoded'
+                ));
+                $response = curl_exec($client);
+                $status_code = curl_getinfo($client, CURLINFO_HTTP_CODE);
+                $result = json_decode($response);
+
+                $nomor_transfer = $result->nomor_transfer;
+                // End Kirim Data ke server
+
+                $id = $this->transfer_m->insert_transfer($post, $nomor_transfer);
+                // $docnum = $this->db->query("select docnum from tb_transfer_stock where id = '$id'")->row()->docnum;
                 $stock_id = $this->stock_m->stock_doc_id();
 
                 foreach ($item_cart->result() as $value) {
                     $params = array(
-                        'docnum' => $docnum,
+                        'docnum' => $nomor_transfer,
                         'item_code' => $value->item_code,
                         'barcode' => $value->barcode,
                         'item_id' => $value->item_id,
@@ -216,7 +262,7 @@ class Transfer extends CI_Controller
                         'type' => 'out',
                         'detail' => 'stock out',
                         'info' => 'transfer stock out',
-                        'docnum_transfer' => $docnum,
+                        'docnum_transfer' => $nomor_transfer,
                         'expired_date' => $value->exp_date,
                         'qty' => $value->qty,
                         'user_id' => $this->session->userdata('userid')
@@ -236,28 +282,16 @@ class Transfer extends CI_Controller
 
                 $this->transfer_m->delete_cart_transfer();
 
-
-
                 if ($this->db->affected_rows() > 0) {
 
-
-                    //send to server
-                    $upload = $this->send($docnum);
-
-                    if ($upload == true) {
-                        $response = array(
-                            'success' => true,
-                            'uploaded' => true
-                        );
-                    } else {
-                        $response = array(
-                            'success' => false,
-                            'uploaded' => false
-                        );
-                    }
+                    $response = array(
+                        'success' => true,
+                        'uploaded' => true
+                    );
                 } else {
                     $response = array(
-                        'success' => false
+                        'success' => false,
+                        'uploaded' => false
                     );
                 }
 
@@ -269,48 +303,47 @@ class Transfer extends CI_Controller
                 );
                 echo json_encode($response);
             }
-
-            //     redirect('stockout');
+            // redirect('stockout');
         }
     }
 
 
-    function send($docnum)
-    {
-        $sql = "select t1.docnum, t2.whs_code_send, t2.whs_code_rec, t1.item_code, t1.exp_date, t1.qty, t1.barcode, t3.username 
-        from tb_transfer_stock_detail t1
-        inner join tb_transfer_stock t2 on t1.docnum = t2.docnum 
-        inner join `user` t3 on t1.created_by = t3.user_id
-        where t1.docnum = '$docnum'";
-        $query = $this->db->query($sql);
+    // function send($docnum)
+    // {
+    //     $sql = "select t1.docnum, t2.whs_code_send, t2.whs_code_rec, t1.item_code, t1.exp_date, t1.qty, t1.barcode, t3.username 
+    //     from tb_transfer_stock_detail t1
+    //     inner join tb_transfer_stock t2 on t1.docnum = t2.docnum 
+    //     inner join `user` t3 on t1.created_by = t3.user_id
+    //     where t1.docnum = '$docnum'";
+    //     $query = $this->db->query($sql);
 
 
-        $post = array(
-            'post_transfer' => $query->result(),
-        );
+    //     $post = array(
+    //         'post_transfer' => $query->result(),
+    //     );
 
-        $options = array(
-            'http' => array(
-                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method'  => 'POST',
-                'content' => http_build_query($post),
-            ),
-        );
+    //     $options = array(
+    //         'http' => array(
+    //             'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+    //             'method'  => 'POST',
+    //             'content' => http_build_query($post),
+    //         ),
+    //     );
 
-        $context  = stream_context_create($options);
-        $response = file_get_contents(my_api() . 'item/transferstock', false, $context);
-        $result = json_decode($response);
+    //     $context  = stream_context_create($options);
+    //     $response = file_get_contents(my_api() . 'item/transferstock', false, $context);
+    //     $result = json_decode($response);
 
-        // var_dump($result);
+    //     // var_dump($result);
 
-        if ($result->status == 1) {
-            $result = true;
-        } else {
-            $result = false;
-        }
+    //     if ($result->status == 1) {
+    //         $result = true;
+    //     } else {
+    //         $result = false;
+    //     }
 
-        return $result;
-    }
+    //     return $result;
+    // }
 
     function cart_data()
     {

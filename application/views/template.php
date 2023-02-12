@@ -28,7 +28,7 @@
 	<style>
 		/* Center the loader */
 		#loader {
-			display: block;
+			display: none;
 			position: absolute;
 			left: 50%;
 			top: 50%;
@@ -106,11 +106,6 @@
 				opacity: 1
 			}
 		}
-
-		/* #myDiv {
-			display: none;
-			text-align: center;
-		} */
 	</style>
 </head>
 
@@ -340,6 +335,7 @@
 	<script>
 		function showLoading() {
 			document.getElementById("wadah_loader").style.display = "block";
+			document.getElementById("loader").style.display = "block";
 		}
 	</script>
 	<script>

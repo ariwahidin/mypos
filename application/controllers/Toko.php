@@ -13,37 +13,47 @@ class Toko extends CI_Controller
 	{
 		$toko = $this->db->query("SELECT * FROM t_toko where is_active = 'y'");
 		$all_toko = $this->db->query("SELECT * FROM t_toko");
+		$whs_code = $this->db->query("SELECT * from master_gudang");
 		$data = array(
 			'toko' => $toko,
 			'all_toko' => $all_toko,
+			'whs_code' => $whs_code,
 		);
 		$this->template->load('template', 'toko/toko', $data);
 	}
 
-	public function pilih_toko()
-	{
-		$post = $_POST;
-		$nonaktif_toko = $this->db->query("UPDATE t_toko SET is_active = 'n' WHERE is_active = 'y'");
-		if ($this->db->query("SELECT * FROM t_toko WHERE is_active = 'y'")->num_rows() < 1) {
-			$params = array(
-				'is_active' => 'y',
-				'updated_by' => $this->session->userdata('userid'),
-				'updated' => international_date_time(),
-			);
-			$this->db->where('id', $post['id']);
-			$this->db->update('t_toko', $params);
-		}
-		redirect('toko');
-	}
+	// public function pilih_toko()
+	// {
+	// 	$post = $_POST;
+	// 	$nonaktif_toko = $this->db->query("UPDATE t_toko SET is_active = 'n' WHERE is_active = 'y'");
+	// 	if ($this->db->query("SELECT * FROM t_toko WHERE is_active = 'y'")->num_rows() < 1) {
+	// 		$params = array(
+	// 			'is_active' => 'y',
+	// 			'updated_by' => $this->session->userdata('userid'),
+	// 			'updated' => international_date_time(),
+	// 		);
+	// 		$this->db->where('id', $post['id']);
+	// 		$this->db->update('t_toko', $params);
+	// 	}
+	// 	redirect('toko');
+	// }
 
 	public function edit_toko()
 	{
 		$post = $_POST;
+
+		// var_dump($post);
+		// die;
+
+
 		$params = array(
 			'nama_toko' => $post['nama_toko'],
+			'whs_code' => $post['whs_code'],
+			'code_store' => $post['kode_store'],
 			'toko_cabang' => $post['cabang_toko'],
 			'alamat_toko' => $post['alamat'],
 		);
+
 		$this->db->where('id', $post['id_toko']);
 		$this->db->update('t_toko', $params);
 

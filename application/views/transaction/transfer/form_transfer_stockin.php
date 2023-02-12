@@ -98,8 +98,10 @@
             success: function(result) {
                 if (result.success == true) {
                     alert('Data Berhasil disimpan')
-                    window.location.href = "<?=base_url('transfer/data_transfer_in')?>"
-                }else {
+                    window.location.href = "<?= base_url('transfer/data_transfer_in') ?>"
+                } else if (result.exists == true) {
+                    alert('Gagal, Data Sudah Ada');
+                } else {
                     alert('Gagal Simpan Data')
                 }
             }

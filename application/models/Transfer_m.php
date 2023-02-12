@@ -16,8 +16,6 @@ class Transfer_m extends CI_Model
         } else {
             $no = "0001";
         }
-
-        // $kode_toko = $this->db->query("SELECT code_store FROM t_toko WHERE is_active = 'y'")->row()->code_store;
         $docnum = 'DG' . date('Ymd') . $no;
         return $docnum;
     }
@@ -118,7 +116,6 @@ class Transfer_m extends CI_Model
             ];
             array_push($row, $params);
         }
-        // var_dump($row);
         $this->db->insert_batch('t_stock', $row);
     }
 
@@ -149,6 +146,16 @@ class Transfer_m extends CI_Model
     }
 
 
+    function simpan_transfer_stock_in(){
+        $params = array(
+            'docnum',
+            'whs_code_rec',
+            'whs_code_send',
+            'type_transfer' => 'in',
+            'created_by' => $this->session->userdata('userid')
+        );
+    }
+
 
     public function update_qty($post)
     {
@@ -164,9 +171,9 @@ class Transfer_m extends CI_Model
         $this->db->delete('t_cart_transfer_stockout');
     }
 
-    public function insert_transfer($post)
+    public function insert_transfer($post, $nomor_transfer)
     {
-        $docnum = $this->docnum();
+        $docnum = $nomor_transfer;
         $whs_code_rec = $post['whs_code'];
         $whs_code_send = $this->db->query("select whs_code from t_toko where is_active = 'y'")->row()->whs_code;
         $type = 'out';
