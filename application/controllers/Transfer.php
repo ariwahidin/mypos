@@ -82,7 +82,6 @@ class Transfer extends CI_Controller
 
         if (isset($_POST['cari'])) {
             $item_transfer = $this->get_item_transfer($_POST);
-            // $data['whs_code'] = $_POST['whs_code'];
             $data['docnum'] = $_POST['docnum'];
         }
 
@@ -130,20 +129,17 @@ class Transfer extends CI_Controller
             'docnum' => $docnum
         );
 
-        $options = array(
-            'http' => array(
-                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method'  => 'POST',
-                'content' => http_build_query($post),
-            ),
-        );
+        $url = my_api() . 'item/gettransferstock';
+        $api = post_curl($url, $post);
 
-        $context  = stream_context_create($options);
-        $response = file_get_contents(my_api() . 'item/gettransferstock', false, $context);
-        $result = json_decode($response);
+        if ($api['status_code'] != 200) {
+            // echo "Tidak Ada Koneksi";
+            $this->session->set_flashdata('error', 'Error ' . $api['status_code']);
+            return false;
+        }
 
-        if (isset($result->data)) {
-            $insert_cart = $this->transfer_m->insert_cart($result->data);
+        if (isset($api['data']->data)) {
+            $insert_cart = $this->transfer_m->insert_cart($api['data']->data);
             $return = $this->db->affected_rows();
         } else {
             $return = $this->db->affected_rows();
@@ -206,13 +202,13 @@ class Transfer extends CI_Controller
 
 
             $item_cart = $this->transfer_m->get_cart();
-            if ($item_cart->num_rows() > 0) {
 
-                // Start Proses kirim data ke server
+            if ($item_cart->num_rows() > 0) {
 
                 $item_transfer = $this->transfer_m->get_cart();
                 $user_id = $this->session->userdata('userid');
                 $user = $this->db->query("select name from user where user_id = '$user_id'")->row()->name;
+
                 $post_data = array(
                     "pengirim" => $this->db->query("SELECT whs_code FROM t_toko WHERE is_active = 'y'")->row()->whs_code,
                     "tujuan" => $post['whs_code'],
@@ -220,26 +216,23 @@ class Transfer extends CI_Controller
                     "post_transfer" => $item_transfer->result()
                 );
 
+                // Start Proses kirim data ke server
                 $url = my_api() . 'item/transferstock';
-                $client =  curl_init($url);
-                curl_setopt($client, CURLOPT_POST, 1);
-                curl_setopt($client, CURLOPT_POSTFIELDS, http_build_query($post_data));
-                curl_setopt($client, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($client, CURLOPT_HTTPHEADER, array(
-                    'Content-Type: application/x-www-form-urlencoded'
-                ));
-                $response = curl_exec($client);
-                $status_code = curl_getinfo($client, CURLINFO_HTTP_CODE);
-                $result = json_decode($response);
+                $api = post_curl($url, $post_data);
 
-                $nomor_transfer = $result->nomor_transfer;
+                if ($api['status_code'] != 200) {
+                    echo json_encode(['koneksi' => $api['status_code']]);
+                    return false;
+                }
+
+                $nomor_transfer = $api['data']->nomor_transfer;
                 // End Kirim Data ke server
 
                 $id = $this->transfer_m->insert_transfer($post, $nomor_transfer);
-                // $docnum = $this->db->query("select docnum from tb_transfer_stock where id = '$id'")->row()->docnum;
                 $stock_id = $this->stock_m->stock_doc_id();
 
                 foreach ($item_cart->result() as $value) {
+
                     $params = array(
                         'docnum' => $nomor_transfer,
                         'item_code' => $value->item_code,
@@ -250,6 +243,7 @@ class Transfer extends CI_Controller
                         'exp_date' => $value->exp_date,
                         'created_by' => $this->session->userdata('userid')
                     );
+
                     // insert tb transfer detail
                     $this->transfer_m->insert_transfer_detail($params);
 
@@ -306,44 +300,6 @@ class Transfer extends CI_Controller
             // redirect('stockout');
         }
     }
-
-
-    // function send($docnum)
-    // {
-    //     $sql = "select t1.docnum, t2.whs_code_send, t2.whs_code_rec, t1.item_code, t1.exp_date, t1.qty, t1.barcode, t3.username 
-    //     from tb_transfer_stock_detail t1
-    //     inner join tb_transfer_stock t2 on t1.docnum = t2.docnum 
-    //     inner join `user` t3 on t1.created_by = t3.user_id
-    //     where t1.docnum = '$docnum'";
-    //     $query = $this->db->query($sql);
-
-
-    //     $post = array(
-    //         'post_transfer' => $query->result(),
-    //     );
-
-    //     $options = array(
-    //         'http' => array(
-    //             'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-    //             'method'  => 'POST',
-    //             'content' => http_build_query($post),
-    //         ),
-    //     );
-
-    //     $context  = stream_context_create($options);
-    //     $response = file_get_contents(my_api() . 'item/transferstock', false, $context);
-    //     $result = json_decode($response);
-
-    //     // var_dump($result);
-
-    //     if ($result->status == 1) {
-    //         $result = true;
-    //     } else {
-    //         $result = false;
-    //     }
-
-    //     return $result;
-    // }
 
     function cart_data()
     {

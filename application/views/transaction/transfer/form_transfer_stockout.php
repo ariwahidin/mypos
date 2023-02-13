@@ -193,12 +193,14 @@
 
             success: function(result) {
                 if (result.success == true && result.uploaded == true) {
-                    alert('Item Transfer berhasil disimpan dan diupload');
-                    window.location.href = '<?= base_url('transfer/data_transfer_out') ?>';
+                    alert('Item Transfer berhasil disimpan dan diupload')
+                    window.location.href = '<?= base_url('transfer/data_transfer_out') ?>'
                 } else if (result.success == false && result.cart == 0) {
-                    alert('Item Tranfser Kosong');
+                    alert('Item Tranfser Kosong')
                 } else if(result.success == false && result.uploaded == false){
-                    alert('Data tidak ter-upload');
+                    alert('Data tidak ter-upload')
+                } else if(result.koneksi != 200){
+                    alert('Tidak Ada Koneksi')
                 } else {
                     alert('Gagal simpan')
                 }

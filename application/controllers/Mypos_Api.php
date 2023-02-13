@@ -52,28 +52,19 @@ class Mypos_Api extends CI_Controller
         }
 
         $url = my_api() . 'item/get_item_transfer';
-        $client =  curl_init($url);
-        curl_setopt($client, CURLOPT_POST, 1);
-        curl_setopt($client, CURLOPT_POSTFIELDS, http_build_query($post));
-        curl_setopt($client, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($client, CURLOPT_HTTPHEADER, array(
-            'Content-Type: application/x-www-form-urlencoded'
-        ));
-        $response = curl_exec($client);
-        $status_code = curl_getinfo($client, CURLINFO_HTTP_CODE);
-        $result = json_decode($response);
+        $api = post_curl($url, $post);
 
-        if ($status_code == 200) {
+        if ($api['status_code'] == 200) {
 
             $data = array(
                 'whs_code' => $whs_code,
-                'result' => $result,
+                'result' => $api['data'],
                 'input_search' => $post
             );
             $this->template->load('template', 'transaction/stock_in/data_transfer', $data);
         } else {
             $data = array(
-                'status_code' => $status_code
+                'status_code' => $api['status_code']
             );
             $this->template->load('template', 'error_page', $data);
         }

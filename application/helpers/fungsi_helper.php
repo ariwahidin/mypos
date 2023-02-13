@@ -134,14 +134,49 @@ function barcode_is_exits($barcode)
     $response = file_get_contents($url, false, stream_context_create($options));
     $result = json_decode($response);
 
-    if($result->success == true){
+    if ($result->success == true) {
         return true;
-    }else{
+    } else {
         return false;
     }
 }
 
-function my_api(){
+function my_api()
+{
     $api_address = "http://103.135.26.106:23407/pandurasa-whs/";
     return $api_address;
+}
+
+function test_koneksi()
+{
+    $url = my_api() . 'test/test_connection_post';
+    $post_data = ['post' => 'ini isi data post'];
+    $api = post_curl($url, $post_data);
+    return $api;
+}
+
+function post_curl($url, $post_data)
+{
+    $client =  curl_init($url);
+    curl_setopt($client, CURLOPT_POST, 1);
+    curl_setopt($client, CURLOPT_POSTFIELDS, http_build_query($post_data));
+    curl_setopt($client, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($client, CURLOPT_HTTPHEADER, array(
+        'Content-Type: application/x-www-form-urlencoded'
+    ));
+    $response = curl_exec($client);
+    $status_code = curl_getinfo($client, CURLINFO_HTTP_CODE);
+
+    if ($status_code == 200) {
+        $result = array(
+            'status_code' => $status_code,
+            'data' => json_decode($response),
+        );
+    } else {
+        $result = array(
+            'status_code' => $status_code,
+        );
+    }
+
+    return $result;
 }

@@ -39,33 +39,24 @@ class Upload extends CI_Controller
 
         $sales_summary = $this->db->query($sql_sales_summary)->result();
         $sales_detail = $this->db->query($sql_sales_detail)->result();
-        
+
 
         $post = array(
             'post_sales_summary' => $sales_summary,
             'post_sales_detail' => $sales_detail,
         );
 
-        // var_dump($post);
-        // die;
+        $url = my_api() . 'item/save_sale_detail';
+        $api = post_curl($url, $post);
 
-
-        $options = array(
-            'http' => array(
-                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method'  => 'POST',
-                'content' => http_build_query($post),
-            ),
-        );
-
-        $context  = stream_context_create($options);
-        $response = file_get_contents(my_api().'item/save_sale_detail', false, $context);
-        $result = json_decode($response);
-        if($result->status == 1){
-            $this->session->set_flashdata('success',$result->messages);
-        }else{
-            $this->session->set_flashdata('error',$result->messages);
+        if ($api['status_code'] != 200) {
+            $this->session->set_flashdata('error', 'error ' . $api['status_code']);
+        } else if ($api['data']->status == 1) {
+            $this->session->set_flashdata('success', $api['data']->messages);
+        } else {
+            $this->session->set_flashdata('error', $api['data']->messages);
         }
+
         redirect('upload');
     }
 }
