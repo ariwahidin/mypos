@@ -10,6 +10,12 @@ class Item extends CI_Controller
         $this->load->model(['item_m', 'category_m', 'unit_m', 'stock_m']);
     }
 
+    function whs_code()
+    {
+        $whs_code = $this->db->query("select whs_code from t_toko where is_active = 'y'")->row()->whs_code;
+        return $whs_code;
+    }
+
     function get_ajax()
     {
         $list = $this->item_m->get_datatables();
@@ -54,6 +60,108 @@ class Item extends CI_Controller
         $this->template->load('template', 'product/item/item_data', $data);
     }
 
+    public function suggest()
+    {
+        $data = array(
+            'item_suggest' => $this->item_m->get_suggest_qty()
+        );
+        $this->template->load('template', 'product/item/item_suggest', $data);
+    }
+
+    public function order()
+    {
+
+        $delete_cart_suggest = $this->item_m->delete_cart();
+        $data = array(
+            'item_suggest' => $this->item_m->get_suggest_qty(),
+            'cart_order' => $this->item_m->get_cart_order()
+        );
+        $this->template->load('template', 'product/item/order', $data);
+    }
+
+    public function add_cart()
+    {
+        $post = $this->input->post();
+
+        $item_selected = $this->item_m->get_suggest_qty($post["item_code"]);
+        $add_cart = $this->item_m->add_cart($item_selected);
+        $cart = $this->item_m->get_cart_order();
+        $data = array(
+            'cart_order' => $cart
+        );
+        $this->load->view('product/item/table_order', $data);
+    }
+
+    public function delete_cart()
+    {
+        $id = $this->input->post('id');
+        $this->item_m->delete_cart($id);
+        $cart = $this->item_m->get_cart_order();
+        $data = array(
+            'cart_order' => $cart
+        );
+        $this->load->view('product/item/table_order', $data);
+    }
+
+    public function order_item()
+    {
+        $item_order = $this->item_m->get_item_order();
+        $data = array(
+            'item_order' => $item_order
+        );
+        $this->template->load('template', 'product/item/data_order', $data);
+    }
+
+    public  function proses_order()
+    {
+        $cart = $this->item_m->get_cart_order();
+        if ($cart->num_rows() > 0) {
+
+            $whs_code = $this->db->query("select whs_code from t_toko where is_active = 'y'")->row()->whs_code;
+            $post_data = array(
+                'whs_code' => $whs_code,
+                'item_order' => $cart->result()
+            );
+
+            $url = my_api() . 'item/order';
+            $api = post_curl($url, $post_data);
+
+            if ($api['status_code'] == 200) {
+
+                if ($api['data']->status == 1) {
+                    $nomor_order = $api['data']->no_order;
+                    $this->item_m->simpan_order_stock($nomor_order);
+                    if ($this->db->affected_rows() > 0) {
+                        $response = array(
+                            'success' => true,
+                            'messages' => $api['data']->messages,
+                            'status' => $api['data']->status
+                        );
+                    } else {
+                        $response = array(
+                            'success' => false,
+                            'messages' => 'Gagal insert data local'
+                        );
+                    }
+                } else {
+                    $response = array(
+                        'success' => false,
+                        'messages' => $api['data']->messages,
+                        'status' => $api['data']->status
+                    );
+                }
+            } else {
+                $response = array(
+                    'success' => false,
+                    'status_code' => $api['status_code']
+                );
+            }
+        } else {
+            $response = array('success' => false);
+        }
+        echo json_encode($response);
+    }
+
     public function add()
     {
         $item = new stdClass();
@@ -82,6 +190,8 @@ class Item extends CI_Controller
         );
         $this->template->load('template', 'product/item/item_form', $data);
     }
+
+
 
     public function edit($id)
     {
@@ -250,5 +360,36 @@ class Item extends CI_Controller
             $this->session->set_flashdata('error', 'Gagal tambah data');
         }
         redirect('item');
+    }
+
+    function refresh_order()
+    {
+        $whs_code = $this->whs_code();
+        $post_data = array(
+            'whs_code' => $whs_code
+        );
+
+        $url = my_api() . 'item/getorder';
+        $api = post_curl($url, $post_data);
+
+        if (count($api["data"]) > 0) {
+            $refresh = $this->item_m->refresh_order($api["data"]);
+            if ($refresh > 0) {
+                $this->session->set_flashdata('success', 'Berhasil refresh');
+            } else {
+                $this->session->set_flashdata('success', 'Data Sudah Up to date');
+            }
+        }
+
+        redirect('item/order_item');
+    }
+
+    function order_detail(){
+        $no_order = $this->input->post('no_order');
+        $detail = $this->item_m->get_detail_order($no_order);
+        $data = array(
+            'detail' => $detail
+        );
+        $this->load->view('product/item/modal_order_detail', $data);
     }
 }

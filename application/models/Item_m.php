@@ -41,14 +41,118 @@ class Item_m extends CI_Model
 
     function get_item()
     {
-        $sql = "select item_id, item_code, barcode, name,harga_jual, sum(stock) as stock from
+        $sql = "select item_id, item_code, barcode, name,harga_jual, sum(stock) as stock, ss.min_stock from
         (
-        select t1.item_id, t1.item_code, t1.barcode, t1.name, t1.harga_jual, case when t2.qty is null then 0 else t2.qty end as stock
+        select t1.item_id, t1.item_code, t1.barcode, t1.name, t1.harga_jual,t1.min_stock, 
+        case when t2.qty is null then 0 else t2.qty end as stock
         from p_item t1
         left join p_item_detail t2 on t1.item_code = t2.item_code
+        order by t1.item_code
         )ss
         group by item_code
         order by stock desc";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+
+    function get_suggest_qty($item_code = null)
+    {
+        $sql = "select * from 
+        (
+        select item_id, item_code, barcode, name,harga_jual, sum(stock) as stock, ss.min_stock, ss.min_stock -  sum(stock) as suggest_qty
+        from
+        (
+        select t1.item_id, t1.item_code, t1.barcode, t1.name, t1.harga_jual,t1.min_stock, 
+        case when t2.qty is null then 0 else t2.qty end as stock
+        from p_item t1
+        left join p_item_detail t2 on t1.item_code = t2.item_code
+        order by t1.item_code
+        )ss
+        group by item_code
+        order by stock desc
+        )xx
+        where xx.suggest_qty > 0";
+        if ($item_code != null) {
+            $s = implode("','", $item_code);
+            $sql .= " AND xx.item_code IN('$s')";
+        }
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    function add_cart($item_selected)
+    {
+        // var_dump($item_selected);
+        foreach ($item_selected->result() as $data) {
+
+            $cek = $this->db->get_where('t_cart_suggest_order', ['item_code' => $data->item_code]);
+
+            if ($cek->num_rows() > 0) {
+                // item sudah ada
+            } else {
+                $params = array(
+                    'item_code' => $data->item_code,
+                    'barcode' => $data->barcode,
+                    'item_name' => $data->name,
+                    'stock' => $data->stock,
+                    'min_stock' => $data->min_stock,
+                    'suggest_qty' => $data->suggest_qty,
+                    'qty_order' => $data->suggest_qty,
+                    'created_by' => $this->session->userdata('userid')
+                );
+                $this->db->insert('t_cart_suggest_order', $params);
+            }
+        }
+    }
+
+    function delete_cart($id = null)
+    {
+        $user_id = $this->session->userdata('userid');
+        $sql = "DELETE FROM t_cart_suggest_order WHERE created_by = '$user_id'";
+        if ($id != null) {
+            $sql .= " AND id = '$id'";
+        }
+        $this->db->query($sql);
+    }
+
+    function simpan_order_stock($nomor_order)
+    {
+        $cart = $this->get_cart_order();
+        $row = array();
+        foreach ($cart->result() as $data) {
+            $params = array(
+                'no_order' => $nomor_order,
+                'item_code' => $data->item_code,
+                'barcode' => $data->barcode,
+                'item_name' => $data->item_name,
+                'stock' => $data->stock,
+                'min_stock' => $data->min_stock,
+                'qty_order' => $data->qty_order,
+                'created_by' => $data->created_by
+            );
+            array_push($row, $params);
+        }
+        $this->db->insert_batch('tb_stock_order', $row);
+    }
+
+    function get_item_order()
+    {
+        $sql = "select distinct t1.no_order, t2.name, t1.created, t1.is_approve  
+        from tb_stock_order t1
+        inner join user t2 on t1.created_by = t2.user_id
+        order by t1.created desc";
+        // $sql = "select t1.*, t2.name as user  from tb_stock_order t1
+        // inner join user t2 on t1.created_by = t2.user_id 
+        // order by t1.created desc ";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    function get_cart_order()
+    {
+        $user_id = $this->session->userdata('userid');
+        $sql = "SELECT t1.*, t2.name as user FROM t_cart_suggest_order t1 INNER JOIN user t2 on t1.created_by = t2.user_id where t1.created_by = '$user_id'";
         $query = $this->db->query($sql);
         return $query;
     }
@@ -261,7 +365,7 @@ class Item_m extends CI_Model
             foreach ($item->result() as $data) {
                 $cek_item_code = $this->db->query("select * from p_item where item_code = '$data->item_code'");
                 if ($cek_item_code->num_rows() > 0) {
-                    $sql_update = "update p_item set barcode = '$data->barcode', name = '$data->item_name', item_name_toko = '$data->item_name', price = '$data->harga_jual', harga_jual = '$data->harga_jual', harga_bersih = '$data->harga_bersih' where item_code = '$data->item_code'";
+                    $sql_update = "update p_item set barcode = '$data->barcode', name = '$data->item_name', min_stock = '$data->min_stock', item_name_toko = '$data->item_name', price = '$data->harga_jual', harga_jual = '$data->harga_jual', harga_bersih = '$data->harga_bersih' where item_code = '$data->item_code'";
                     $this->db->query($sql_update);
                     $total_update = $total_update + 1;
                 } else {
@@ -269,6 +373,7 @@ class Item_m extends CI_Model
                         'item_code' => $data->item_code,
                         'barcode' => $data->barcode,
                         'name' => $data->item_name,
+                        'min_stock' => $data->min_stock,
                         'item_name_toko' => $data->item_name,
                         'category_id' => '15',
                         'unit_id' => '5',
@@ -315,5 +420,37 @@ class Item_m extends CI_Model
             );
             $this->db->insert('p_item_detail', $params);
         }
+    }
+
+    function refresh_order($data)
+    {
+        $affected = 0;
+        foreach ($data as $dt) {
+            $data = array(
+                'qty_order' => $dt->qty_order,
+                'is_approve' => $dt->is_approve,
+                'approve_by' => $dt->approved_by,
+                'approve_at' => $dt->approved_at
+            );
+
+            $where = array(
+                'no_order' => $dt->doc_id,
+                'barcode' => $dt->barcode
+            );
+
+            $this->db->where($where);
+            $this->db->update('tb_stock_order', $data);
+
+            $affected += $this->db->affected_rows();
+        }
+        // var_dump($this->db->last_query());
+        // die;
+        return $affected;
+    }
+
+    function get_detail_order($no_order)
+    {
+        $query = $this->db->get_where('tb_stock_order', array('no_order' => $no_order));
+        return $query;
     }
 }

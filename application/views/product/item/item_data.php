@@ -1,5 +1,5 @@
 <section class="content-header">
-    <h1>Items Toko
+    <h1>Stock Item
         <small>Data Barang Di Toko</small>
     </h1>
     <ol class="breadcrumb">
@@ -15,8 +15,9 @@
         <div class="box-header">
             <!-- <h3 class="box-title">Data Product Items</h3> -->
             <div class="pull-right">
+                <a class="btn btn-flat btn-success" href="<?= site_url('item/order') ?>">Order</a>
+                <a class="btn btn-flat btn-info" href="<?= site_url('item/suggest') ?>">Qty Suggest</a>
                 <a onclick="showLoading()" class="btn btn-flat btn-primary" href="<?= site_url('Warehouse/get_harga_item') ?>">Refresh</a>
-                <!-- <button class="btn btn-flat btn-success" data-toggle="modal" data-target="#modal-tambah-item">Tambah Item Baru</button> -->
             </div>
         </div>
         <div class="box-body table-responsive">
@@ -29,6 +30,7 @@
                         <th>Name</th>
                         <th>Harga Jual</th>
                         <th>Stock</th>
+                        <th>Min Stock</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -44,6 +46,7 @@
                             <td>
                                 <a href="<?= base_url('item/item_stock_detail/') . $data->item_code ?>"><?= $data->stock ?></a>
                             </td>
+                            <td><?= $data->min_stock ?></td>
                             <td>
                                 <button class="btn btn-flat btn-primary btn-xs" id="btn_edit" data-item-code="<?= $data->item_code ?>" data-item-name="<?= $data->name ?>" data-barcode="<?= $data->barcode ?>">
                                     <i class="fa fa-plus"></i> Add Stock

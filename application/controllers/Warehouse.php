@@ -29,6 +29,10 @@ class Warehouse extends CI_Controller
 
 
         if ($api['status_code'] == 200) {
+
+            // var_dump($api['data']);
+            // die;
+
             if (count($api['data']->data) > 0) {
                 $row = array();
                 foreach ($api['data']->data as $it) {
@@ -38,6 +42,7 @@ class Warehouse extends CI_Controller
                         'barcode' => $it->barcode,
                         'item_name' => $it->item_name,
                         'brand_code' => $it->brand_code,
+                        'min_stock' => $it->min_stock,
                         'harga_jual' => $it->harga_jual,
                         'harga_bersih' => $it->harga_bersih,
                         'harga_ppn' => $it->harga_ppn,

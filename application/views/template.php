@@ -12,6 +12,12 @@
 	<link rel="stylesheet" href="<?= base_url() ?>assets/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
 	<link rel="stylesheet" href="<?= base_url() ?>assets/dist/css/AdminLTE.min.css">
 	<link rel="stylesheet" href="<?= base_url() ?>assets/dist/css/skins/_all-skins.min.css">
+
+
+	<link rel="stylesheet" href="<?= base_url() ?>assets/css/dataTables.checkboxes.css">
+	<link rel="stylesheet" href="<?= base_url() ?>assets/css/datatables.min.css">
+
+
 	<!--[if lt IE 9]>
 	<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -189,7 +195,7 @@
 
 						</ul>
 					</li>
-					<li class="treeview <?= $this->uri->segment(1) == 'report' || $this->uri->segment(1) == 'stock' || $this->uri->segment(1) == 'upload' ? 'active' : '' ?>">
+					<li class="treeview <?= $this->uri->segment(1) == 'report' || $this->uri->segment(1) == 'stock' || $this->uri->segment(1) == 'upload' || $this->uri->segment(1) == 'item' ? 'active' : '' ?>">
 						<a href="#">
 							<i class="fa fa-pie-chart"></i> <span>Reports</span>
 							<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
@@ -256,8 +262,11 @@
 								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
 							</a>
 							<ul class="treeview-menu">
-								<li class="<?= $this->uri->segment(1) == 'item' ? 'active' : '' ?>">
+								<li class="<?= $this->uri->segment(1) == 'item' && $this->uri->segment(2) != 'order_item' ? 'active' : '' ?>">
 									<a href="<?= site_url('item') ?>"><i class="fa fa-circle-o"></i> <span>Data Stock</span></a>
+								</li>
+								<li <?= $this->uri->segment(2) == 'order_item' ? 'class="active"' : '' ?>>
+									<a href="<?= site_url('item/order_item') ?>"><i class="fa fa-circle-o"></i> Data Order Stock</a>
 								</li>
 								<li class="<?= $this->uri->segment(2) == 'stock_in' ? 'active' : '' ?>">
 									<a onclick="showLoading()" href="<?= site_url('mypos_api/stock_in') ?>"><i class="fa fa-circle-o"></i> <span>Stock In</span></a>
@@ -299,14 +308,13 @@
 			</section>
 		</aside>
 
-		<!-- <div id="loadingIndicator" class="d-none">
-			<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
-			<span class="sr-only">Loading...</span>
-		</div> -->
+		<!-- <script src="<?= base_url() ?>assets/bower_components/jquery/dist/jquery.min.js"></script> -->
+		<!-- <script src="<?= base_url() ?>assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script> -->
+		<!-- <script src="<?= base_url() ?>assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script> -->
 
-		<script src="<?= base_url() ?>assets/bower_components/jquery/dist/jquery.min.js"></script>
-		<script src="<?= base_url() ?>assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-		<script src="<?= base_url() ?>assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+		<script src="<?= base_url() ?>assets/js/jquery.min.js"></script>
+		<script src="<?= base_url() ?>assets/js/datatables.min.js"></script>
+		<script src="<?= base_url() ?>assets/js/dataTables.checkboxes.min.js"></script>
 		<script src="<?= base_url() ?>assets/plugins/sweetalert2/sweetalert2.min.js"></script>
 		<!-- Content Wrapper -->
 		<div class="content-wrapper">

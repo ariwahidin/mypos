@@ -157,6 +157,7 @@ function test_koneksi()
 
 function post_curl($url, $post_data)
 {
+    
     $client =  curl_init($url);
     curl_setopt($client, CURLOPT_POST, 1);
     curl_setopt($client, CURLOPT_POSTFIELDS, http_build_query($post_data));
@@ -164,6 +165,7 @@ function post_curl($url, $post_data)
     curl_setopt($client, CURLOPT_HTTPHEADER, array(
         'Content-Type: application/x-www-form-urlencoded'
     ));
+
     $response = curl_exec($client);
     $status_code = curl_getinfo($client, CURLINFO_HTTP_CODE);
 
