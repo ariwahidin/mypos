@@ -28,6 +28,27 @@ class Bonus extends CI_Controller
 
     public function edit(){
         $post = $_POST;
-        var_dump($post);
+        $start_date = date('Y-m-d h:i:s', strtotime(str_replace("/","-",$post['start_periode'])));
+        $end_date = date('Y-m-d h:i:s', strtotime(str_replace("/","-",$post['end_periode'])));
+
+        $data_edit = array(
+            'min_sales' => $post['min_belanja'],
+            'start_periode' => $start_date,
+            'end_periode' => $end_date,
+            'is_active' => $post['status'],
+            'created_by' => $this->session->userdata('userid'),
+            'created' => date('Y-m-d'),
+        );
+
+        $this->db->where('id_event', $post['id_event']);
+        $this->db->update('tb_event', $data_edit);
+
+        if($this->db->affected_rows() > 0){
+            $this->session->set_flashdata('success', 'Edit Berhasil');
+        }else{
+            $this->session->set_flashdata('error', 'Gagal Edit');
+        }
+
+        redirect('bonus');
     }
 }

@@ -42,6 +42,7 @@
                                 data-status="<?=$data->is_active?>"
                                 data-item="<?=$data->item_code?>"
                                 data-min_belanja="<?=$data->min_sales?>"
+                                data-id="<?=$data->id_event?>"
                                 >
                                 Edit
                             </button>
@@ -71,6 +72,7 @@
                 <div class="form-group">
                     <label for="">Minimal Belanja</label>
                     <input name="min_belanja" type="number" id="min_belanja" class="form-control">
+                    <input name="id_event" type="hidden" id="id_event" class="form-control">
                 </div>
                 <div class="form-group">
                     <label for="">Item Bonus</label>
@@ -125,6 +127,8 @@
         var end_periode = $(this).data('end_periode')
         var min_belanja = $(this).data('min_belanja')
         var item = $(this).data('item')
+        var id_event = $(this).data('id')
+        $('#id_event').val(id_event)
         $('#item_bonus').val(item)
         $('#min_belanja').val(min_belanja)
         $('#start_periode').val(start_periode)

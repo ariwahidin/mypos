@@ -443,8 +443,6 @@ class Item_m extends CI_Model
 
             $affected += $this->db->affected_rows();
         }
-        // var_dump($this->db->last_query());
-        // die;
         return $affected;
     }
 

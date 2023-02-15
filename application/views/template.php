@@ -115,7 +115,7 @@
 	</style>
 </head>
 
-<body class="hold-transition skin-purple sidebar-mini <?= $this->uri->segment(1) == 'sale' && $this->uri->segment(2) != 'stock' ? 'sidebar-collapse' : null ?> ">
+<body class="hold-transition skin-blue-light sidebar-mini <?= $this->uri->segment(1) == 'sale' && $this->uri->segment(2) != 'stock' ? 'sidebar-collapse' : null ?> ">
 	<div id="wadah_loader">
 		<div id="loader"></div>
 	</div>
@@ -195,7 +195,7 @@
 
 						</ul>
 					</li>
-					<li class="treeview <?= $this->uri->segment(1) == 'report' || $this->uri->segment(1) == 'stock' || $this->uri->segment(1) == 'upload' || $this->uri->segment(1) == 'item' ? 'active' : '' ?>">
+					<li class="treeview <?= $this->uri->segment(1) == 'report' || $this->uri->segment(1) == 'stock' || $this->uri->segment(1) == 'upload' ? 'active' : '' ?>">
 						<a href="#">
 							<i class="fa fa-pie-chart"></i> <span>Reports</span>
 							<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
@@ -232,7 +232,7 @@
 								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
 							</a>
 							<ul class="treeview-menu">
-								<li <?= $this->uri->segment(2) == 'data_transfer_out' || $this->uri->segment(2) == '' ? 'class="active"' : '' ?>>
+								<li <?= $this->uri->segment(1) == 'transfer' && $this->uri->segment(2) == 'data_transfer_out' ? 'class="active"' : '' ?>>
 									<a href="<?= site_url('transfer/data_transfer_out') ?>"><i class="fa fa-circle-o"></i> <span>Transfer Stock Out</span></a>
 								</li>
 								<li <?= $this->uri->segment(2) == 'data_transfer_in' || $this->uri->segment(2) == 'in' ? 'class="active"' : '' ?>>
@@ -247,7 +247,7 @@
 								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
 							</a>
 							<ul class="treeview-menu">
-								<li <?= $this->uri->segment(2) == '' ? 'class="active"' : '' ?>>
+								<li <?= $this->uri->segment(1) == 'produksi' && $this->uri->segment(2) == '' ? 'class="active"' : '' ?>>
 									<a href="<?= site_url('produksi') ?>"><i class="fa fa-circle-o"></i> <span>Produksi (Buat Baru)</span></a>
 								</li>
 								<li <?= $this->uri->segment(2) == 'ready' ? 'class="active"' : '' ?>>
@@ -266,7 +266,7 @@
 									<a href="<?= site_url('item') ?>"><i class="fa fa-circle-o"></i> <span>Data Stock</span></a>
 								</li>
 								<li <?= $this->uri->segment(2) == 'order_item' ? 'class="active"' : '' ?>>
-									<a href="<?= site_url('item/order_item') ?>"><i class="fa fa-circle-o"></i> Data Order Stock</a>
+									<a href="<?= site_url('item/order_item') ?>"><i class="fa fa-circle-o"></i> Order Stock</a>
 								</li>
 								<li class="<?= $this->uri->segment(2) == 'stock_in' ? 'active' : '' ?>">
 									<a onclick="showLoading()" href="<?= site_url('mypos_api/stock_in') ?>"><i class="fa fa-circle-o"></i> <span>Stock In</span></a>
@@ -283,7 +283,7 @@
 								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
 							</a>
 							<ul class="treeview-menu">
-								<li>
+								<li <?= $this->uri->segment(1) == 'bonus' ? 'class="active"' : '' ?>>
 									<a href="<?= site_url('bonus') ?>"><i class="fa fa-circle-o"></i> <span>Setting Bonus</span></a>
 								</li>
 								<li <?= $this->uri->segment(1) == 'user' ? 'class="active"' : '' ?>>
@@ -295,10 +295,10 @@
 								<li <?= $this->uri->segment(1) == 'toko' ? 'class="active"' : '' ?>>
 									<a href="<?= site_url('toko') ?>"><i class="fa fa-circle-o"></i> <span>Toko</span></a>
 								</li>
-								<li <?= $this->uri->segment(1) == 'type_bayar' ? 'class="active"' : '' ?>>
+								<li <?= $this->uri->segment(1) == 'payment' ? 'class="active"' : '' ?>>
 									<a href="<?= site_url('payment') ?>"><i class="fa fa-circle-o"></i> <span>Type Bayar</span></a>
 								</li>
-								<li>
+								<li <?= $this->uri->segment(1) == 'printer' ? 'class="active"' : '' ?>>
 									<a href="<?= site_url('printer') ?>"><i class="fa fa-circle-o"></i> <span>Setting Printer</span></a>
 								</li>
 							</ul>
