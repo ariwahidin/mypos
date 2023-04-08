@@ -29,7 +29,7 @@ function check_admin()
 
 function indo_currency($nominal)
 {
-    $result = "Rp " . number_format($nominal, 2, ',', '.');
+    $result = 'Rp ' . number_format($nominal, 2, ',', '.');
     return $result;
 }
 
@@ -116,21 +116,21 @@ function get_counter()
 function barcode_is_exits($barcode)
 {
     $ci = &get_instance();
-    $url = "http://119.110.68.194/pandurasa-whs/item/barcode_exists";
+    $url = 'http://119.110.68.194/pandurasa-whs/item/barcode_exists';
     $toko = $ci->db->query("SELECT * FROM t_toko WHERE is_active = 'y'")->row();
-    $post = array(
+    $post = [
         'kode_seller' => $toko->kode_seller,
         'kode_area' => $toko->kode_area,
         'kode_counter' => $toko->code_store,
         'barcode' => $barcode,
-    );
-    $options = array(
-        "http" => array(
-            "method" => "POST",
-            "header" => "Content-Type: application/x-www-form-urlencoded",
-            "content" => http_build_query($post)
-        )
-    );
+    ];
+    $options = [
+        'http' => [
+            'method' => 'POST',
+            'header' => 'Content-Type: application/x-www-form-urlencoded',
+            'content' => http_build_query($post),
+        ],
+    ];
     $response = file_get_contents($url, false, stream_context_create($options));
     $result = json_decode($response);
 
@@ -143,7 +143,7 @@ function barcode_is_exits($barcode)
 
 function my_api()
 {
-    $api_address = "http://103.135.26.106:23407/pandurasa-whs/";
+    $api_address = 'http://103.135.26.106:23407/pandurasa-whs/';
     return $api_address;
 }
 
@@ -157,28 +157,42 @@ function test_koneksi()
 
 function post_curl($url, $post_data)
 {
-    
-    $client =  curl_init($url);
+    $client = curl_init($url);
+    $data_json = json_encode($post_data);
+    $post = [
+        'data_post' => $data_json,
+    ];
     curl_setopt($client, CURLOPT_POST, 1);
-    curl_setopt($client, CURLOPT_POSTFIELDS, http_build_query($post_data));
+    curl_setopt($client, CURLOPT_POSTFIELDS, http_build_query($post));
     curl_setopt($client, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($client, CURLOPT_HTTPHEADER, array(
-        'Content-Type: application/x-www-form-urlencoded'
-    ));
-
     $response = curl_exec($client);
     $status_code = curl_getinfo($client, CURLINFO_HTTP_CODE);
+    curl_close($client);
 
     if ($status_code == 200) {
-        $result = array(
+        $result = [
             'status_code' => $status_code,
             'data' => json_decode($response),
-        );
+        ];
     } else {
-        $result = array(
+        $result = [
             'status_code' => $status_code,
-        );
+        ];
     }
 
     return $result;
+}
+
+function get_curl($u)
+{
+    $url = 'http://103.135.26.106:23407/pandurasa-whs/'.$u;
+
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_HEADER, false);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+    $response = curl_exec($curl);
+    curl_close($curl);
+    return json_decode($response, true);
 }

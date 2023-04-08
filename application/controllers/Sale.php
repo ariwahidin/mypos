@@ -9,6 +9,7 @@ class Sale extends CI_Controller
 		check_not_login();
 		$this->load->model('sale_m');
 		$this->load->model(['customer_m', 'item_m', 'supplier_m']);
+		$this->load->library('escpos');
 	}
 
 	public function index()
@@ -33,7 +34,15 @@ class Sale extends CI_Controller
 	}
 
 	public function prepare(){
-		$this->template->load('template', 'transaction/sale/prepare');
+		$sql = "select t1.*, t2.item_code, t3.name  from tb_event t1 
+        inner join tb_item_bonus t2 on t1.id_event = t2.id_event
+        inner join p_item t3 on t2.item_code = t3.item_code 
+        where now() > t1.start_periode and now() < t1.end_periode and t1.is_active = 'y'";
+		$item_bonus_active = $this->db->query($sql);
+		$data = array(
+			'item_bonus_acitve' => $item_bonus_active
+		);
+		$this->template->load('template', 'transaction/sale/prepare', $data);
 	}
 
 	function check_event()
@@ -324,13 +333,85 @@ class Sale extends CI_Controller
 
 	public function print_receipt_today()
 	{
+		$this->cetakStrukDaily();
+		// $receipt = $this->sale_m->get_sales_today_per_user();
+		// $tax = $this->db->query("select tax + 1 as tax from tax")->row()->tax;
+		// $data = array(
+		// 	'tax' => $tax,
+		// 	'receipt' => $receipt
+		// );
+		// $this->load->view('report/print_receipt_today', $data);
+	}
+
+	function get_printer()
+    {
+        $query = $this->db->query("select * from tb_printer");
+        return $query;
+    }
+
+	function cetakStrukDaily()
+    {
 		$receipt = $this->sale_m->get_sales_today_per_user();
 		$tax = $this->db->query("select tax + 1 as tax from tax")->row()->tax;
-		$data = array(
-			'tax' => $tax,
-			'receipt' => $receipt
-		);
-		$this->load->view('report/print_receipt_today', $data);
+
+        $profile = Escpos\CapabilityProfile::load("simple");
+        $connector = new Escpos\PrintConnectors\WindowsPrintConnector($this->get_printer()->row()->printer_name);
+        $printer = new Escpos\Printer($connector, $profile);
+        $img = Escpos\EscposImage::load("assets/dist/img/DgChocoGallerys.png", false);
+        $jumlah_print = 1;
+
+
+        $printer->initialize();
+
+        for ($i = 0; $i < $jumlah_print; $i++) {
+
+            $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
+            $printer->bitImage($img, Escpos\Printer::IMG_DOUBLE_WIDTH | Escpos\Printer::IMG_DOUBLE_HEIGHT | Escpos\Printer::JUSTIFY_CENTER);
+            $printer->setJustification(); // Reset
+            $printer->text("\n");
+
+            $printer->setEmphasis(false);
+            $printer->setPrintLeftMargin(16);
+
+            $printer->text($receipt->row()->toko_cabang . "\n");
+            $printer->text("DATE    : " . date('d-m-Y', strtotime($receipt->row()->tanggal_transaksi)) . "\n");
+            $printer->text("CASHIER : " . $receipt->row()->username . "\n");
+            $printer->text("-----------------------------------------\n");
+
+			$grand_total = 0;
+			foreach($receipt->result() as $data){
+				$grand_total += $data->total;
+			}
+
+            foreach ($receipt->result() as $data) {
+
+                $printer->text($this->buatBaris1Kolom($data->item_name));
+                $total_price = $data->qty * $data->price;
+                $printer->text($this->buatBaris3Kolom($data->qty . " PCS", number_format($data->price), $data->discount_item > 0 ? number_format($data->price * $data->qty) : number_format($data->total)));
+
+                if ($data->discount_item > 0) {
+                    $discount_percent = ($data->discount_item / $data->price) * 100;
+                    $total_discount_item = number_format($data->qty * $data->discount_item);
+                    $printer->text($this->buatBaris3Kolom("Disc.", number_format($data->discount_percent) . "%", "-" . number_format($data->discount_item)));
+                }
+                $printer->text("\n");
+            }
+
+            $printer->text("-----------------------------------------\n");
+
+            $printer->text($this->buatBaris3Kolom("Gross Total", "", number_format($grand_total / $tax)));
+            $printer->text($this->buatBaris3Kolom("Serv & Char", "", number_format($receipt->row()->total_service)));
+            $printer->text($this->buatBaris3Kolom("Discount", "", number_format($receipt->row()->total_discount)));
+            $printer->text($this->buatBaris3Kolom("Tax", "", number_format($grand_total - ($grand_total / $tax))));
+            $printer->text($this->buatBaris3Kolom("Grand Total", "", number_format($grand_total + ($receipt->row()->total_service) - ($receipt->row()->total_discount))));
+
+            $printer->text("-----------------------------------------\n");
+
+            $printer->text($this->buatBaris3Kolom("Printed : ", "", date('d-m-Y H:i:s', strtotime($this->db->query("select now() as now")->row()->now))));
+            $printer->feed(2);
+            $printer->cut();
+        }
+		$printer->close();
 	}
 
 	public function del($id)
@@ -347,4 +428,76 @@ class Sale extends CI_Controller
 			</script>";
 		}
 	}
+
+	function buatBaris1Kolom($kolom1)
+    {
+        // Mengatur lebar setiap kolom (dalam satuan karakter)
+        $lebar_kolom_1 = 40;
+
+        // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
+        $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
+
+        // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
+        $kolom1Array = explode("\n", $kolom1);
+
+        // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
+        $jmlBarisTerbanyak = count($kolom1Array);
+
+        // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
+        $hasilBaris = array();
+
+        // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris 
+        for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
+
+            // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+            $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+
+            // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
+            $hasilBaris[] = $hasilKolom1;
+        }
+
+        // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
+        return implode($hasilBaris, "\n") . "\n";
+    }
+
+    function buatBaris3Kolom($kolom1, $kolom2, $kolom3)
+    {
+        // Mengatur lebar setiap kolom (dalam satuan karakter)
+        $lebar_kolom_1 = 11;
+        $lebar_kolom_2 = 14;
+        $lebar_kolom_3 = 14;
+
+        // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
+        $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
+        $kolom2 = wordwrap($kolom2, $lebar_kolom_2, "\n", true);
+        $kolom3 = wordwrap($kolom3, $lebar_kolom_3, "\n", true);
+
+        // Merubah hasil wordwrap menjadi array, kolom yang memiliki 2 index array berarti memiliki 2 baris (kena wordwrap)
+        $kolom1Array = explode("\n", $kolom1);
+        $kolom2Array = explode("\n", $kolom2);
+        $kolom3Array = explode("\n", $kolom3);
+
+        // Mengambil jumlah baris terbanyak dari kolom-kolom untuk dijadikan titik akhir perulangan
+        $jmlBarisTerbanyak = max(count($kolom1Array), count($kolom2Array), count($kolom3Array));
+
+        // Mendeklarasikan variabel untuk menampung kolom yang sudah di edit
+        $hasilBaris = array();
+
+        // Melakukan perulangan setiap baris (yang dibentuk wordwrap), untuk menggabungkan setiap kolom menjadi 1 baris 
+        for ($i = 0; $i < $jmlBarisTerbanyak; $i++) {
+
+            // memberikan spasi di setiap cell berdasarkan lebar kolom yang ditentukan, 
+            $hasilKolom1 = str_pad((isset($kolom1Array[$i]) ? $kolom1Array[$i] : ""), $lebar_kolom_1, " ");
+            // memberikan rata kanan pada kolom 3 dan 4 karena akan kita gunakan untuk harga dan total harga
+            $hasilKolom2 = str_pad((isset($kolom2Array[$i]) ? $kolom2Array[$i] : ""), $lebar_kolom_2, " ", STR_PAD_LEFT);
+
+            $hasilKolom3 = str_pad((isset($kolom3Array[$i]) ? $kolom3Array[$i] : ""), $lebar_kolom_3, " ", STR_PAD_LEFT);
+
+            // Menggabungkan kolom tersebut menjadi 1 baris dan ditampung ke variabel hasil (ada 1 spasi disetiap kolom)
+            $hasilBaris[] = $hasilKolom1 . " " . $hasilKolom2 . " " . $hasilKolom3;
+        }
+
+        // Hasil yang berupa array, disatukan kembali menjadi string dan tambahkan \n disetiap barisnya.
+        return implode($hasilBaris, "\n") . "\n";
+    }
 }

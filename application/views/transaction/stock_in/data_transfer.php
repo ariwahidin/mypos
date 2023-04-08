@@ -19,7 +19,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <input type="text" name="whs_code" value="<?=$whs_code?>" class="form-control" placeholder="Whs Code" required readonly>
+                                    <input type="text" name="whs_code" value="<?= $whs_code ?>" class="form-control" placeholder="Whs Code" required readonly>
                                 </td>
                                 <td>
                                     <input type="number" name="surat_jalan" value="<?= empty($_SESSION['surat_jalan']) == true ? $input_search['surat_jalan'] : $_SESSION['surat_jalan'] ?>" class="form-control" class="form-control" placeholder="No Surat Jalan" required>
@@ -82,7 +82,7 @@
                                             <td><?= $data->barcode ?></td>
                                             <td><?= $data->description ?></td>
                                             <td><?= (int)$data->qty_ed ?></td>
-                                            <td><?= date('d-m-Y',strtotime($data->exp_date)) ?></td>
+                                            <td><?= date('d-m-Y', strtotime($data->exp_date)) ?></td>
                                         </tr>
                                 <?php }
                                 } ?>
@@ -104,11 +104,27 @@
     var btn_stock_in = document.getElementById("btn_stock_in");
     var form_stock_in = document.getElementById("form_stock_in");
     btn_stock_in.addEventListener("click", function() {
-        if (confirm("Yakin akan melakukan Stock In?")) {
-            showLoading();
-            form_stock_in.submit();
-        } else {
-            // the user clicked Cancel, so do nothing
-        }
+        // if (confirm("Yakin akan melakukan Stock In?")) {
+        //     showLoading();
+        //     form_stock_in.submit();
+        // } else {
+        //     // the user clicked Cancel, so do nothing
+        // }
+
+        Swal.fire({
+            title: 'Apakah anda yakin akan melakukan stock in?',
+            // text: "You won't be able to revert this!",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, yakin!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                showLoading();
+                form_stock_in.submit();
+            }
+        })
+
     })
 </script>

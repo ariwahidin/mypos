@@ -27,11 +27,7 @@ class Warehouse extends CI_Controller
         $url = my_api() . 'item/get_item_harga';
         $api = post_curl($url, $post_parameter);
 
-
         if ($api['status_code'] == 200) {
-
-            // var_dump($api['data']);
-            // die;
 
             if (count($api['data']->data) > 0) {
                 $row = array();

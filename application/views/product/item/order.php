@@ -88,7 +88,12 @@
                 item_code.push(rowId)
             });
             if (item_code == '') {
-                alert('Item Belum Dipilih')
+                //alert('Item Belum Dipilih')
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Item Belum Dipilih!',
+                })
             } else {
                 add_cart(item_code)
             }
@@ -129,9 +134,14 @@
             dataType: 'JSON',
             success: function(response) {
                 if (response.success == true) {
-                    window.location.href = '<?=base_url('item/order_item')?>'
+                    window.location.href = '<?= base_url('item/order_item') ?>'
                 } else {
-                    alert("Gagal Proses")
+                    //alert("Gagal Proses")
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong!',
+                    })
                 }
             }
         })

@@ -17,7 +17,7 @@
                                 <select name="" id="item_produksi" class="form-control">
                                     <option value="">--Pilih Item Produksi--</option>
                                     <?php foreach ($item_produksi->result() as $produksi) { ?>
-                                        <option value="<?= $produksi->id ?>"><?= $produksi->item_name.' ('.$produksi->item_code.'-'.$produksi->id.')' ?></option>
+                                        <option value="<?= $produksi->id ?>"><?= $produksi->item_name . ' (' . $produksi->item_code . '-' . $produksi->id . ')' ?></option>
                                     <?php } ?>
                                 </select>
                             </div>
@@ -94,9 +94,14 @@
         var item_produksi = $('#item_produksi').val()
         var qty_item_produksi = $('#qty_item_produksi').val()
         var exp_date = $('#exp_date').val()
-        if(item_produksi == '' || qty_item_produksi == '' || qty_item_produksi < 1 || exp_date == ''){
-            alert('Item Produksi, Qty, dan Exp Date Tidak boleh kosong')
-        }else{
+        if (item_produksi == '' || qty_item_produksi == '' || qty_item_produksi < 1 || exp_date == '') {
+            //alert('Item Produksi, Qty, dan Exp Date Tidak boleh kosong')
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Item Produksi, Qty, dan Exp Date Tidak boleh kosong',
+            })
+        } else {
             proses_produksi(item_produksi, qty_item_produksi, exp_date)
         }
     })
@@ -125,7 +130,12 @@
         var cart_id = $(this).data('cartid')
         var exp_date = $(this).data('exp_date')
         if (qty > stock) {
-            alert("stock tidak cukup")
+            //alert("stock tidak cukup")
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'stock tidak cukup',
+            })
         } else {
             // alert("stock cukup")
             edit_cart(id_item_detail, item_id, exp_date, cart_id)
@@ -146,13 +156,20 @@
 
             success: function(result) {
                 if (result.success == true) {
-                    alert('Produksi berhasil disimpan');
-                    window.location.href = '<?=base_url('produksi/ready')?>';
+                    //alert('Produksi berhasil disimpan');
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Produksi berhasil disimpan',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                    window.location.href = '<?= base_url('produksi/ready') ?>';
                 } else if (result.success == false && result.cart == 0) {
                     alert('Cart Kosong')
-                } else if (result.success == false && result.complete == false){
+                } else if (result.success == false && result.complete == false) {
                     alert('Item bahan tidak sesuai stock')
-                }else {
+                } else {
                     alert('Gagal proses produksi')
                 }
             }

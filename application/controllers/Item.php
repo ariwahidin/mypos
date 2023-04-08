@@ -23,6 +23,7 @@ class Item extends CI_Controller
         // die;
         $data = array();
         $no = @$_POST['start'];
+
         foreach ($list as $item) {
             $no++;
             $row = array();
@@ -40,12 +41,14 @@ class Item extends CI_Controller
             // $row[] = '<a href="' . site_url('item/del/' . $item->item_id) . '" onclick="return confirm(\'Yakin hapus data?\')"  class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> Delete</a>';
             $data[] = $row;
         }
+
         $output = array(
             "draw" => @$_POST['draw'],
             "recordsTotal" => $this->item_m->count_all(),
             "recordsFiltered" => $this->item_m->count_filtered(),
             "data" => $data,
         );
+
         // output to json format
         echo json_encode($output);
     }
@@ -58,6 +61,132 @@ class Item extends CI_Controller
         );
 
         $this->template->load('template', 'product/item/item_data', $data);
+    }
+
+    public function addFromExcel()
+    {
+        $data = array();
+        $this->template->load('template', 'product/item/addFromExcel', $data);
+    }
+
+    public function uploadExcel()
+    {
+        if (isset($_POST['submitBtn'])) {
+            // Periksa apakah file berhasil diunggah
+            if (isset($_FILES['fileInput']) && $_FILES['fileInput']['error'] == 0) {
+                // Tentukan direktori tujuan untuk menyimpan file yang diunggah
+                $target_dir = "uploads/excel-file/";
+                // var_dump($target_dir);
+                // die;
+
+                $target_file = $target_dir . basename($_FILES["fileInput"]["name"]);
+
+                // Pindahkan file yang diunggah ke direktori tujuan
+                if (move_uploaded_file($_FILES["fileInput"]["tmp_name"], $target_file)) {
+                    // Baca isi file Excel yang diunggah menggunakan pustaka PHPExcel
+                    // var_dump($target_file);
+                    include APPPATH . 'third_party/PHPExcel/Classes/PHPExcel.php';
+                    $objPHPExcel = PHPExcel_IOFactory::load($target_file);
+                    $worksheet = $objPHPExcel->getActiveSheet();
+
+                    // Konversi isi file Excel menjadi format HTML
+                    // $html = $worksheet->toArray();
+                    // var_dump($html);
+                    $excel = $worksheet->toArray();
+                    $data_excel_valid = array();
+
+
+                    foreach ($excel as $data) {
+
+                        $cek = $this->db->get_where('p_item', array('item_code' => $data[0]));
+
+                        if ($cek->num_rows() > 0) {
+                            $rows = array(
+                                'item_id' => $cek->row()->item_id,
+                                'item_code' => $data[0],
+                                'barcode' => $data[1],
+                                'name' => $data[2],
+                                'qty' => $data[3],
+                                'expired_date' => date('Y-m-d', strtotime($data[4]))
+                            );
+                            array_push($data_excel_valid, $rows);
+                        }
+                    }
+
+                    $data = array(
+                        'target_file' => $target_file,
+                        'excel_data' => $data_excel_valid
+                    );
+
+                    $this->template->load('template', 'product/item/dataFromExcel', $data);
+                    // die;
+
+                    // $html = '<table>';
+                    // foreach ($html as $row) {
+                    //     $html .= '<tr>';
+                    //     foreach ($row as $cell) {
+                    //         $html .= '<td>' . $cell . '</td>';
+                    //     }
+                    //     $html .= '</tr>';
+                    // }
+                    // $html .= '</table>';
+
+                    // // Tampilkan tabel HTML di halaman web
+                    // echo $html;
+                } else {
+                    echo "Gagal mengunggah file.";
+                }
+            } else {
+                echo "Terjadi kesalahan saat mengunggah file.";
+            }
+        }
+
+        if (isset($_POST['submitProses'])) {
+            // var_dump($_POST);
+            include APPPATH . 'third_party/PHPExcel/Classes/PHPExcel.php';
+            $objPHPExcel = PHPExcel_IOFactory::load($_POST['file_target']);
+            $worksheet = $objPHPExcel->getActiveSheet();
+            $excel = $worksheet->toArray();
+            // var_dump($excel);
+
+            $params = array();
+
+            foreach ($excel as $data) {
+
+                $cek = $this->db->get_where('p_item', array('item_code' => $data[0]));
+
+                if ($cek->num_rows() > 0) {
+                    $rows = array(
+                        'item_id' => $cek->row()->item_id,
+                        'item_code' => $data[0],
+                        'barcode' => $data[1],
+                        'name' => $data[2],
+                        'qty' => $data[3],
+                        'expired_date' => date('Y-m-d', strtotime($data[4]))
+                    );
+                    array_push($params, $rows);
+                }
+            }
+
+            $this->stock_m->simpan_item_detail_from_excel($params);
+            $this->stock_m->add_stock_from_excel($params);
+
+
+            if ($this->db->affected_rows() > 0) {
+                // echo "data berhasil di proses";
+                $this->session->set_flashdata('success', 'Proses Data Berhasil');
+            } else {
+                // echo "gagal proses data";
+                $this->session->set_flashdata('error', 'Gagal Proses Data');
+            }
+
+            $file_path = $_POST['file_target'];
+
+            if (file_exists($file_path)) {
+                unlink($file_path);
+            }
+            redirect('item/addFromExcel');
+        }
     }
 
     public function suggest()
@@ -384,7 +513,8 @@ class Item extends CI_Controller
         redirect('item/order_item');
     }
 
-    function order_detail(){
+    function order_detail()
+    {
         $no_order = $this->input->post('no_order');
         $detail = $this->item_m->get_detail_order($no_order);
         $data = array(

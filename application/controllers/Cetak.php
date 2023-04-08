@@ -27,14 +27,28 @@ class Cetak extends CI_Controller
             $printer->bitImage($img, Escpos\Printer::IMG_DOUBLE_WIDTH | Escpos\Printer::IMG_DOUBLE_HEIGHT | Escpos\Printer::JUSTIFY_CENTER);
             $printer->setJustification(); // Reset
 
+
+            // $printer->setEmphasis(true);
+            // $printer->text("Left margin\n");
+            $printer->setEmphasis(false);
+            //$printer->text("Default left\n");
+
+            // foreach (array(1, 2, 4, 8, 16, 32, 64, 128, 256, 512) as $margin) {
+            //     $printer->setPrintLeftMargin($margin);
+            //     $printer->text("left margin $margin\n");
+            // }
+
+            $printer->setPrintLeftMargin(16);
+            //$printer->setPrintLeftMargin(16);
+
             $printer->text("\n");
             $printer->text("MALL KELAPA GADING\n");
             $printer->text("DATE    : " . date('d-m-Y h:i:s') . "\n");
             $printer->text("ORDER   : F23-2302230001" . "\n");
             $printer->text("CASHIER : Lina" . "\n");
-            $printer->text("----------------------------------------------\n");
+            $printer->text("-----------------------------------------\n");
 
-            $printer->text("TWN - Seasonal (English 50g+WNL 100g)#6x150g" . "\n");
+            $printer->text($this->buatBaris1Kolom("TWN - Seasonal (English 50g+WNL 100g)#6x150g"));
             $printer->text($this->buatBaris3Kolom("2 PCS", "200.000", "400.000"));
             $printer->text($this->buatBaris3Kolom("Disc.", "25%", "-100.000"));
             $printer->text("\n");
@@ -49,21 +63,21 @@ class Cetak extends CI_Controller
             $printer->text("\n");
 
             $printer->text($this->buatBaris3Kolom("Service", "", "0"));
-            $printer->text("----------------------------------------------\n");
+            $printer->text("-----------------------------------------\n");
 
             $printer->text($this->buatBaris3Kolom("Total", "5 PCS", "450.000"));
             $printer->text($this->buatBaris3Kolom("Disc Sale", "", "0"));
             $printer->text($this->buatBaris3Kolom("Grand Total", "", "450.000"));
 
-            $printer->text("----------------------------------------------\n");
+            $printer->text("-----------------------------------------\n");
 
             $printer->text($this->buatBaris3Kolom("Type Bayar", "", "Cash"));
             $printer->text($this->buatBaris3Kolom("Total Bayar", "", "500.000"));
             $printer->text($this->buatBaris3Kolom("Change", "", "50.000"));
 
-            $printer->text("----------------------------------------------\n");
-            $printer->text("                   Thank You                  \n");
-            $printer->text("                  Test Print                  \n");
+            $printer->text("-----------------------------------------\n");
+            $printer->text("                   Thank You             \n");
+            $printer->text("                  Test Print             \n");
 
             $printer->feed(2);
             $printer->cut();
@@ -96,12 +110,14 @@ class Cetak extends CI_Controller
             $printer->setJustification(); // Reset
             $printer->text("\n");
 
+            $printer->setEmphasis(false);
+            $printer->setPrintLeftMargin(16);
 
             $printer->text($toko->nama_toko . "\n");
             $printer->text("DATE    : " . date('d-m-Y h:i:s', strtotime($sale->sale_created)) . "\n");
             $printer->text("ORDER   : " . $sale->invoice . "\n");
             $printer->text("CASHIER : " . $sale->nama_user . "\n");
-            $printer->text("----------------------------------------------\n");
+            $printer->text("-----------------------------------------\n");
 
             foreach ($sale_detail as $data) {
 
@@ -117,7 +133,7 @@ class Cetak extends CI_Controller
                 $printer->text("\n");
             }
 
-            $printer->text("----------------------------------------------\n");
+            $printer->text("-----------------------------------------\n");
 
             $printer->text($this->buatBaris3Kolom("Total", $sale->total_item . " PCS", number_format($sale->total_item_value)));
             $printer->text($this->buatBaris3Kolom("Service", "", number_format($sale->service)));
@@ -125,15 +141,15 @@ class Cetak extends CI_Controller
             $grand_total = ($sale->total_item_value + $sale->service) - $sale->discount;
             $printer->text($this->buatBaris3Kolom("Grand Total", "", number_format($grand_total)));
 
-            $printer->text("----------------------------------------------\n");
+            $printer->text("-----------------------------------------\n");
 
             $printer->text($this->buatBaris3Kolom("Type Bayar", "", $sale->type_pembayaran));
             $printer->text($this->buatBaris3Kolom("Total Bayar", "", number_format($sale->cash)));
             $printer->text($this->buatBaris3Kolom("Change", "", number_format($sale->remaining)));
             $printer->text("Harga Sudah Termasuk PPN\n");
 
-            $printer->text("----------------------------------------------\n");
-            $printer->text("                   Thank You                  \n");
+            $printer->text("-----------------------------------------\n");
+            $printer->text("                 Thank You               \n");
 
             $printer->feed(2);
             $printer->cut();
@@ -152,7 +168,7 @@ class Cetak extends CI_Controller
     function buatBaris1Kolom($kolom1)
     {
         // Mengatur lebar setiap kolom (dalam satuan karakter)
-        $lebar_kolom_1 = 42;
+        $lebar_kolom_1 = 40;
 
         // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
         $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);
@@ -183,9 +199,9 @@ class Cetak extends CI_Controller
     function buatBaris3Kolom($kolom1, $kolom2, $kolom3)
     {
         // Mengatur lebar setiap kolom (dalam satuan karakter)
-        $lebar_kolom_1 = 12;
-        $lebar_kolom_2 = 15;
-        $lebar_kolom_3 = 15;
+        $lebar_kolom_1 = 11;
+        $lebar_kolom_2 = 14;
+        $lebar_kolom_3 = 14;
 
         // Melakukan wordwrap(), jadi jika karakter teks melebihi lebar kolom, ditambahkan \n 
         $kolom1 = wordwrap($kolom1, $lebar_kolom_1, "\n", true);

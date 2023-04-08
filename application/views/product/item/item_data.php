@@ -15,6 +15,7 @@
         <div class="box-header">
             <!-- <h3 class="box-title">Data Product Items</h3> -->
             <div class="pull-right">
+                <a class="btn btn-flat btn-warning" href="<?= site_url('item/addFromExcel') ?>">Add Item From Excel</a>
                 <a class="btn btn-flat btn-success" href="<?= site_url('item/order') ?>">Order</a>
                 <a class="btn btn-flat btn-info" href="<?= site_url('item/suggest') ?>">Qty Suggest</a>
                 <a onclick="showLoading()" class="btn btn-flat btn-primary" href="<?= site_url('Warehouse/get_harga_item') ?>">Refresh</a>
@@ -59,6 +60,7 @@
         </div>
     </div>
 </section>
+
 <!-- Modal -->
 <div class="modal flip" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-sm" role="document">
@@ -115,7 +117,12 @@
 
     $(document).on('click', '#btn_simpan', function() {
         if ($('#stock').val() == "" || $('#exp_date').val() == "") {
-            alert("Stock dan Expired Date Tidak Boleh Kosong")
+            // alert("Stock dan Expired Date Tidak Boleh Kosong")
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Stock dan Expired Date Tidak Boleh Kosong!'
+            })
         } else {
             $('#form_add').submit()
         }

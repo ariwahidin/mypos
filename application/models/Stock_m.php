@@ -163,6 +163,30 @@ class Stock_m extends CI_Model
         };
     }
 
+    public function simpan_item_detail_from_excel($params)
+    {
+        foreach ($params as $data) {
+            $values = array(
+                'item_id' => $data['item_id'],
+                'item_code' => $data['item_code'],
+                'barcode' => $data['barcode'],
+                'name' => $data['name'],
+                'qty' => $data['qty'],
+                'exp_date' => $data['expired_date'],
+                'created_by' => $this->session->userdata('userid')
+            );
+            $qty = $data['qty'];
+            $item_code = $data['item_code'];
+            $expired_date = $data['expired_date'];
+            $expired_is_same = $this->db->query("select * from p_item_detail where item_code = '$item_code' and exp_date = '$expired_date'");
+            if ($expired_is_same->num_rows() > 0) {
+                $this->db->query("update p_item_detail set qty = qty + $qty where item_code = '$item_code' and exp_date ='$expired_date'");
+            } else {
+                $this->db->insert('p_item_detail', $values);
+            }
+        }
+    }
+
     function update_stock_in($post)
     {
         for ($i = 0; $i < count($post['item_code']); $i++) {
@@ -260,6 +284,27 @@ class Stock_m extends CI_Model
         );
 
         $this->db->insert('t_stock', $params);
+    }
+
+    function add_stock_from_excel($params)
+    {
+        $doc_id = $this->stock_doc_id();
+        $rows = array();
+        foreach ($params as $data) {
+            $values = array(
+                'doc_id' => $doc_id,
+                'item_code' => $data['item_code'],
+                'item_id' => $data['item_id'],
+                'barcode' => $data['barcode'],
+                'type' => 'in',
+                'info' => 'excel file',
+                'qty' => $data['qty'],
+                'expired_date' => $data['expired_date'],
+                'user_id' => $this->session->userdata('userid')
+            );
+            array_push($rows, $values);
+        }
+        $this->db->insert_batch('t_stock', $rows);
     }
 
     // public function get_stock_in_data(){

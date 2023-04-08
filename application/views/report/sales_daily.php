@@ -2,7 +2,8 @@
     <section class="content-header">
         <h1>Sales Daily
             <small>Penjualan Hari Ini Tanggal : <?= date('d-m-Y', strtotime($sum->row()->tanggal)) ?></small>
-            <a href="<?= site_url('sale/print_receipt_today') ?>" class="btn btn-success btn-flat pull-right"><i class="fa fa-print"></i> Print</a>
+            <!-- <a href="<?= site_url('sale/print_receipt_today') ?>" class="btn btn-success btn-flat pull-right"><i class="fa fa-print"></i> Print</a> -->
+            <button onclick="printStrukDaily()" class="btn btn-success btn-flat pull-right"><i class="fa fa-print"></i> Print</button>
         </h1>
     </section>
 
@@ -115,3 +116,17 @@
         <p>Belum ada penjualan hari ini</p>
     </section>
 <?php } ?>
+
+<script>
+    function printStrukDaily(){
+        $.ajax({
+            url : "<?=base_url('sale/print_receipt_today')?>",
+            type: "POST",
+            data:{},
+            dataType : "JSON",
+            success: function(response){
+
+            },
+        })
+    }
+</script>

@@ -13,6 +13,7 @@
 
     <div class="row">
         <div class="col-md-6">
+            <?php $this->view('messages') ?>
             <div class="box">
                 <div class="box-header">
                     <h3 class="box-title">Data Users</h3>
@@ -49,7 +50,7 @@
                                                 <i class="fa fa-pencil"></i> Update
                                             </a>
                                             <input type="hidden" name="user_id" value="<?= $data->user_id ?>">
-                                            <button onclick="return confirm('Yakin hapus data?')" class="btn btn-danger btn-xs">
+                                            <button class="btn btn-danger btn-xs">
                                                 <i class="fa fa-trash"></i> Delete
                                             </button>
                                         </form>
@@ -65,3 +66,16 @@
     </div>
 
 </section>
+<script>
+    function deleteUser() {
+        Swal.fire({
+            title: 'Apakah anda yakin?',
+            // text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!'
+        })
+    }
+</script>

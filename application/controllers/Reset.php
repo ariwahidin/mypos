@@ -25,28 +25,64 @@ class Reset extends CI_Controller
                 echo "Data telah direset";
             }
         } else {
-            echo "Fungsi tidak bisa dijalankan";
+            echo "Access Denied";
         }
+    }
+
+    function delete_data(){
+        //Hapus data sales berdasarkan tanggal
+        if($user_id = $this->session->userdata('userid') == 1){
+            // echo "Access Granted";
+            $this->template->load('template','/reset/view_delete_data.php');
+        }else{
+            echo "Access Denied";
+        }
+    }
+
+    function delete_data_sales(){
+        $start_date = $_POST['start_date'];
+        $end_date = $_POST['end_date'];
+
+        var_dump($start_date);
+        var_dump($end_date);
     }
 
     function reset_item()
     {
-        if (!empty($_POST)) {
-            $user_id = $this->session->userdata('userid');
-            $exp_date = $_POST['exp_date'];
-            $qty = $_POST['qty'];
-            $this->db->query("delete from p_item_detail");
-            $sql = "insert into p_item_detail(item_id, item_code,barcode, name, qty, exp_date, created_by)
+        $user_id = $this->session->userdata('userid');
+        if ($user_id == 1) {
+            if (!empty($_POST)) {
+                $exp_date = $_POST['exp_date'];
+                $qty = $_POST['qty'];
+                $this->db->query("delete from p_item_detail");
+                $sql = "insert into p_item_detail(item_id, item_code,barcode, name, qty, exp_date, created_by)
                     select item_id, item_code,barcode, name, '$qty', '$exp_date', '$user_id' from p_item";
-            $this->db->query($sql);
-            if ($this->db->affected_rows() > 0) {
-                echo "Stock Item Telah Direset";
+                $this->db->query($sql);
+                if ($this->db->affected_rows() > 0) {
+                    echo "Stock Item Telah Direset";
+                } else {
+                    echo "Gagal";
+                }
             } else {
-                echo "Gagal";
+                echo "Tidak Ada Post";
+            }
+            $this->template->load('template', 'reset_item');
+        } else {
+            echo "Access Denied";
+        }
+    }
+
+    function delete_all_item_detail()
+    {
+        if ($this->session->userdata('userid') == 1) {
+            $this->db->query("delete from p_item_detail");
+            if($this->db->affected_rows() > 0){
+                echo "Success";
+            }else{
+                echo "Failed";
             }
         } else {
-            echo "Tidak Ada Post";
+            echo "Access Denied";
         }
-        $this->template->load('template', 'reset_item');
     }
 }

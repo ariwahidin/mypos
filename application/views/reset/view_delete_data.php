@@ -1,10 +1,8 @@
 <section class="content-header">
     <h1>
-        Upload Data
-        <small>Upload data ke kantor pusat</small>
+        Delete Data Sales
     </h1>
 </section>
-<!-- Main content -->
 <section class="content">
     <?php $this->view('messages') ?>
     <div class="row">
@@ -26,8 +24,8 @@
                         <tbody>
                             <tr>
                                 <td>1</td>
-                                <td>Upload Data Sales</td>
-                                <form action="<?=base_url('upload/upload_data')?>" method="POST" id="form_upload">
+                                <td>Delete Data Sales</td>
+                                <form action="" method="POST" id="form_upload">
                                     <td>
                                         <input type="date" 
                                         name="start_date" id="start_date" 
@@ -42,8 +40,8 @@
                                     </td>
                                 </form>
                                 <td>
-                                    <button id="btn_upload" class="btn btn-primary btn-flat btn-sm">
-                                        Upload
+                                    <button id="btn_upload" class="btn btn-danger btn-flat btn-sm">
+                                        Delete
                                     </button>
                                 </td>
                             </tr>
@@ -54,17 +52,3 @@
         </div>
     </div>
 </section>
-<script>
-    $(document).on("click", "#btn_upload", function () {
-        var start_date = $("#start_date").val()
-        var end_date = $("#end_date").val()
-
-        if (start_date == "" || end_date == "") {
-            alert("Tanggal Tidak Boleh Kososng")
-        } else {
-            showLoading()
-            $("#form_upload").submit()
-        }
-
-    })
-</script>

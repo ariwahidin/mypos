@@ -40,10 +40,24 @@ class Bonus extends CI_Controller
             'created' => date('Y-m-d'),
         );
 
+        $data_edit_item = array(
+            'item_code' => $post['item_bonus']
+        );
+
+        $affected = 0;
+
         $this->db->where('id_event', $post['id_event']);
         $this->db->update('tb_event', $data_edit);
+        $affected += $this->db->affected_rows();
+        $this->db->where('id_event', $post['id_event']);
+        $this->db->update('tb_item_bonus', $data_edit_item);
+        $affected += $this->db->affected_rows();
+        // var_dump($post);
+        // var_dump($data_edit);
+        // var_dump($this->db->error());
+        // die;
 
-        if($this->db->affected_rows() > 0){
+        if($affected > 0){
             $this->session->set_flashdata('success', 'Edit Berhasil');
         }else{
             $this->session->set_flashdata('error', 'Gagal Edit');
