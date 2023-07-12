@@ -129,7 +129,8 @@ class Transfer_m extends CI_Model
         foreach ($data as $dt) {
             $cek = $this->db->query("select * from p_item_detail where item_code = '$dt->item_code' and exp_date = '$dt->exp_date'");
             if ($cek->num_rows() > 0) {
-                $this->db->query("update p_item_detail set qty = qty + '$dt->qty' where item_code = '$dt->item_code'");
+                //cek exp sama atau tidak
+                $this->db->query("update p_item_detail set qty = qty + '$dt->qty' where item_code = '$dt->item_code' and exp_date = '$dt->exp_date'");
             } else {
                 $params = array(
                     'item_id' => $dt->item_id,

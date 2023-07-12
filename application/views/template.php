@@ -214,11 +214,16 @@
 								<a href="<?= site_url('stock/out') ?>"><i class="fa fa-circle-o"></i> Data Stock Out</a>
 							</li>
 							<li <?= $this->uri->segment(1) == 'upload' ? 'class="active"' : '' ?>>
-								<a href="<?= site_url('upload') ?>"><i class="fa fa-circle-o"></i> Upload Data</a>
+								<a onclick="showLoading()" href="<?= site_url('upload') ?>"><i class="fa fa-circle-o"></i> Upload Data</a>
 							</li>
 							<li <?= $this->uri->segment(2) == 'daily' ? 'class="active"' : '' ?>>
 								<a href="<?= site_url('report/daily') ?>">
 									<i class="fa fa-circle-o"></i> Sales Daily
+								</a>
+							</li>
+							<li <?= $this->uri->segment(2) == 'stockdaily' || $this->uri->segment(2) == 'stockdailydetail' ? 'class="active"' : '' ?>>
+								<a onclick="showLoading()" href="<?= site_url('report/stockdaily') ?>">
+									<i class="fa fa-circle-o"></i> Stock Daily
 								</a>
 							</li>
 						</ul>
@@ -277,7 +282,7 @@
 							</ul>
 						</li>
 
-						<li class="treeview <?= $this->uri->segment(1) == 'bonus' || $this->uri->segment(1) == 'user' || $this->uri->segment(1) == 'tax' || $this->uri->segment(1) == 'toko' || $this->uri->segment(1) == 'payment' || $this->uri->segment(1) == 'printer' ? 'active' : '' ?>">
+						<li class="treeview <?= $this->uri->segment(1) == 'bonus' || $this->uri->segment(1) == 'user' || $this->uri->segment(1) == 'tax' || $this->uri->segment(1) == 'toko' || $this->uri->segment(1) == 'payment' || $this->uri->segment(1) == 'printer' || $this->uri->segment(1) == 'backup' ? 'active' : '' ?>">
 							<a href="#">
 								<i class="fa fa-folder"></i> <span>Other</span>
 								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
@@ -301,6 +306,9 @@
 								<li <?= $this->uri->segment(1) == 'printer' ? 'class="active"' : '' ?>>
 									<a href="<?= site_url('printer') ?>"><i class="fa fa-circle-o"></i> <span>Setting Printer</span></a>
 								</li>
+								<li <?= $this->uri->segment(1) == 'backup' ? 'class="active"' : '' ?>>
+									<a href="<?= site_url('backup') ?>"><i class="fa fa-circle-o"></i> <span>Backup Data</span></a>
+								</li>
 							</ul>
 						</li>
 					<?php } ?>
@@ -323,7 +331,7 @@
 
 		<footer class="main-footer">
 			<div class="pull-right hidden-xs">
-				<b>Version</b> 1.0
+				<b>Version</b> 1.8
 			</div>
 			<span>myPOS</span><strong> By <a href="#"> <strong> Handal Inti Boga</strong></a></strong>
 		</footer>
@@ -344,6 +352,11 @@
 		function showLoading() {
 			document.getElementById("wadah_loader").style.display = "block";
 			document.getElementById("loader").style.display = "block";
+		}
+
+		function hideLoading() {
+			document.getElementById("wadah_loader").style.display = "none";
+			document.getElementById("loader").style.display = "none";
 		}
 	</script>
 	<script>

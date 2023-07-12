@@ -363,9 +363,12 @@ class Item_m extends CI_Model
         $total_insert = 0;
         if ($item->num_rows() > 0) {
             foreach ($item->result() as $data) {
-                $cek_item_code = $this->db->query("select * from p_item where item_code = '$data->item_code'");
-                if ($cek_item_code->num_rows() > 0) {
-                    $sql_update = "update p_item set barcode = '$data->barcode', name = '$data->item_name', min_stock = '$data->min_stock', item_name_toko = '$data->item_name', price = '$data->harga_jual', harga_jual = '$data->harga_jual', harga_bersih = '$data->harga_bersih' where item_code = '$data->item_code'";
+                $cek_barcode_exists = $this->db->query("select * from p_item where barcode = '$data->barcode'");
+                if ($cek_barcode_exists->num_rows() > 0) {
+                    $sql_update = "update p_item set item_code = '$data->item_code', name = '$data->item_name', 
+                    min_stock = '$data->min_stock', item_name_toko = '$data->item_name', price = '$data->harga_jual', 
+                    harga_jual = '$data->harga_jual', harga_bersih = '$data->harga_bersih' 
+                    where barcode = '$data->barcode'";
                     $this->db->query($sql_update);
                     $total_update = $total_update + 1;
                 } else {
@@ -405,7 +408,7 @@ class Item_m extends CI_Model
         $cek = $this->db->query("select * from p_item_detail where item_code = '$item_code' and exp_date = '$exp_date'");
         if ($cek->num_rows() > 0) {
             // update
-            $sql = "update p_item_detail set qty = qty + '$stock' where item_code = '$item_code'";
+            $sql = "update p_item_detail set qty = qty + '$stock' where item_code = '$item_code' and exp_date = '$exp_date'";
             $this->db->query($sql);
         } else {
             // insert

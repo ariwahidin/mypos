@@ -97,12 +97,28 @@
 
             success: function(result) {
                 if (result.success == true) {
-                    alert('Data Berhasil disimpan')
-                    window.location.href = "<?= base_url('transfer/data_transfer_in') ?>"
+                    // alert('Data Berhasil disimpan')
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Transfer in berhasil',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(function() {
+                        window.location.href = "<?= base_url('transfer/data_transfer_in') ?>"
+                    })
                 } else if (result.exists == true) {
-                    alert('Gagal, Data Sudah Ada');
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'error',
+                        title: 'Gagal, data sudah ada!',
+                    })
                 } else {
-                    alert('Gagal Simpan Data')
+                    Swal.fire({
+                        position: 'center',
+                        icon: 'error',
+                        title: 'Gagal',
+                    })
                 }
             }
         });
