@@ -44,23 +44,18 @@ class Stock extends CI_Controller
     public function stock_detail()
     {
         $stock = $this->stock_m->get_stock_detail();
-
         if (isset($_POST['download_stock_detail'])) {
 
             // var_dump($_POST);
             // die;
-
             if ($stock->num_rows() > 0) {
-
                 $data = array(
                     'toko' => $this->db->query("SELECT * FROM t_toko where is_active = 'y'"),
                     'stock' => $stock,
                 );
-
                 $this->load->view('report/stock_detail_excel', $data);
                 return false;
             } else {
-
                 $this->session->set_flashdata('error', 'Data yang di cari tidak tersedia');
                 redirect('stock/stock_detail');
                 return false;

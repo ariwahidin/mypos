@@ -15,6 +15,7 @@
                             <th>Name</th>
                             <th>Stock</th>
                             <th>Expired Date</th>
+                            <th>Disc (%)</th>
                             <th>Actions</th>
                         </tr>
                     </thead>

@@ -18,7 +18,7 @@
                 <a class="btn btn-flat btn-warning" href="<?= site_url('item/addFromExcel') ?>">Add Item From Excel</a>
                 <a class="btn btn-flat btn-success" href="<?= site_url('item/order') ?>">Order</a>
                 <a class="btn btn-flat btn-info" href="<?= site_url('item/suggest') ?>">Qty Suggest</a>
-                <a onclick="showLoading()" class="btn btn-flat btn-primary" href="<?= site_url('Warehouse/get_harga_item') ?>">Refresh</a>
+                <a onclick="showLoading()" class="btn btn-flat btn-primary" href="<?= site_url('Warehouse/get_harga_item') ?>">Refresh Item</a>
             </div>
         </div>
         <div class="box-body table-responsive">

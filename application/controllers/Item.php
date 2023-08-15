@@ -524,4 +524,52 @@ class Item extends CI_Controller
         );
         $this->load->view('product/item/modal_order_detail', $data);
     }
+
+
+    function discount()
+    {
+        $data = array();
+        $this->template->load('template', 'product/item/item_discount', $data);
+    }
+
+    function loadItemDiscount()
+    {
+        $data = array(
+            'item' => $this->item_m->getItemDiscount(),
+        );
+        $this->load->view('product/item/table_item_discount', $data);
+    }
+
+    function getDiscountItem()
+    {
+        $url = 'item/getItemDiscount';
+        $api = get_curl($url);
+
+        if ($api['success'] == true) {
+            $item = $api['item'];
+            $update = $this->item_m->updateItemDiscount($item);
+            if ($update > 0) {
+                $response = array(
+                    'updated' => $update,
+                    'icon' => 'success',
+                    'message' => 'Berhasil Update Data',
+                    'success' => true
+                );
+            } else {
+                $response = array(
+                    'success' => false,
+                    'icon' => 'warning',
+                    'updated' => $update,
+                    'message' => 'Data sudah up to date',
+                );
+            }
+        } else {
+            $response = array(
+                'success' => false,
+                'icon' => 'error',
+                'message' => 'Tidak ada data',
+            );
+        }
+        echo json_encode($response);
+    }
 }

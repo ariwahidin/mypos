@@ -331,7 +331,7 @@
 
 		<footer class="main-footer">
 			<div class="pull-right hidden-xs">
-				<b>Version</b> 1.7
+				<b>Version</b> 1.8
 			</div>
 			<span>myPOS</span><strong> By <a href="#"> <strong> Handal Inti Boga</strong></a></strong>
 		</footer>

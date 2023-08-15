@@ -481,6 +481,8 @@ class Item extends CI_Controller
     function add_stock()
     {
         $post = $this->input->post();
+        // var_dump($post);
+        // die;
         $this->stock_m->add_stock_manual($post);
         $this->item_m->add_stock($post);
         if ($this->db->affected_rows() > 0) {

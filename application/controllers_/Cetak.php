@@ -23,28 +23,23 @@ class Cetak extends CI_Controller
         $printer->initialize();
 
         for ($i = 0; $i < $jumlah_print; $i++) {
-            $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
-            $printer->bitImage($img, Escpos\Printer::IMG_DOUBLE_WIDTH | Escpos\Printer::IMG_DOUBLE_HEIGHT | Escpos\Printer::JUSTIFY_CENTER);
-            $printer->setJustification(); // Reset
 
-
-            // $printer->setEmphasis(true);
-            // $printer->text("Left margin\n");
-            $printer->setEmphasis(false);
-
-            // $printer->text("Default left\n");
-
-            // foreach (array(1, 2, 4, 8, 16, 32, 64, 128, 256, 512) as $margin) {
-            //     $printer->setPrintLeftMargin($margin);
-            //     $printer->text("left margin $margin\n");
-            // }
+            if ($this->printer_m->getPrinterSettings()->print_logo == 'true') {
+                $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
+                $printer->bitImage($img, Escpos\Printer::IMG_DOUBLE_WIDTH | Escpos\Printer::IMG_DOUBLE_HEIGHT | Escpos\Printer::JUSTIFY_CENTER);
+                $printer->setJustification();
+                $printer->text("\n");
+                $printer->setPrintLeftMargin($this->printer_m->get_margin_left());
+                $printer->text("Nama Toko" . "\n");
+            } else {
+                $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
+                $printer->text($this->printer_m->getPrinterSettings()->alt_text . "\n");
+                $printer->text("Nama Toko" . "\n");
+                $printer->text("\n");
+                $printer->setJustification(); // Reset
+            }
 
             $printer->setPrintLeftMargin($this->printer_m->get_margin_left());
-
-            // $printer->setPrintLeftMargin(16);
-
-            $printer->text("\n");
-            $printer->text("MALL KELAPA GADING\n");
             $printer->text("DATE    : " . date('d-m-Y h:i:s') . "\n");
             $printer->text("ORDER   : F23-2302230001" . "\n");
             $printer->text("CASHIER : Lina" . "\n");
@@ -109,15 +104,22 @@ class Cetak extends CI_Controller
 
         for ($i = 0; $i < $jumlah_print; $i++) {
 
-            $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
-            $printer->bitImage($img, Escpos\Printer::IMG_DOUBLE_WIDTH | Escpos\Printer::IMG_DOUBLE_HEIGHT | Escpos\Printer::JUSTIFY_CENTER);
-            $printer->setJustification(); // Reset
-            $printer->text("\n");
+            if ($this->printer_m->getPrinterSettings()->print_logo == 'true') {
+                $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
+                $printer->bitImage($img, Escpos\Printer::IMG_DOUBLE_WIDTH | Escpos\Printer::IMG_DOUBLE_HEIGHT | Escpos\Printer::JUSTIFY_CENTER);
+                $printer->setJustification();
+                $printer->text("\n");
+                $printer->setPrintLeftMargin($this->printer_m->get_margin_left());
+                $printer->text($toko->nama_toko . "\n");
+            } else {
+                $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
+                $printer->text($this->printer_m->getPrinterSettings()->alt_text . "\n");
+                $printer->text($toko->nama_toko . "\n");
+                $printer->text("\n");
+                $printer->setJustification(); // Reset
+            }
 
-            $printer->setEmphasis(false);
             $printer->setPrintLeftMargin($this->printer_m->get_margin_left());
-
-            $printer->text($toko->nama_toko . "\n");
             $printer->text("DATE    : " . date('d-m-Y h:i:s', strtotime($sale->sale_created)) . "\n");
             $printer->text("ORDER   : " . $sale->invoice . "\n");
             $printer->text("CASHIER : " . $sale->nama_user . "\n");

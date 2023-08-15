@@ -23,15 +23,16 @@ class Printer extends CI_Controller
             $insert = $this->printer_m->set_printer_json($_POST);
         }
 
-        if ($this->db->affected_rows() > 0 || $insert) {
-            $this->session->set_flashdata('success', 'Data berhasil disimpan');
-        }
+        // if ($this->db->affected_rows() > 0 || $insert) {
+        //     $this->session->set_flashdata('success', 'Data berhasil disimpan');
+        // }
 
         $printer = $this->printer_m->get_printer();
 
         $data = array(
             'printer' => $printer,
             'margin_left' => $this->printer_m->get_margin_left(),
+            'settings_printer' => $this->printer_m->getPrinterSettings(),
         );
         $this->template->load('template', 'printer/data_printer', $data);
     }

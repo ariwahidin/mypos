@@ -180,21 +180,23 @@
 					<li <?= $this->uri->segment(1) == 'dashboard' || $this->uri->segment(1) == '' ? 'class="active"' : '' ?>>
 						<a href="<?= site_url('dashboard') ?>"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a>
 					</li>
-					<li class="treeview <?= $this->uri->segment(1) == 'sale' ? 'active' : '' ?>">
-						<a href="#">
-							<i class="fa fa-shopping-cart"></i> <span>Transaction</span>
-							<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
-						</a>
-						<ul class="treeview-menu">
-							<li <?= $this->uri->segment(1) == 'sale' && $this->uri->segment(2) != 'stock' ? 'class="active"' : '' ?>>
-								<a href="<?= site_url('sale') ?>"><i class="fa fa-circle-o"></i> Sales</a>
-							</li>
-							<!-- <li <?= $this->uri->segment(2) == 'stock' ? 'class="active"' : '' ?>>
+					<?php if ($this->session->userdata('level') != '1') { ?>
+						<li class="treeview <?= $this->uri->segment(1) == 'sale' ? 'active' : '' ?>">
+							<a href="#">
+								<i class="fa fa-shopping-cart"></i> <span>Transaction</span>
+								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+							</a>
+							<ul class="treeview-menu">
+								<li <?= $this->uri->segment(1) == 'sale' && $this->uri->segment(2) != 'stock' ? 'class="active"' : '' ?>>
+									<a href="<?= site_url('sale') ?>"><i class="fa fa-circle-o"></i> Sales</a>
+								</li>
+								<!-- <li <?= $this->uri->segment(2) == 'stock' ? 'class="active"' : '' ?>>
 								<a href="<?= site_url('sale/stock') ?>"><i class="fa fa-circle-o"></i> Stocks</a>
 							</li> -->
 
-						</ul>
-					</li>
+							</ul>
+						</li>
+					<?php } ?>
 					<li class="treeview <?= $this->uri->segment(1) == 'report' || $this->uri->segment(1) == 'stock' || $this->uri->segment(1) == 'upload' ? 'active' : '' ?>">
 						<a href="#">
 							<i class="fa fa-pie-chart"></i> <span>Reports</span>
@@ -267,6 +269,9 @@
 								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
 							</a>
 							<ul class="treeview-menu">
+								<li class="<?= $this->uri->segment(2) == 'discount' ? 'active' : '' ?>">
+									<a href="<?= site_url('item/discount') ?>"><i class="fa fa-circle-o"></i> <span>Item Discount</span></a>
+								</li>
 								<li class="<?= $this->uri->segment(1) == 'item' && $this->uri->segment(2) != 'order_item' ? 'active' : '' ?>">
 									<a href="<?= site_url('item') ?>"><i class="fa fa-circle-o"></i> <span>Data Stock</span></a>
 								</li>

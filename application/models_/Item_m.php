@@ -408,7 +408,7 @@ class Item_m extends CI_Model
         $cek = $this->db->query("select * from p_item_detail where item_code = '$item_code' and exp_date = '$exp_date'");
         if ($cek->num_rows() > 0) {
             // update
-            $sql = "update p_item_detail set qty = qty + '$stock' where item_code = '$item_code'";
+            $sql = "update p_item_detail set qty = qty + '$stock' where item_code = '$item_code' and exp_date = '$exp_date'";
             $this->db->query($sql);
         } else {
             // insert

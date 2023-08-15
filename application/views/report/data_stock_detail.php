@@ -1,6 +1,6 @@
 <section class="content-header">
     <h1>
-        Stock Detail
+        Stock Detail <?= date('d/m/Y') ?>
     </h1>
 </section>
 
@@ -26,6 +26,7 @@
                         <th>Barcode</th>
                         <th>Desc</th>
                         <th>Stock</th>
+                        <th>Disc (%)</th>
                         <th>Exp Date</th>
                     </tr>
                 </thead>
@@ -37,6 +38,7 @@
                             <td><?= $data->barcode ?></td>
                             <td><?= $data->item_name ?></td>
                             <td><?= $data->qty ?></td>
+                            <td><?= $data->discount ?></td>
                             <td><?= date('d-m-Y', strtotime($data->exp_date)) ?></td>
                         </tr>
                     <?php

@@ -454,4 +454,51 @@ class Item_m extends CI_Model
         $query = $this->db->get_where('tb_stock_order', array('no_order' => $no_order));
         return $query;
     }
+
+    function getItemDiscount()
+    {
+        $sql = "select
+        t1.id, t1.item_code, t2.barcode ,t2.name as item_name, t2.harga_jual, t1.discount,
+        t2.harga_jual - (t2.harga_jual * (t1.discount/100)) as after_disc,
+        t1.exp_date, t1.start_periode, t1.end_periode
+        from p_item_discount t1
+        inner join p_item t2 on t1.item_code = t2.item_code";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    function updateItemDiscount($item)
+    {
+        $total_update = 0;
+        foreach ($item as $key => $value) {
+            $cek = $this->cekItemDiscount($value);
+            if ($cek->num_rows() == 0) {
+                $params = array(
+                    'item_code' => $value['item_code'],
+                    'exp_date' => $value['exp_date'],
+                    'start_periode' => $value['start_periode'],
+                    'end_periode' => $value['end_periode'],
+                    'discount' => $value['discount'],
+                    'created_by' => $value['created_by'],
+                    'created_at' => international_date_time()
+                );
+                $this->db->insert('p_item_discount', $params);
+                $total_update += 1;
+            }
+        }
+        return $total_update;
+    }
+
+    function cekItemDiscount($item)
+    {
+        $params = array(
+            'item_code' => $item['item_code'],
+            'exp_date' => $item['exp_date'],
+            'discount' => $item['discount'],
+            'start_periode' => $item['start_periode'],
+            'end_periode' => $item['end_periode']
+        );
+        $query = $this->db->get_where('p_item_discount', $params);
+        return $query;
+    }
 }

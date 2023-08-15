@@ -4,6 +4,7 @@ class Dashboard extends CI_Controller {
 
 	public function index()
 	{
+		// var_dump($_SESSION);
 		check_not_login();
 		$sql="SELECT t_sale_detail.item_id, p_item.name, (SELECT SUM(t_sale_detail.qty)) AS sold
 		FROM t_sale_detail

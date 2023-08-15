@@ -287,6 +287,7 @@
                             <th>Name</th>
                             <th>Stock</th>
                             <th>Exp Date</th>
+                            <th>Disc (%)</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -297,8 +298,9 @@
                                 <td width="80%"><?= $data->item_name ?></td>
                                 <td><?= $data->qty ?></td>
                                 <td width="80%"><?= date('d-m-Y', strtotime($data->exp_date)) ?></td>
+                                <td><?= $data->discount ?></td>
                                 <td class="text-right">
-                                    <button class="btn btn-xs btn-info" id="select" data-item_id="<?= $data->item_id ?>" data-id_item_detail="<?= $data->id ?>" data-harga_jual="<?= $data->harga_jual ?>" data_stock="<?= $data->qty ?>" data-exp_date="<?= $data->exp_date ?>">
+                                    <button class="btn btn-xs btn-info" id="select" data-item_id="<?= $data->item_id ?>" data-id_item_detail="<?= $data->id ?>" data-harga_jual="<?= $data->harga_jual ?>" data_stock="<?= $data->qty ?>" data-exp_date="<?= $data->exp_date ?>" data-discount="<?=$data->discount?>">
                                         <i class="fa fa-check"></i> Select
                                     </button>
                                 </td>
@@ -593,9 +595,9 @@
         var id_detail_item = $(this).data('id_item_detail')
         var harga_jual = $(this).data('harga_jual')
         var exp_date = $(this).data('exp_date')
+        var discount = $(this).data('discount')
 
-
-        add_cart(item_id, id_detail_item, harga_jual, qty, exp_date)
+        add_cart(item_id, id_detail_item, harga_jual, qty, exp_date, discount)
         $('#modal-item').modal('hide')
 
     })
@@ -1198,6 +1200,7 @@
             button.setAttribute('data-exp_date', (result.item[i].exp_date));
             button.setAttribute('data-barcode', (result.item[i].barcode));
             button.setAttribute('data-harga_jual', (result.item[i].harga_jual));
+            button.setAttribute('data-discount', (result.item[i].discount));
             button.setAttribute('onclick', 'tambah_keranjang(this)');
             var newRow = tbodyRef.insertRow();
             var newCell1 = newRow.insertCell();
@@ -1205,18 +1208,23 @@
             // var newCell3 = newRow.insertCell();
             var newCell4 = newRow.insertCell();
             var newCell5 = newRow.insertCell();
+            var newCellDiscount = newRow.insertCell();
             var newCell6 = newRow.insertCell();
+
+
             var newText1 = document.createTextNode(result.item[i].barcode);
             var newText2 = document.createTextNode(result.item[i].item_name);
             // var newText3 = document.createTextNode('');
             var newText4 = document.createTextNode(result.item[i].qty);
             var newText5 = document.createTextNode(date_format(result.item[i].exp_date));
+            var newTextDiscount = document.createTextNode(result.item[i].discount);
             var newText6 = button;
             newCell1.appendChild(newText1);
             newCell2.appendChild(newText2);
             // newCell3.appendChild(newText3);
             newCell4.appendChild(newText4);
             newCell5.appendChild(newText5);
+            newCellDiscount.appendChild(newTextDiscount);
             newCell6.appendChild(newText6);
             // tbodyRef.appendChild("<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
         }
@@ -1241,16 +1249,17 @@
         var item_id = e.getAttribute('data-item_id');
         var exp_date = e.getAttribute('data-exp_date');
         var harga_jual = e.getAttribute('data-harga_jual');
+        var discount = e.getAttribute('data-discount');
         var qty = 1;
 
-        add_cart(item_id, id_detail_item, harga_jual, qty, exp_date)
+        add_cart(item_id, id_detail_item, harga_jual, qty, exp_date, discount)
 
         $('#barcode').focus()
         $('#modal-item-found').modal('hide');
 
     }
 
-    function add_cart(item_id, id_detail_item, harga_jual, qty, exp_date) {
+    function add_cart(item_id, id_detail_item, harga_jual, qty, exp_date, discount) {
         $.ajax({
             type: 'POST',
             url: '<?= site_url('sale/process') ?>',
@@ -1261,6 +1270,7 @@
                 'price': harga_jual,
                 'qty': qty,
                 'exp_date': exp_date,
+                'discount': discount,
             },
             dataType: 'json',
 

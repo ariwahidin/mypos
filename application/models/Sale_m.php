@@ -64,13 +64,22 @@ class Sale_m extends CI_Model
         // from p_item_detail t1
         // inner join p_item t2 on t1.item_code = t2.item_code 
         // where t1.qty > 0";
-        
+
         // Query Diubah 30/05/2023
+        // $sql = "select t1.id, t1.item_id, t1.item_code, t2.barcode, t2.name, t1.qty, 
+        //         t1.exp_date, t1.created_by, t1.created_at,  t2.name as item_name , t2.harga_jual
+        //         from p_item_detail t1
+        //         inner join p_item t2 on t1.item_code = t2.item_code 
+        //         where t1.qty > 0";
+
         $sql = "select t1.id, t1.item_id, t1.item_code, t2.barcode, t2.name, t1.qty, 
-                t1.exp_date, t1.created_by, t1.created_at,  t2.name as item_name , t2.harga_jual
-                from p_item_detail t1
-                inner join p_item t2 on t1.item_code = t2.item_code 
-                where t1.qty > 0";
+        t1.exp_date, t1.created_by, t1.created_at, 
+        t2.name as item_name , t2.harga_jual, case when t3.discount is null then 0 else t3.discount end as discount
+        from p_item_detail t1
+        inner join p_item t2 on t1.item_code = t2.item_code
+        left join p_item_discount t3 on t1.item_code  = t3.item_code and t1.exp_date = t3.exp_date 
+        and current_date() >= t3.start_periode and  current_date() <= t3.end_periode
+        where t1.qty > 0";
 
         if ($barcode != null) {
             $sql .= " and t2.barcode = '$barcode'";
@@ -84,6 +93,7 @@ class Sale_m extends CI_Model
     {
         $sql = "SELECT MAX(cart_id) AS cart_no FROM t_cart";
         $query = $this->db->query($sql);
+
         if ($query->num_rows() > 0) {
             $row = $query->row();
             $cart_no = ((int)$row->cart_no) + 1;
@@ -93,6 +103,8 @@ class Sale_m extends CI_Model
 
         $exp = str_replace("/", "-", $post['exp_date']);
         $date_expired = date('Y-m-d', strtotime($exp));
+        $discount_item = (float)$post['price'] * ((float)$post['discount'] / 100);
+        $price_after_discount = (float)$post['price'] - $discount_item;
 
         $params = array(
             'cart_id' => $cart_no,
@@ -100,12 +112,15 @@ class Sale_m extends CI_Model
             'item_id_detail' => $post['item_id_detail'],
             'price' => $post['price'],
             'qty' => $post['qty'],
-            'total' => ($post['price'] * $post['qty']),
+            'discount_item' => $discount_item,
+            'discount_percent' => (float)$post['discount'],
+            'total' => ($price_after_discount * $post['qty']),
             'item_expired' => $date_expired,
             'item_expired_2' => $date_expired,
             'user_id' => $this->session->userdata('userid')
         );
         // var_dump($params);
+        // die;
         $this->db->insert('t_cart', $params);
 
         // var_dump($this->db->error());

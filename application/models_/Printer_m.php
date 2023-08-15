@@ -17,6 +17,14 @@ class Printer_m extends CI_Model
         return (int)$data_printer->margin_left;
     }
 
+    function getPrinterSettings()
+    {
+        $file_json = FCPATH . 'json_file/printer.json';
+        $json_data = file_get_contents($file_json);
+        $data_printer = json_decode($json_data);
+        return $data_printer;
+    }
+
     function set_printer_json($post)
     {
         $file_json = FCPATH . 'json_file/printer.json';
@@ -24,6 +32,8 @@ class Printer_m extends CI_Model
             'nama_printer' => $post['printer_name'],
             'jumlah_print' => $post['jumlah_print'],
             'margin_left' => $post['margin_left'],
+            'print_logo' => $post['print_logo'],
+            'alt_text' => $post['alt_text'],
         );
         $json_data = json_encode($data_printer_input);
         $insert = file_put_contents($file_json, $json_data);
