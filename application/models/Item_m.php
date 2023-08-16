@@ -462,9 +462,24 @@ class Item_m extends CI_Model
         t2.harga_jual - (t2.harga_jual * (t1.discount/100)) as after_disc,
         t1.exp_date, t1.start_periode, t1.end_periode
         from p_item_discount t1
-        inner join p_item t2 on t1.item_code = t2.item_code";
+        inner join p_item t2 on t1.item_code = t2.item_code
+        order by t1.end_periode desc";
         $query = $this->db->query($sql);
         return $query;
+    }
+
+    function deleteAllItemDiscount()
+    {
+        $sql = "delete from p_item_discount";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    function generateIdItemDiscount()
+    {
+        $sql = "select case when max(id) is null then 0 else max(id) end as id from p_item_discount";
+        $query = $this->db->query($sql);
+        return (int)$query->row()->id + (int)1;
     }
 
     function updateItemDiscount($item)
@@ -474,6 +489,7 @@ class Item_m extends CI_Model
             $cek = $this->cekItemDiscount($value);
             if ($cek->num_rows() == 0) {
                 $params = array(
+                    'id' => $this->generateIdItemDiscount(),
                     'item_code' => $value['item_code'],
                     'exp_date' => $value['exp_date'],
                     'start_periode' => $value['start_periode'],

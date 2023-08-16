@@ -300,7 +300,7 @@
                                 <td width="80%"><?= date('d-m-Y', strtotime($data->exp_date)) ?></td>
                                 <td><?= $data->discount ?></td>
                                 <td class="text-right">
-                                    <button class="btn btn-xs btn-info" id="select" data-item_id="<?= $data->item_id ?>" data-id_item_detail="<?= $data->id ?>" data-harga_jual="<?= $data->harga_jual ?>" data_stock="<?= $data->qty ?>" data-exp_date="<?= $data->exp_date ?>" data-discount="<?=$data->discount?>">
+                                    <button class="btn btn-xs btn-info" id="select" data-item_id="<?= $data->item_id ?>" data-id_item_detail="<?= $data->id ?>" data-harga_jual="<?= $data->harga_jual ?>" data_stock="<?= $data->qty ?>" data-exp_date="<?= $data->exp_date ?>" data-discount="<?= $data->discount ?>">
                                         <i class="fa fa-check"></i> Select
                                     </button>
                                 </td>
@@ -1144,7 +1144,6 @@
     })
 
     $(document).on('click', '#cancel_payment', function() {
-
         Swal.fire({
             title: 'Apakah anda yakin untuk cancel transaksi ini?',
             // text: "You won't be able to revert this!",
@@ -1163,27 +1162,24 @@
                         'cancel_payment': true
                     },
                     success: function(result) {
-                        if (result.success == true) {
-                            $('#cart_table').load('<?= site_url('sale/cart_data') ?>', function() {
-                                calculate()
-                            })
+                        if (result.success == true || result.success == false) {
+                            window.location.href = "<?= base_url('sale/prepare') ?>"
+                            // $('#cart_table').load('<?= site_url('sale/cart_data') ?>', function() {
+                            //     calculate()
+                            // })
                         }
                     }
                 })
-                $('#discount').val(0)
-                $('#cash').val(0)
-                $('#customer').val('').change()
-                $('#barcode').val('')
-                $('#barcode').focus()
-                $('#input_jenis_kartu').val('')
-                $('#nomor_kartu').val('')
-                $('#nama_pemilik_kartu').val('')
-
+                // $('#discount').val(0)
+                // $('#cash').val(0)
+                // $('#customer').val('').change()
+                // $('#barcode').val('')
+                // $('#barcode').focus()
+                // $('#input_jenis_kartu').val('')
+                // $('#nomor_kartu').val('')
+                // $('#nama_pemilik_kartu').val('')
             }
         })
-
-        // if (confirm('Apakah anda yakin untuk cancel?')) {
-        // }
     })
 
     function show_table(result) {

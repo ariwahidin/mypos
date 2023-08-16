@@ -14,7 +14,7 @@ if ($cart->num_rows() > 0) {
                 <?php } ?>
                 <?= number_format($data->discount_item) ?>
                 &nbsp;
-                <button id="update_disc" data-toggle="modal" data-target="#modal_edit_disc" data-cartid="<?= $data->cart_id ?>" data-disc="<?= $data->discount_percent ?>" class="btn btn-xs btn-success">
+                <button style="display: none;" id="update_disc" data-toggle="modal" data-target="#modal_edit_disc" data-cartid="<?= $data->cart_id ?>" data-disc="<?= $data->discount_percent ?>" class="btn btn-xs btn-success">
                     <i class="fa fa-pencil"></i>
                 </button>
             </td>
@@ -29,7 +29,7 @@ if ($cart->num_rows() > 0) {
             <td class="text-right">
                 <?= date('d-m-Y', strtotime($data->item_expired_2)) ?>
                 &nbsp;
-                <button id="update_ed" data-toggle="modal" data-target="#modal_edit_ed" data-cartid="<?= $data->cart_id ?>" data-ed_ori="<?= date('d-m-Y', strtotime($data->item_expired)) ?>" data-ed="<?= date('d-m-Y', strtotime($data->item_expired_2)) ?>" class="btn btn-xs btn-warning">
+                <button style="display: none;" id="update_ed" data-toggle="modal" data-target="#modal_edit_ed" data-cartid="<?= $data->cart_id ?>" data-ed_ori="<?= date('d-m-Y', strtotime($data->item_expired)) ?>" data-ed="<?= date('d-m-Y', strtotime($data->item_expired_2)) ?>" class="btn btn-xs btn-warning">
                     <i class="fa fa-pencil"></i>
                 </button>
             </td>

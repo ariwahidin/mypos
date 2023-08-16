@@ -6,8 +6,8 @@
             <th>Item Name</th>
             <th>Exp Date</th>
             <th>Disc (%)</th>
-            <th>Start Date</th>
-            <th>End Date</th>
+            <th>Start Periode</th>
+            <th>End Periode</th>
         </tr>
     </thead>
     <tbody>
@@ -17,10 +17,10 @@
                 <td><?= $no++ ?></td>
                 <td><?= $data->barcode ?></td>
                 <td><?= $data->item_name ?></td>
-                <td><?= $data->exp_date ?></td>
+                <td><?= date('d M Y',strtotime($data->exp_date)) ?></td>
                 <td><?= $data->discount ?></td>
-                <td><?= $data->start_periode ?></td>
-                <td><?= $data->end_periode ?></td>
+                <td><?= date('d M Y', strtotime($data->start_periode)) ?></td>
+                <td><?= date('d M Y', strtotime($data->end_periode)) ?></td>
             </tr>
         <?php } ?>
     </tbody>

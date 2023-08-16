@@ -546,8 +546,13 @@ class Item extends CI_Controller
         $api = get_curl($url);
 
         if ($api['success'] == true) {
+            
+            //delete item discount sebelum di timpa item discount baru
+            $delete = $this->item_m->deleteAllItemDiscount();
+
             $item = $api['item'];
             $update = $this->item_m->updateItemDiscount($item);
+
             if ($update > 0) {
                 $response = array(
                     'updated' => $update,
@@ -563,6 +568,7 @@ class Item extends CI_Controller
                     'message' => 'Data sudah up to date',
                 );
             }
+
         } else {
             $response = array(
                 'success' => false,

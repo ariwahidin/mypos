@@ -272,7 +272,7 @@
 								<li class="<?= $this->uri->segment(2) == 'discount' ? 'active' : '' ?>">
 									<a href="<?= site_url('item/discount') ?>"><i class="fa fa-circle-o"></i> <span>Item Discount</span></a>
 								</li>
-								<li class="<?= $this->uri->segment(1) == 'item' && $this->uri->segment(2) != 'order_item' ? 'active' : '' ?>">
+								<li class="<?= $this->uri->segment(1) == 'item' && $this->uri->segment(2) != 'order_item' && $this->uri->segment(2) != 'discount' ? 'active' : '' ?>">
 									<a href="<?= site_url('item') ?>"><i class="fa fa-circle-o"></i> <span>Data Stock</span></a>
 								</li>
 								<li <?= $this->uri->segment(2) == 'order_item' ? 'class="active"' : '' ?>>
@@ -336,7 +336,7 @@
 
 		<footer class="main-footer">
 			<div class="pull-right hidden-xs">
-				<b>Version</b> 1.8
+				<b>Version</b> 1.9
 			</div>
 			<span>myPOS</span><strong> By <a href="#"> <strong> Handal Inti Boga</strong></a></strong>
 		</footer>
