@@ -31,15 +31,17 @@ class Cetak extends CI_Controller
             // $printer->setEmphasis(true);
             // $printer->text("Left margin\n");
             $printer->setEmphasis(false);
-            //$printer->text("Default left\n");
+
+            // $printer->text("Default left\n");
 
             // foreach (array(1, 2, 4, 8, 16, 32, 64, 128, 256, 512) as $margin) {
             //     $printer->setPrintLeftMargin($margin);
             //     $printer->text("left margin $margin\n");
             // }
 
-            $printer->setPrintLeftMargin(16);
-            //$printer->setPrintLeftMargin(16);
+            $printer->setPrintLeftMargin(8);
+            
+            // $printer->setPrintLeftMargin(16);
 
             $printer->text("\n");
             $printer->text("MALL KELAPA GADING\n");
@@ -89,10 +91,12 @@ class Cetak extends CI_Controller
 
     function cetakStruk($id)
     {
+
         $id_toko = $this->db->query("SELECT id_toko FROM t_sale WHERE sale_id = '$id'")->row()->id_toko;
         $toko = $this->db->query("SELECT * FROM t_toko WHERE id = '$id_toko'")->row();
         $sale = $this->sale_m->get_sale($id)->row();
         $sale_detail = $this->sale_m->get_sale_detail($id)->result();
+
 
         $profile = Escpos\CapabilityProfile::load("simple");
         $connector = new Escpos\PrintConnectors\WindowsPrintConnector($this->get_printer()->row()->printer_name);
@@ -111,7 +115,7 @@ class Cetak extends CI_Controller
             $printer->text("\n");
 
             $printer->setEmphasis(false);
-            $printer->setPrintLeftMargin(16);
+            $printer->setPrintLeftMargin(8);
 
             $printer->text($toko->nama_toko . "\n");
             $printer->text("DATE    : " . date('d-m-Y h:i:s', strtotime($sale->sale_created)) . "\n");
@@ -126,7 +130,7 @@ class Cetak extends CI_Controller
                 $printer->text($this->buatBaris3Kolom($data->qty . " PCS", number_format($data->price), number_format($total_price)));
 
                 if ($data->discount_item > 0) {
-                    $discount_percent = ($data->discount_item / $data->price) * 100;
+                    $discount_percent = round(($data->discount_item / $data->price) * 100);
                     $total_discount_item = number_format($data->qty * $data->discount_item);
                     $printer->text($this->buatBaris3Kolom("Disc.", $discount_percent . "%", "-" . $total_discount_item));
                 }
