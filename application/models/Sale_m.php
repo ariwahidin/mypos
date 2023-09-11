@@ -44,29 +44,69 @@ class Sale_m extends CI_Model
 
     public function get_cart($params = null)
     {
-        $this->db->select('t_cart.*, p_item.barcode, p_item_detail.qty as stock, p_item.name as item_name, t_cart.price as cart_price');
+        // var_dump($params);
+        // die;
+        $this->db->select('t_cart.*, p_promo.nama_promo, p_item.barcode, p_item_detail.qty as stock, p_item.name as item_name, t_cart.price as cart_price');
         $this->db->from('t_cart');
         $this->db->join('p_item', 't_cart.item_id = p_item.item_id', 'left');
         $this->db->join('p_item_detail', 't_cart.item_id_detail = p_item_detail.id', 'left');
+        $this->db->join('p_promo', 't_cart.kode_promo = p_promo.kode_promo', 'left');
         if ($params != null) {
             $this->db->where($params);
         }
         $this->db->where('user_id', $this->session->userdata('userid'));
         $query = $this->db->get();
+        // var_dump($this->db->last_query());
         // var_dump($this->db->error());
+        // die;
         return $query;
     }
 
     public function get_item_detail($barcode = null)
     {
 
-        $sql = "select t1.*, t2.name as item_name , t2.harga_jual
-		from p_item_detail t1
-		inner join p_item t2 on t1.item_code = t2.item_code 
+        // $sql = "select t1.*, t2.name as item_name , t2.harga_jual
+        // from p_item_detail t1
+        // inner join p_item t2 on t1.item_code = t2.item_code 
+        // where t1.qty > 0";
+
+        // Query Diubah 30/05/2023
+        // $sql = "select t1.id, t1.item_id, t1.item_code, t2.barcode, t2.name, t1.qty, 
+        //         t1.exp_date, t1.created_by, t1.created_at,  t2.name as item_name , t2.harga_jual
+        //         from p_item_detail t1
+        //         inner join p_item t2 on t1.item_code = t2.item_code 
+        //         where t1.qty > 0";
+
+        // $sql = "select t1.id, t1.item_id, t1.item_code, t2.barcode, t2.name, t1.qty, 
+        // t1.exp_date, t1.created_by, t1.created_at, 
+        // t2.name as item_name , t2.harga_jual, 
+        // case when t3.discount is null then 0 else t3.discount end as discount,
+        // t4.kode_promo as kode_promo, t5.nama_promo
+        // from p_item_detail t1
+        // inner join p_item t2 on t1.item_code = t2.item_code
+        // left join p_item_discount t3 on t1.item_code  = t3.item_code 
+        // and t1.exp_date >= t3.exp_date_from and t1.exp_date <= t3.exp_date_to
+        // and current_date() >= t3.start_periode and  current_date() <= t3.end_periode
+        // left join p_promo_detail t4 on t1.item_code = t4.item_code and t4.kode_promo = 'P002'
+        // left join p_promo t5 on t4.kode_promo = t5.kode_promo
+        // where t1.qty > 0";
+
+        $sql = "select t1.id, t1.item_id, t1.item_code, t2.barcode, t2.name, t1.qty, 
+        t1.exp_date, t1.created_by, t1.created_at, 
+        t2.name as item_name , t2.harga_jual, 
+        case when t3.discount is null then 0 else t3.discount end as discount,
+        t3.kode_promo as kode_promo, t4.nama_promo
+        from p_item_detail t1
+        inner join p_item t2 on t1.item_code = t2.item_code
+        left join p_promo_detail t3 on t1.item_code  = t3.item_code 
+        and t1.exp_date >= t3.exp_date_from and t1.exp_date <= t3.exp_date_to
+        and current_date() >= t3.start_periode and  current_date() <= t3.end_periode
+        and t3.kode_promo = 'P003'
+        left join p_promo t4 on t3.kode_promo = t4.kode_promo
         where t1.qty > 0";
 
         if ($barcode != null) {
-            $sql .= " and t1.barcode = '$barcode'";
+            $sql .= " and t2.barcode = '$barcode'";
         }
 
         $query = $this->db->query($sql);
@@ -75,8 +115,11 @@ class Sale_m extends CI_Model
 
     public function add_cart($post)
     {
+        // var_dump($post);
+        // die;
         $sql = "SELECT MAX(cart_id) AS cart_no FROM t_cart";
         $query = $this->db->query($sql);
+
         if ($query->num_rows() > 0) {
             $row = $query->row();
             $cart_no = ((int)$row->cart_no) + 1;
@@ -84,21 +127,73 @@ class Sale_m extends CI_Model
             $cart_no = "1";
         }
 
+        $item_code = $this->db->query("select item_code from p_item_detail where id = '$post[item_id_detail]'")->row()->item_code;
         $exp = str_replace("/", "-", $post['exp_date']);
         $date_expired = date('Y-m-d', strtotime($exp));
+        $discount_item = (float)$post['price'] * ((float)$post['discount'] / 100);
+        $price_after_discount = (float)$post['price'] - $discount_item;
 
         $params = array(
             'cart_id' => $cart_no,
             'item_id' => $post['item_id'],
             'item_id_detail' => $post['item_id_detail'],
+            'item_code' => $item_code,
             'price' => $post['price'],
             'qty' => $post['qty'],
-            'total' => ($post['price'] * $post['qty']),
+            'discount_item' => $discount_item,
+            'discount_percent' => (float)$post['discount'],
+            'total' => ($price_after_discount * $post['qty']),
             'item_expired' => $date_expired,
             'item_expired_2' => $date_expired,
+            'kode_promo' => $post['kode_promo'],
             'user_id' => $this->session->userdata('userid')
         );
+
         // var_dump($params);
+        // die;
+        $this->db->insert('t_cart', $params);
+
+        // var_dump($this->db->error());
+    }
+
+    public function add_cart_item_bonus($params)
+    {
+        // var_dump($post);
+        // die;
+        $sql = "SELECT MAX(cart_id) AS cart_no FROM t_cart";
+        $query = $this->db->query($sql);
+
+        if ($query->num_rows() > 0) {
+            $row = $query->row();
+            $cart_no = ((int)$row->cart_no) + 1;
+        } else {
+            $cart_no = "1";
+        }
+
+        // $item_code = $this->db->query("select item_code from p_item_detail where id = '$post[item_id_detail]'")->row()->item_code;
+        // $exp = str_replace("/", "-", $post['exp_date']);
+        // $date_expired = date('Y-m-d', strtotime($exp));
+        $discount_item = (float)$params->harga_jual * ((float)$params->discount / 100);
+        $price_after_discount = (float)$params->harga_jual - $discount_item;
+
+        $params = array(
+            'cart_id' => $cart_no,
+            'item_id' => $params->item_id,
+            'item_id_detail' => $params->id,
+            'item_code' => $params->item_code,
+            'price' => $params->harga_jual,
+            'qty' => $params->qty_bonus,
+            'discount_item' => $discount_item,
+            'discount_percent' => $params->discount,
+            'total' => ($price_after_discount * $params->qty_bonus),
+            'item_expired' => $params->exp_date,
+            'item_expired_2' => $params->exp_date,
+            'kode_promo' => $params->kode_promo,
+            'user_id' => $this->session->userdata('userid')
+        );
+
+        // var_dump($params);
+        // die;
         $this->db->insert('t_cart', $params);
 
         // var_dump($this->db->error());
@@ -111,8 +206,9 @@ class Sale_m extends CI_Model
         $sql = "UPDATE t_cart SET price = '$post[price]',
         qty = qty + '$post[qty]',
         total = ('$post[price]' - discount_item) * qty
-        WHERE item_id_detail = '$post[item_id_detail]'";
+        WHERE item_id_detail = '$post[item_id_detail]' and kode_promo = '$post[kode_promo]'";
         $this->db->query($sql);
+        // var_dump($this->db->last_query());
     }
 
     public function del_cart($params = null)
@@ -235,12 +331,12 @@ class Sale_m extends CI_Model
     {
 
         $sql = "SELECT t2.item_code, t1.sale_id, t1.item_id, t2.barcode, t2.name, 
-        t1.price, sum(t1.qty) as qty, sum(t1.discount_item) as discount_item, 
+        t1.price, sum(t1.qty) as qty, avg(t1.discount_item) as discount_item, 
         sum(t1.total) as total  
         FROM t_sale_detail t1 
         JOIN p_item t2 ON t1.item_id = t2.item_id 
         WHERE t1.sale_id = '$sale_id'
-        group by t2.item_code";
+        group by t2.item_code, t1.discount_item";
         // var_dump($sql);
         // die;
 
@@ -251,16 +347,19 @@ class Sale_m extends CI_Model
         return $query;
     }
 
-    public function get_sales_today_per_user(){
+    public function get_sales_today_per_user()
+    {
         $user_id = $this->session->userdata('userid');
         $sql = "select nama_toko, toko_cabang, item_name, price, sum(qty) as qty, sum(total_price) total_price, sum(total) as total, sum(discount_item) as discount_item, 
-        sum(discount_item) / sum(total_price) * 100 as discount_percent, avg(xx.total_service) as total_service, avg(xx.total_discount) as total_discount,
-        ss.tanggal_transaksi, username, ss.user_id
+        sum(ss.total_discount_item) / sum(total_price) * 100 as discount_percent, 
+        sum(ss.total_discount_item) as total_discount_item,
+        avg(xx.total_service) as total_service, avg(xx.total_discount) as total_discount,
+        ss.tanggal_transaksi, name, ss.user_id
         from
         (
         select t5.nama_toko, t5.toko_cabang, t1.item_id, t1.item_id_detail, t2.item_code, t2.barcode, t2.name as item_name, 
-        t2.price, t1.qty, t2.price * t1.qty as total_price, t1.discount_item, 
-        t1.total, date(t3.created) as tanggal_transaksi, t3.user_id, t4.username
+        t2.price, t1.qty, t2.price * t1.qty as total_price, t1.discount_item, t1.discount_item * t1.qty as total_discount_item,
+        t1.total, date(t3.created) as tanggal_transaksi, t3.user_id, t4.name
         from t_sale_detail t1
         inner join p_item t2 on t2.item_id = t1.item_id
         inner join t_sale t3 on t3.sale_id = t1.sale_id
@@ -276,7 +375,10 @@ class Sale_m extends CI_Model
         group by user_id 
         )xx
         on ss.user_id = xx.user_id 
-        group by ss.item_code, ss.item_name, ss.price";
+        group by ss.item_code, ss.item_name, ss.price, ss.discount_item";
+
+        // print_r($sql);
+        // die;
         $query = $this->db->query($sql);
         return $query;
     }
@@ -380,7 +482,8 @@ class Sale_m extends CI_Model
         return $query;
     }
 
-    public function get_sales_daily(){
+    public function get_sales_daily()
+    {
         $user_id = $this->session->userdata('userid');
         $sql = "select ss.barcode, ss.name as item_name, sum(ss.qty) as qty , sum(ss.total) as total, ss.tanggal
         from
@@ -397,13 +500,150 @@ class Sale_m extends CI_Model
         return $query;
     }
 
-    public function get_sum_daily(){
+    public function get_sum_daily()
+    {
         $user_id = $this->session->userdata('userid');
         $sql = "select sum(discount) as total_discount, sum(service) as total_service, user_id, date(created) as tanggal 
         from t_sale t1
         where date(t1.created) = date(now()) and user_id = '$user_id'
-        group by date(t1.created)"; 
+        group by date(t1.created)";
         $query = $this->db->query($sql);
         return $query;
+    }
+
+    public function get_total_belanja()
+    {
+        $user_id = $this->session->userdata('userid');
+        $sql = "select sum(total) as total_belanja 
+        from t_cart where user_id = '$user_id'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function get_promo_tebus_murah()
+    {
+        $sql = "select id, nama_promo, min_belanja, is_active 
+        from p_promo where kode_promo = 'P001'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function get_item_promo_tebus_murah()
+    {
+        // $sql = "select t1.kode_promo, t2.item_id, t3.id as id_item_detail, t1.item_code,
+        // t2.barcode, t2.item_name_toko  as item_name,
+        // t2.harga_jual, t1.discount,
+        // (t1.discount/100) * t2.harga_jual as value_discount,
+        // t2.harga_jual - ((t1.discount/100) * t2.harga_jual) as after_discount,
+        // t3.exp_date, t3.qty
+        // from p_promo_detail t1
+        // inner join p_item t2 on t1.item_code = t2.item_code
+        // inner join p_item_detail t3 on t1.item_code = t3.item_code
+        // where t1.kode_promo = 'P001' and t3.qty > 0";
+        $sql = "select t1.kode_promo, t2.item_id, t3.id as id_item_detail, t1.item_code,
+        t2.barcode, t2.item_name_toko  as item_name,
+        t2.harga_jual, t1.discount,
+        (t1.discount/100) * t2.harga_jual as value_discount,
+        t2.harga_jual - ((t1.discount/100) * t2.harga_jual) as after_discount,
+        t3.exp_date, t3.qty
+        from p_promo_detail t1
+        inner join p_item t2 on t1.item_code = t2.item_code
+        inner join p_item_detail t3 on t1.item_code = t3.item_code
+        where t1.kode_promo = 'P001' 
+        and t3.exp_date >= t1.exp_date_from and t3.exp_date <= t1.exp_date_to
+        and current_date() >= t1.start_periode and  current_date() <= t1.end_periode
+        and t3.qty > 0";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function getItemBonusNearEd($item_code, $kode_promo)
+    {
+        $sql = "select b.id, b.item_id, b.item_code, b.barcode, 
+        b.name, c.harga_jual,
+        d.qty_bonus, a.discount, a.kode_promo, b.exp_date
+        from p_promo_detail a  
+        inner join (select * from p_item_detail where item_code = '$item_code'
+        and qty > 0 order by exp_date asc limit 1) b on a.item_code = b.item_code
+        inner join p_item c on a.item_code = c.item_code
+        inner join p_promo d on a.kode_promo = d.kode_promo
+        where a.kode_promo = '$kode_promo' and a.item_code = '$item_code'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function cekQtyCartForPromo($item_code, $kode_promo)
+    {
+        $user_id = $this->session->userdata('userid');
+        $sql = "select sum(qty) as total_qty from t_cart where item_code = '$item_code' and kode_promo != '$kode_promo' and user_id='$user_id'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function getPromoIsExist($item_code, $kode_promo)
+    {
+        $user_id = $this->session->userdata('userid');
+        $sql = "select item_code from t_cart where item_code = '$item_code' and kode_promo = '$kode_promo' and user_id ='$user_id'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function delete_cart_item_promo($item_code, $kode_promo)
+    {
+        $user_id = $this->session->userdata('userid');
+        $sql = "delete from t_cart where item_code='$item_code' and kode_promo = '$kode_promo' and user_id = '$user_id'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function cekTebusMurahExistsInCart()
+    {
+        $user_id = $this->session->userdata('userid');
+        $sql = "select * from t_cart where kode_promo = 'P001' and user_id = '$user_id'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function cekTotalBelanjaWithOutTebusMurah()
+    {
+        $user_id = $this->session->userdata('userid');
+        $sql = "select sum(total) as total_belanja from t_cart where kode_promo != 'P001' and user_id = '$user_id'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function cek_item_tebus_murah_in_cart()
+    {
+        $user_id = $this->session->userdata('userid');
+        $sql = "select * from t_cart where kode_promo = 'P001' and user_id='$user_id'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function cek_amount_tebus_murah()
+    {
+        $sql = "select min_belanja from p_promo where kode_promo = 'P001'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function delete_item_tebus_murah()
+    {
+        $user_id = $this->session->userdata('userid');
+        $sql = "delete from t_cart where kode_promo = 'P001' and user_id = '$user_id'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function get_promo_active(){
+        $sql = "select id, kode_promo, nama_promo, is_active 
+        from p_promo where is_active = 'y'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function getDetailPromo($kode_promo){
+        $sql = "";
+        $query = $this->db->query($sql);
     }
 }

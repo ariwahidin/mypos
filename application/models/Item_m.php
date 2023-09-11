@@ -363,9 +363,12 @@ class Item_m extends CI_Model
         $total_insert = 0;
         if ($item->num_rows() > 0) {
             foreach ($item->result() as $data) {
-                $cek_item_code = $this->db->query("select * from p_item where item_code = '$data->item_code'");
-                if ($cek_item_code->num_rows() > 0) {
-                    $sql_update = "update p_item set barcode = '$data->barcode', name = '$data->item_name', min_stock = '$data->min_stock', item_name_toko = '$data->item_name', price = '$data->harga_jual', harga_jual = '$data->harga_jual', harga_bersih = '$data->harga_bersih' where item_code = '$data->item_code'";
+                $cek_barcode_exists = $this->db->query("select * from p_item where barcode = '$data->barcode'");
+                if ($cek_barcode_exists->num_rows() > 0) {
+                    $sql_update = "update p_item set item_code = '$data->item_code', name = '$data->item_name', 
+                    min_stock = '$data->min_stock', item_name_toko = '$data->item_name', price = '$data->harga_jual', 
+                    harga_jual = '$data->harga_jual', harga_bersih = '$data->harga_bersih' 
+                    where barcode = '$data->barcode'";
                     $this->db->query($sql_update);
                     $total_update = $total_update + 1;
                 } else {
@@ -405,7 +408,7 @@ class Item_m extends CI_Model
         $cek = $this->db->query("select * from p_item_detail where item_code = '$item_code' and exp_date = '$exp_date'");
         if ($cek->num_rows() > 0) {
             // update
-            $sql = "update p_item_detail set qty = qty + '$stock' where item_code = '$item_code'";
+            $sql = "update p_item_detail set qty = qty + '$stock' where item_code = '$item_code' and exp_date = '$exp_date'";
             $this->db->query($sql);
         } else {
             // insert
@@ -449,6 +452,74 @@ class Item_m extends CI_Model
     function get_detail_order($no_order)
     {
         $query = $this->db->get_where('tb_stock_order', array('no_order' => $no_order));
+        return $query;
+    }
+
+    function getItemDiscount()
+    {
+        $sql = "select
+        t1.id, t1.item_code, t2.barcode ,t2.name as item_name, t2.harga_jual, t1.discount,
+        t2.harga_jual - (t2.harga_jual * (t1.discount/100)) as after_disc,
+        t1.exp_date_from, t1.exp_date_to, t1.start_periode, t1.end_periode
+        from p_item_discount t1
+        inner join p_item t2 on t1.item_code = t2.item_code
+        order by t1.end_periode desc";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    function deleteAllItemDiscount()
+    {
+        $sql = "delete from p_promo_detail";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    function generateIdItemDiscount()
+    {
+        $sql = "select case when max(id) is null then 0 else max(id) end as id from p_promo_detail";
+        $query = $this->db->query($sql);
+        return (int)$query->row()->id + (int)1;
+    }
+
+    function updateItemDiscount($item)
+    {
+        //delete item discount sebelum di timpa item discount baru
+        $this->deleteAllItemDiscount();
+        $total_update = 0;
+        foreach ($item as $key => $value) {
+            $cek = $this->cekItemDiscount($value);
+            if ($cek->num_rows() == 0) {
+                $params = array(
+                    'id' => $this->generateIdItemDiscount(),
+                    'kode_promo' => $value['kode_promo'],
+                    'item_code' => $value['item_code'],
+                    'exp_date_from' => $value['exp_date_from'],
+                    'exp_date_to' => $value['exp_date_to'],
+                    'start_periode' => $value['start_periode'],
+                    'end_periode' => $value['end_periode'],
+                    'discount' => $value['discount'],
+                    'created_by' => $value['created_by'],
+                    'created_at' => international_date_time()
+                );
+                $this->db->insert('p_promo_detail', $params);
+                $total_update += 1;
+            }
+        }
+        return $total_update;
+    }
+
+    function cekItemDiscount($item)
+    {
+        $params = array(
+            'item_code' => $item['item_code'],
+            'exp_date_from' => $item['exp_date_from'],
+            'exp_date_to' => $item['exp_date_to'],
+            'discount' => $item['discount'],
+            'start_periode' => $item['start_periode'],
+            'end_periode' => $item['end_periode']
+        );
+        $query = $this->db->get_where('p_promo_detail', $params);
         return $query;
     }
 }

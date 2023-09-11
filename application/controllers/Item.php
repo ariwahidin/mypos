@@ -119,20 +119,6 @@ class Item extends CI_Controller
                     );
 
                     $this->template->load('template', 'product/item/dataFromExcel', $data);
-                    // die;
-
-                    // $html = '<table>';
-                    // foreach ($html as $row) {
-                    //     $html .= '<tr>';
-                    //     foreach ($row as $cell) {
-                    //         $html .= '<td>' . $cell . '</td>';
-                    //     }
-                    //     $html .= '</tr>';
-                    // }
-                    // $html .= '</table>';
-
-                    // // Tampilkan tabel HTML di halaman web
-                    // echo $html;
                 } else {
                     echo "Gagal mengunggah file.";
                 }
@@ -168,6 +154,7 @@ class Item extends CI_Controller
                 }
             }
 
+            $this->stock_m->deleteAllStockDetail();
             $this->stock_m->simpan_item_detail_from_excel($params);
             $this->stock_m->add_stock_from_excel($params);
 
@@ -481,6 +468,8 @@ class Item extends CI_Controller
     function add_stock()
     {
         $post = $this->input->post();
+        // var_dump($post);
+        // die;
         $this->stock_m->add_stock_manual($post);
         $this->item_m->add_stock($post);
         if ($this->db->affected_rows() > 0) {
@@ -521,5 +510,59 @@ class Item extends CI_Controller
             'detail' => $detail
         );
         $this->load->view('product/item/modal_order_detail', $data);
+    }
+
+
+    function discount()
+    {
+        $data = array();
+        $this->template->load('template', 'product/item/item_discount', $data);
+    }
+
+    function loadItemDiscount()
+    {
+        $data = array(
+            'item' => $this->item_m->getItemDiscount(),
+        );
+        $this->load->view('product/item/table_item_discount', $data);
+    }
+
+    function getDiscountItem()
+    {
+        $url = 'item/getPromoDetail';
+        $api = get_curl($url);
+
+        if ($api['success'] == true) {
+            
+            // //delete item discount sebelum di timpa item discount baru
+            // $delete = $this->item_m->deleteAllItemDiscount();
+
+            $item = $api['item'];
+            $update = $this->item_m->updateItemDiscount($item);
+
+            if ($update > 0) {
+                $response = array(
+                    'updated' => $update,
+                    'icon' => 'success',
+                    'message' => 'Berhasil Update Data',
+                    'success' => true
+                );
+            } else {
+                $response = array(
+                    'success' => false,
+                    'icon' => 'warning',
+                    'updated' => $update,
+                    'message' => 'Data sudah up to date',
+                );
+            }
+
+        } else {
+            $response = array(
+                'success' => false,
+                'icon' => 'error',
+                'message' => 'Tidak ada data',
+            );
+        }
+        echo json_encode($response);
     }
 }
