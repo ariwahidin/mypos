@@ -38,7 +38,13 @@
                             <?php foreach ($item->result() as $data) { ?>
                                 <tr>
                                     <td><?= $data->barcode ?></td>
-                                    <td style="width: 40%"><?= $data->item_name ?></td>
+                                    <td style="width: 60%"><?= $data->item_name ?>
+                                        <?php
+                                        $promo = get_nama_promo($data->item_code, $data->exp_date);
+                                        if ($promo->num_rows() > 0) { ?>
+                                            <span style="margin-left: 5px;" class="label bg-green"><?= $promo->row()->nama_promo ?></span>
+                                        <?php } ?>
+                                    </td>
                                     <td style="text-align: right;"><?= $data->qty ?></td>
                                     <td style="width: 12%; text-align: right;"><?= date('d-m-Y', strtotime($data->exp_date)) ?></td>
                                     <td style="text-align: right;"><?= $data->discount ?></td>

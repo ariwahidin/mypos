@@ -559,15 +559,17 @@ class Sale_m extends CI_Model
 
     public function getItemBonusNearEd($item_code, $kode_promo)
     {
-        $sql = "select b.id, b.item_id, b.item_code, b.barcode, 
-        b.name, c.harga_jual,
-        d.qty_bonus, a.discount, a.kode_promo, b.exp_date
-        from p_promo_detail a  
-        inner join (select * from p_item_detail where item_code = '$item_code'
-        and qty > 0 order by exp_date asc limit 1) b on a.item_code = b.item_code
-        inner join p_item c on a.item_code = c.item_code
-        inner join p_promo d on a.kode_promo = d.kode_promo
-        where a.kode_promo = '$kode_promo' and a.item_code = '$item_code'";
+        $sql = "select a.id, a.item_id, a.item_code , a.barcode ,a.name, b.harga_jual,
+        a.exp_date, c.discount, c.kode_promo, d.qty_bonus, c.exp_date_from, c.exp_date_to,
+        c.start_periode, c.end_periode
+        from p_item_detail a 
+        left join p_item b on b.item_code = a.item_code
+        left join p_promo_detail c on a.item_code = c.item_code
+        left join p_promo d on c.kode_promo = d.kode_promo
+        where a.item_code = '$item_code' and c.kode_promo = '$kode_promo'
+        and a.exp_date >= c.exp_date_from and a.exp_date <= c.exp_date_to
+        and date(now()) >= c.start_periode and date(now()) <= c.end_periode
+        order by a.exp_date asc limit 1";
         $query = $this->db->query($sql);
         return $query;
     }
@@ -643,7 +645,12 @@ class Sale_m extends CI_Model
     }
 
     public function getDetailPromo($kode_promo){
-        $sql = "";
+        $sql = "select b.nama_promo,c.barcode , c.name, a.* 
+        from p_promo_detail a
+        left join p_promo b on a.kode_promo = b.kode_promo 
+        left join p_item c on a.item_code = c.item_code 
+        where a.kode_promo = '$kode_promo'";
         $query = $this->db->query($sql);
+        return $query;
     }
 }
