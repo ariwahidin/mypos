@@ -22,21 +22,6 @@ class Toko extends CI_Controller
 		$this->template->load('template', 'toko/toko', $data);
 	}
 
-	// public function pilih_toko()
-	// {
-	// 	$post = $_POST;
-	// 	$nonaktif_toko = $this->db->query("UPDATE t_toko SET is_active = 'n' WHERE is_active = 'y'");
-	// 	if ($this->db->query("SELECT * FROM t_toko WHERE is_active = 'y'")->num_rows() < 1) {
-	// 		$params = array(
-	// 			'is_active' => 'y',
-	// 			'updated_by' => $this->session->userdata('userid'),
-	// 			'updated' => international_date_time(),
-	// 		);
-	// 		$this->db->where('id', $post['id']);
-	// 		$this->db->update('t_toko', $params);
-	// 	}
-	// 	redirect('toko');
-	// }
 
 	public function edit_toko()
 	{

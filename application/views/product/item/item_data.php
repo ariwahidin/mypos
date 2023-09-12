@@ -15,7 +15,9 @@
         <div class="box-header">
             <!-- <h3 class="box-title">Data Product Items</h3> -->
             <div class="pull-right">
-                <a class="btn btn-flat btn-warning" href="<?= site_url('item/addFromExcel') ?>">Add Item From Excel</a>
+                <?php if ($this->session->userdata('username') == 'superadmin') { ?>
+                    <a class="btn btn-flat btn-warning" href="<?= site_url('item/addFromExcel') ?>">Replace Stock From Excel</a>
+                <?php } ?>
                 <a class="btn btn-flat btn-success" href="<?= site_url('item/order') ?>">Order</a>
                 <a class="btn btn-flat btn-info" href="<?= site_url('item/suggest') ?>">Qty Suggest</a>
                 <a onclick="showLoading()" class="btn btn-flat btn-primary" href="<?= site_url('Warehouse/get_harga_item') ?>">Refresh Item</a>
@@ -49,9 +51,11 @@
                             </td>
                             <td><?= $data->min_stock ?></td>
                             <td>
-                                <button class="btn btn-flat btn-primary btn-xs" id="btn_edit" data-item-code="<?= $data->item_code ?>" data-item-name="<?= $data->name ?>" data-barcode="<?= $data->barcode ?>">
-                                    <i class="fa fa-plus"></i> Add Stock
-                                </button>
+                                <?php if ($this->session->userdata('username') == 'superadmin') { ?>
+                                    <button class="btn btn-flat btn-primary btn-xs" id="btn_edit" data-item-code="<?= $data->item_code ?>" data-item-name="<?= $data->name ?>" data-barcode="<?= $data->barcode ?>">
+                                        <i class="fa fa-plus"></i> Add Stock
+                                    </button>
+                                <?php } ?>
                             </td>
                         </tr>
                     <?php } ?>

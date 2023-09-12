@@ -119,20 +119,6 @@ class Item extends CI_Controller
                     );
 
                     $this->template->load('template', 'product/item/dataFromExcel', $data);
-                    // die;
-
-                    // $html = '<table>';
-                    // foreach ($html as $row) {
-                    //     $html .= '<tr>';
-                    //     foreach ($row as $cell) {
-                    //         $html .= '<td>' . $cell . '</td>';
-                    //     }
-                    //     $html .= '</tr>';
-                    // }
-                    // $html .= '</table>';
-
-                    // // Tampilkan tabel HTML di halaman web
-                    // echo $html;
                 } else {
                     echo "Gagal mengunggah file.";
                 }
@@ -168,6 +154,7 @@ class Item extends CI_Controller
                 }
             }
 
+            $this->stock_m->deleteAllStockDetail();
             $this->stock_m->simpan_item_detail_from_excel($params);
             $this->stock_m->add_stock_from_excel($params);
 

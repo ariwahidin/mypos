@@ -45,15 +45,27 @@
                                     <td><?= $data->address ?></td>
                                     <td><?= $data->level == 1 ? "Admin" : "Kasir" ?></td>
                                     <td class="text-center" width="160px">
-                                        <form action="<?= site_url('user/del') ?>" method="post">
-                                            <a href="<?= site_url('user/edit/' . $data->user_id) ?>" class="btn btn-primary btn-xs">
-                                                <i class="fa fa-pencil"></i> Update
-                                            </a>
-                                            <input type="hidden" name="user_id" value="<?= $data->user_id ?>">
-                                            <button class="btn btn-danger btn-xs">
-                                                <i class="fa fa-trash"></i> Delete
-                                            </button>
-                                        </form>
+                                        <?php if ($data->username != 'superadmin') { ?>
+                                            <form action="<?= site_url('user/del') ?>" method="post">
+                                                <a href="<?= site_url('user/edit/' . $data->user_id) ?>" class="btn btn-primary btn-xs">
+                                                    <i class="fa fa-pencil"></i> Update
+                                                </a>
+                                                <input type="hidden" name="user_id" value="<?= $data->user_id ?>">
+                                                <button class="btn btn-danger btn-xs">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        <?php } else if ($this->session->userdata('username') == 'superadmin') { ?>
+                                            <form action="<?= site_url('user/del') ?>" method="post">
+                                                <a href="<?= site_url('user/edit/' . $data->user_id) ?>" class="btn btn-primary btn-xs">
+                                                    <i class="fa fa-pencil"></i> Update
+                                                </a>
+                                                <input type="hidden" name="user_id" value="<?= $data->user_id ?>">
+                                                <button class="btn btn-danger btn-xs">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        <?php } ?>
                                     </td>
                                 </tr>
                             <?php

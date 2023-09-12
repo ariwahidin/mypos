@@ -58,7 +58,8 @@ class Stock_m extends CI_Model
         case when t3.discount is null then 0 else t3.discount end as discount
         from p_item_detail t1
         inner join p_item t2 on t1.item_code = t2.item_code
-        left join p_item_discount t3 on t1.item_code  = t3.item_code and t1.exp_date = t3.exp_date 
+        left join p_item_discount t3 on t1.item_code  = t3.item_code 
+        and t1.exp_date >= t3.exp_date_from and t1.exp_date <= t3.exp_date_to
         and current_date() >= t3.start_periode and  current_date() <= t3.end_periode
         where t1.qty > 0";
 
@@ -335,6 +336,12 @@ class Stock_m extends CI_Model
         left join p_item t2 on t1.item_code = t2.item_code 
         group by t1.exp_date, t1.item_code
         order by t1.exp_date desc)ss";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    function deleteAllStockDetail(){
+        $sql = "delete from p_item_detail";
         $query = $this->db->query($sql);
         return $query;
     }

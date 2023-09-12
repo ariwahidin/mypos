@@ -20,26 +20,13 @@
                                     <tr>
                                         <th>Barcode</th>
                                         <th>Manual Item</th>
-                                        <!-- <th>Price</th>
-                                        <th>Qty</th>
-                                        <th>Exp. Date</th>
-                                        <th></th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td>
                                             <div class="">
-                                                <!-- <input type="hidden" id="item_id">
-                                                <input type="hidden" id="price">
-                                                <input type="hidden" id="stock">
-                                                <input type="hidden" id="qty_cart"> -->
                                                 <input type="text" id="barcode" class="form-control" autofocus autocomplete="off" placeholder="Input Barcode Lalu Enter">
-                                                <!-- <span class="input-group-btn">
-                                                    <button type="button" class="btn btn-info btn-flat" data-toggle="modal" data-target="#modal-item">
-                                                        <i class="fa fa-search"></i>
-                                                    </button>
-                                                </span> -->
                                             </div>
                                         </td>
 
@@ -48,29 +35,6 @@
                                                 <button class="btn btn-flat btn-primary" data-toggle="modal" data-target="#modal-item">Pilih Product Manual</button>
                                             </div>
                                         </td>
-                                        <!-- 
-                                        <td width="15%">
-                                            <div class="form-group">
-                                                <input class="form-control" type="text" id="price_item" readonly>
-                                            </div>
-                                        </td>
-                                        <td width="10%">
-                                            <div class="form-group">
-                                                <input type="number" id="qty" value="1" min="1" class="form-control">
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="form-group">
-                                                <input type="text" id="expired_date" class="form-control" data-inputmask="'alias': 'date'">
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div>
-                                                <button type="button" id="add_cart" class="btn btn-primary">
-                                                    <i class="fa fa-cart-plus"></i> Add
-                                                </button>
-                                            </div>
-                                        </td> -->
                                     </tr>
                                 </tbody>
                             </table>
@@ -269,6 +233,7 @@
 <div id="show_modal_item">
     <?php $this->view('transaction/sale/modal_item_data') ?>
 </div>
+
 <!-- Modal Add Product Item -->
 <div class="modal flip" id="modal-item">
     <div class="modal-dialog modal-lg">
@@ -534,7 +499,6 @@
 
     function tax() {
         var tax = parseFloat('<?= $tax ?>');
-        // console.log(total_item() * tax);
         return total_item() * tax;
     }
 
@@ -555,8 +519,6 @@
         $('#total_bayar').text(number_with_commas(grand_total));
         var change = is_number($('#cash').val()) - grand_total;
         $('#change').val(number_with_commas(change));
-        // $('#tax').val(number_with_commas(tax_value));
-
     }
 
     $(document).on('click', '#prepare_bayar', function() {
@@ -606,7 +568,6 @@
 
     function get_cart_qty(barcode) {
         $('#cart_table tr').each(function() {
-            // var qty_cart = $(this).find("td").eq(4).html()
             var qty_cart = $("#cart_table td.barcode:contains('" + barcode + "')").parent().find("td").eq(5).html()
             if (qty_cart != null) {
                 $('#qty_cart').val(qty_cart)
@@ -615,8 +576,6 @@
             }
         })
     }
-
-
 
     $(document).on('change', '#type_bayar', function() {
         if ($(this).val() != '1') {
@@ -669,7 +628,6 @@
                 $('#cash').focus()
             }
         })
-
     })
 
     $(document).on('keyup', function(e) {
@@ -677,8 +635,6 @@
             $('#prepare_bayar').click()
         }
     })
-
-
 
     $('#discount_item_percent_edit').on('keydown keyup change', function(e) {
         if ($(this).val() > 100) {
@@ -689,8 +645,6 @@
         }
         $('#discount_item_percent_edit').val(parseFloat($(this).val()));
     })
-
-
 
     $(document).on('click', '#del_cart', function() {
         Swal.fire({
@@ -839,14 +793,7 @@
         new_ed = split[1] + '/' + split[0] + '/' + split[2]
         var x = new Date(new_ed)
         var y = new Date(today())
-        // console.log(ed)
-        // console.log(today())
 
-        // console.log(x);
-        // console.log(x.getDate())
-        // console.log(isValidDate(x));
-
-        // console.log(isValidDate(y));
         console.log(x.getTime());
         if (x.getTime() < y.getTime()) {
             alert('Exp Date tidak boleh lebih kecil dari hari ini')
@@ -937,8 +884,6 @@
         }
     })
 
-
-
     $('#modal-bayar-pake-kartu').on('shown.bs.modal', function() {
         $('#owner').focus()
     });
@@ -1028,8 +973,6 @@
     $(document).ready(function() {
         calculate()
     })
-
-
 
     // Proses payment
     $(document).on('click', '#submit_bayar', function() {
@@ -1164,20 +1107,9 @@
                     success: function(result) {
                         if (result.success == true || result.success == false) {
                             window.location.href = "<?= base_url('sale/prepare') ?>"
-                            // $('#cart_table').load('<?= site_url('sale/cart_data') ?>', function() {
-                            //     calculate()
-                            // })
                         }
                     }
                 })
-                // $('#discount').val(0)
-                // $('#cash').val(0)
-                // $('#customer').val('').change()
-                // $('#barcode').val('')
-                // $('#barcode').focus()
-                // $('#input_jenis_kartu').val('')
-                // $('#nomor_kartu').val('')
-                // $('#nama_pemilik_kartu').val('')
             }
         })
     })
@@ -1286,7 +1218,6 @@
         });
     }
 
-
     $('#barcode').keypress(function(e) {
         var key = e.which;
         var barcode = $(this).val();
@@ -1310,30 +1241,8 @@
                                 $('#modal-item-found').modal('show');
                                 $('#barcode').val('');
                             });
-                            // alert('product ditemukan');
-                            // $('#modal-item').modal('show');
-                            // $('#item_id').val(result.item.item_id)
-                            // $('#barcode').val(barcode)
-                            // $('#desc').val(result.item.name)
-                            // $('#price_item').val(result.item.price)
-                            // $('#price').val(result.item.price)
-                            // $('#stock').val(result.item.stock)
-                            // $('#qty_cart').val($("#cart_table td.barcode:contains('" + barcode + "')").parent().find("td").eq(5).html())
-                            // $('#expired_date').val(result.item.exp_date)
-                            // $('#add_cart').click();
                         } else {
-                            // alert('Product tidak ditemukan')
                             Swal.fire('Product tidak ditemukan')
-                            // $('#item_id').val('')
-                            // $('#barcode').val('')
-                            // $('#price').val('')
-                            // $('#stock').val('')
-                            // $('#qty_cart').val('')
-                            // $('#desc').val('')
-                            // $('#price_item').val('')
-                            // $('#expired_date').val('')
-                            // $('#qty').val(1)
-                            // $('#barcode').focus()
                         }
                     }
                 })
@@ -1341,12 +1250,9 @@
         }
     })
 
-
-
     function number_with_commas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
-
 
     function number_without_commas(x) {
         return x.replace(/,/g, '');
