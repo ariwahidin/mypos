@@ -164,7 +164,7 @@ class Sale extends CI_Controller
 		$this->template->load('template', 'report/stock_data', $data);
 	}
 
-	public function cekPromoPerItem($item_code)
+	public function cekPromoPerItem($item_code, $id_item_detail = null)
 	{
 		$user_id = $this->session->userdata('userid');
 		$kode_promo = $this->db->query("select b.kode_promo, a.item_code, a.item_expired,
@@ -218,13 +218,13 @@ class Sale extends CI_Controller
 				}
 			}
 		} else {
-			$this->cekPromoBogof($item_code);
+			$this->cekPromoBogof($item_code, $id_item_detail);
 		}
 	}
 
-	public function cekPromoBogof($item_code)
+	public function cekPromoBogof($item_code, $id_item_detail)
 	{
-		$user_id = $this->session->userdata('userid'); 
+		$user_id = $this->session->userdata('userid');
 		// cek apakah ada item promo bogof di cart dan apakah exp date sesuai dengan settingan promo
 		$kode_promo = $this->db->query("select b.kode_promo, a.item_code, a.item_expired,
         b.exp_date_from, b.exp_date_to, b.start_periode, b.end_periode
@@ -255,9 +255,9 @@ class Sale extends CI_Controller
 				$stock = $stock->row()->stock;
 				// var_dump($predic_qty);
 				if ($predic_qty <= $stock) {
-					
+
 					// ambil item yang exp date terdekat sesuai dengan yang disetting promo
-					$item_bonus = $this->sale_m->getItemBonusNearEd($item_code, $kode_promo);
+					$item_bonus = $this->sale_m->getItemBonusNearEd($item_code, $kode_promo, $id_item_detail);
 					// var_dump($this->db->last_query());
 					if ($item_bonus->num_rows() > 0) {
 						$params = $item_bonus->row();
@@ -318,7 +318,7 @@ class Sale extends CI_Controller
 
 				// $this->sale_m->add_cart( $data );
 				if ($this->db->affected_rows() > 0) {
-					$this->cekPromoPerItem($item_code);
+					$this->cekPromoPerItem($item_code, $item_id_detail);
 					$this->cekPromoTebusMurahIsAccurate();
 					$params = array('success' => true);
 				} else {
@@ -797,6 +797,18 @@ class Sale extends CI_Controller
 	{
 		$response = array(
 			'success' => true
+		);
+		echo json_encode($response);
+	}
+
+	public function cekStock()
+	{
+		$id_item_detail = $this->input->post('id_item_detail');
+		$qty_stock = $this->sale_m->getStock($id_item_detail)->row()->stock;
+		$qty_cart = $this->sale_m->getQtyCart($id_item_detail)->row()->qty;
+		$stock_balance = $qty_stock - $qty_cart;
+		$response = array(
+			'stock' => $stock_balance
 		);
 		echo json_encode($response);
 	}

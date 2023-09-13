@@ -634,7 +634,7 @@
                             //     'Your file has been deleted.',
                             //     'success'
                             // )
-                        }else{
+                        } else {
                             showConfirmPay()
                         }
                     })
@@ -799,13 +799,47 @@
 
     $(document).on('click', '#update_qty', function() {
         var qty = $(this).data('qty')
-        var stock = $(this).data('stock')
+        var stock = 0
         var cart_id = $(this).data('cartid')
+        var id_item_detail = $(this).data('id_item_detail')
+        $.ajax({
+            url: "<?= base_url('sale/cekStock') ?>",
+            method: "POST",
+            data: {
+                id_item_detail
+            },
+            dataType: "JSON",
+            async: false,
+            success: function(response) {
+                stock = response.stock
+            },
+            error: function(err) {
+                Swal.fire("Error : " + err)
+            }
+        })
+
+        const stock_awal = stock
+        var stock_akhir = stock;
+        const qty_awal = $(this).data('qty')
+        // console.log("stock awal : " + stock_awal)
+        // console.log("qty awal : " + qty_awal)
+
         $('#qty_edit').val(qty)
         $('#qty_stock').val(stock)
         $('#input_edit_qty_cart_id').val(cart_id);
         $("#modal_edit_qty").on('shown.bs.modal', function() {
             $('#qty_edit').focus();
+            $('#qty_edit').on('keyup', function() {
+                // console.log($(this).val())
+                // console.log(parseFloat(stock_awal) + parseFloat(qty_awal) - parseFloat($(this).val()))
+                if (!isNaN(stock_awal) && !isNaN(qty_awal)) {
+                    stock_akhir = parseFloat(stock_awal) + parseFloat(qty_awal) - parseFloat($(this).val());
+                    if (!isNaN(stock_akhir)) {
+                        $('#qty_stock').val(stock_akhir);
+                    }
+                }
+            })
+
             $('#btn_save_edit_qty').attr({
                 "data-qty": qty,
                 "data-stock": stock,
@@ -814,14 +848,14 @@
     })
 
     $(document).on('click', '#btn_save_edit_qty', function() {
-        // alert('edit_qty');
         var stock = $('#qty_stock').val();
         var qty = $('#qty_edit').val()
         var cart_id = $('#input_edit_qty_cart_id').val();
 
         if (qty == '' || qty == 0) {
-            // alert('Qty Tidak Boleh Kosong')
             Swal.fire('Qty tidak boleh kosong')
+        } else if (parseFloat(stock) < 0) {
+            Swal.fire('Stock tidak mencukupi')
         } else {
             $.ajax({
                 type: 'POST',
@@ -837,13 +871,10 @@
                         $('#cart_table').load('<?= site_url('sale/cart_data') ?>', function() {
                             calculate()
                         })
-                        // alert('Item cart berhasil ter-update')
-                        // Swal.fire('Item cart berhasil ter-update')
                         $('#modal_edit_qty').modal('hide');
                     } else if (result.success == false && result.stock == false) {
                         Swal.fire('Stock tidak mencukupi')
                     } else {
-                        // alert('Data item cart tidak ter-update')
                         Swal.fire('Data item cart tidak ter-update')
                         $('#modal_edit_qty').modal('hide');
                     }

@@ -4,7 +4,7 @@
             <div class="modal-header">
                 <div class="callout callout-success">
                     <h4 style="font-size: 26px;">Tebus murah aktif, tawarkan produk ini kepada pelanggan
-                        <button style="display: inline; margin-left: 5px;" class="btn btn-sm btn-primary pull-right">Lewati</button>
+                        <button style="display: inline; margin-left: 5px;" onclick="lanjutBayar()" class="btn btn-sm btn-primary pull-right">Lanjut bayar</button>
                         <button style="display: inline;" class="btn btn-sm btn-danger pull-right" data-dismiss="modal" aria-label="Close">Tutup</button>
                     </h4>
                     <!-- <p>Tawarkan product tebus murah kepada pelanggan</p> -->
@@ -51,4 +51,9 @@
     $(document).ready(function() {
         $('#table_item_tebus_harga').DataTable()
     })
+
+    function lanjutBayar(){
+        $('#modal-item-tebus-harga').modal('hide')
+        showConfirmPay()
+    }
 </script>

@@ -20,14 +20,14 @@ if ($cart->num_rows() > 0) {
                 <?php } ?>
                 <?= number_format($data->discount_item) ?>
                 &nbsp;
-                <button style="display: inline;" id="update_disc" data-toggle="modal" data-target="#modal_edit_disc" data-cartid="<?= $data->cart_id ?>" data-disc="<?= $data->discount_percent ?>" class="btn btn-xs btn-success">
+                <button <?= $data->kode_promo == 'P005' ? 'disabled' : '' ?> style="display: inline;" id="update_disc" data-toggle="modal" data-target="#modal_edit_disc" data-cartid="<?= $data->cart_id ?>" data-disc="<?= $data->discount_percent ?>" class="btn btn-xs btn-success">
                     <i class="fa fa-pencil"></i>
                 </button>
             </td>
             <td class="text-center">
                 <?= $data->qty ?>
                 &nbsp;
-                <button id="update_qty" data-toggle="modal" data-target="#modal_edit_qty" data-cartid="<?= $data->cart_id ?>" data-stock="<?= $data->stock ?>" data-qty="<?= $data->qty ?>" class="btn btn-xs btn-primary">
+                <button <?= $data->kode_promo == 'P005' ? 'disabled' : '' ?> id="update_qty" data-toggle="modal" data-target="#modal_edit_qty" data-id_item_detail="<?= $data->item_id_detail ?>" data-cartid="<?= $data->cart_id ?>" data-stock="" data-qty="<?= $data->qty ?>" class="btn btn-xs btn-primary">
                     <i class="fa fa-pencil"></i>
                 </button>
             </td>
@@ -35,7 +35,7 @@ if ($cart->num_rows() > 0) {
             <td class="text-right">
                 <?= date('d-m-Y', strtotime($data->item_expired_2)) ?>
                 &nbsp;
-                <button style="display: none;" id="update_ed" data-toggle="modal" data-target="#modal_edit_ed" data-cartid="<?= $data->cart_id ?>" data-ed_ori="<?= date('d-m-Y', strtotime($data->item_expired)) ?>" data-ed="<?= date('d-m-Y', strtotime($data->item_expired_2)) ?>" class="btn btn-xs btn-warning">
+                <button <?= $data->kode_promo == 'P005' ? 'disabled' : '' ?> id="update_ed" data-toggle="modal" data-target="#modal_edit_ed" data-cartid="<?= $data->cart_id ?>" data-ed_ori="<?= date('d-m-Y', strtotime($data->item_expired)) ?>" data-ed="<?= date('d-m-Y', strtotime($data->item_expired_2)) ?>" class="btn btn-xs btn-warning">
                     <i class="fa fa-pencil"></i>
                 </button>
             </td>
@@ -53,7 +53,7 @@ if ($cart->num_rows() > 0) {
                 class="btn btn-xs btn-primary">
                     <i class="fa fa-pencil"></i> Update
                 </button> -->
-                <button id="del_cart" data-cartid="<?= $data->cart_id ?>" class="btn btn-xs btn-danger">
+                <button <?= $data->kode_promo == 'P005' ? 'disabled' : '' ?> id="del_cart" data-cartid="<?= $data->cart_id ?>" class="btn btn-xs btn-danger">
                     <i class="fa fa-trash"></i> Delete
                 </button>
             </td>

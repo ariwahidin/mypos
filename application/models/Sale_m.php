@@ -26,17 +26,12 @@ class Sale_m extends CI_Model
         // var_dump($post);
         // die;
         $item_id_detail = $post['item_id_detail'];
-        $stock = $this->db->query("select * from p_item_detail where id = '$item_id_detail'")->row()->qty;
-        $qty = $post['qty'];
-        $sql = "select * from t_cart where item_id_detail = '$item_id_detail'";
-        $query = $this->db->query($sql);
+        $stock = $this->db->query("select sum(qty) as total_stock from p_item_detail where id = '$item_id_detail'")->row()->total_stock;
+        // $qty = $post['qty'];
+        $qty_cart = $this->db->query("select sum(qty) as qty from t_cart where item_id_detail = '$item_id_detail'")->row()->qty;
 
-        if ($query->num_rows() > 0) {
-            if ($stock <= $query->row()->qty) {
-                return false;
-            } else {
-                return true;
-            }
+        if ($qty_cart >= $stock) {
+            return false;
         } else {
             return true;
         }
@@ -557,7 +552,7 @@ class Sale_m extends CI_Model
         return $query;
     }
 
-    public function getItemBonusNearEd($item_code, $kode_promo)
+    public function getItemBonusNearEd($item_code, $kode_promo, $id_item_detail = null)
     {
         $sql = "select a.id, a.item_id, a.item_code , a.barcode ,a.name, b.harga_jual,
         a.exp_date, c.discount, c.kode_promo, d.qty_bonus, c.exp_date_from, c.exp_date_to,
@@ -569,7 +564,13 @@ class Sale_m extends CI_Model
         where a.item_code = '$item_code' and c.kode_promo = '$kode_promo'
         and a.exp_date >= c.exp_date_from and a.exp_date <= c.exp_date_to
         and date(now()) >= c.start_periode and date(now()) <= c.end_periode
-        order by a.exp_date asc limit 1";
+        and a.qty > 0";
+
+        if ($id_item_detail != null) {
+            $sql .= " and a.id = '$id_item_detail'";
+        }
+
+        $sql .= " order by a.exp_date asc limit 1";
         $query = $this->db->query($sql);
         return $query;
     }
@@ -637,19 +638,35 @@ class Sale_m extends CI_Model
         return $query;
     }
 
-    public function get_promo_active(){
+    public function get_promo_active()
+    {
         $sql = "select id, kode_promo, nama_promo, is_active 
         from p_promo where is_active = 'y'";
         $query = $this->db->query($sql);
         return $query;
     }
 
-    public function getDetailPromo($kode_promo){
+    public function getDetailPromo($kode_promo)
+    {
         $sql = "select b.nama_promo,c.barcode , c.name, a.* 
         from p_promo_detail a
         left join p_promo b on a.kode_promo = b.kode_promo 
         left join p_item c on a.item_code = c.item_code 
         where a.kode_promo = '$kode_promo'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function getStock($id_item_detail)
+    {
+        $sql = "select sum(qty) as stock from p_item_detail where id ='$id_item_detail'";
+        $query = $this->db->query($sql);
+        return $query;
+    }
+
+    public function getQtyCart($id_item_detail)
+    {
+        $sql = "select sum(qty) as qty from t_cart where item_id_detail ='$id_item_detail'";
         $query = $this->db->query($sql);
         return $query;
     }
