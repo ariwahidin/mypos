@@ -522,4 +522,46 @@ class Item_m extends CI_Model
         $query = $this->db->get_where('p_promo_detail', $params);
         return $query;
     }
+
+    function generateIdPromo()
+    {
+        $sql = "select case when max(id) is null then 0 else max(id) end as id from p_promo";
+        $query = $this->db->query($sql);
+        return (int)$query->row()->id + (int)1;
+    }
+
+    function deleteMasterPromo()
+    {
+        $sql = "delete from p_promo";
+        $query = $this->db->query($sql);
+    }
+
+    function updateMasterPromo($promo)
+    {
+        $this->deleteMasterPromo();
+        $total_update = 0;
+
+        foreach ($promo as $key => $value) {
+            $params = array(
+                'id' => $this->generateIdPromo(),
+                'kode_promo' => $value['kode_promo'],
+                'nama_promo' => $value['nama_promo'],
+                'min_belanja' => $value['min_belanja'],
+                'min_qty' => $value['min_qty'],
+                'qty_bonus' => $value['qty_bonus'],
+                'is_disc_show' => $value['is_disc_show'],
+                'is_active' => $value['is_active'],
+                'created_by' => $value['created_by'],
+                'created' => $value['created_at']
+            );
+            $this->db->insert('p_promo', $params);
+
+            // var_dump($this->db->error());
+
+            if ($this->db->affected_rows() > 0) {
+                $total_update += 1;
+            }
+        }
+        return $total_update;
+    }
 }

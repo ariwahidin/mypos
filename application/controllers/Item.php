@@ -533,16 +533,19 @@ class Item extends CI_Controller
         $api = get_curl($url);
 
         if ($api['success'] == true) {
-            
+
             // //delete item discount sebelum di timpa item discount baru
             // $delete = $this->item_m->deleteAllItemDiscount();
 
             $item = $api['item'];
+            $promo = $api['promo'];
+            $updateMasterPromo = $this->item_m->updateMasterPromo($promo);
             $update = $this->item_m->updateItemDiscount($item);
 
-            if ($update > 0) {
+            if ($update > 0 && $updateMasterPromo > 0) {
                 $response = array(
                     'updated' => $update,
+                    'updatedMasterPromo' => $updateMasterPromo,
                     'icon' => 'success',
                     'message' => 'Berhasil Update Data',
                     'success' => true
@@ -552,10 +555,10 @@ class Item extends CI_Controller
                     'success' => false,
                     'icon' => 'warning',
                     'updated' => $update,
+                    'updatedMasterPromo' => $updateMasterPromo,
                     'message' => 'Data sudah up to date',
                 );
             }
-
         } else {
             $response = array(
                 'success' => false,
