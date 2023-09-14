@@ -6,6 +6,14 @@ class Migrasi_m extends CI_Model
     // untuk update t_cart
     public function up_tb_cart()
     {
+
+        $add_item_code = "ALTER TABLE t_cart ADD column item_code varchar(255) after item_id_detail";
+        if ($this->db->query($add_item_code)) {
+            echo "berhasil tambah kolom item code" . "<br>";
+        } else {
+            echo "gagal tambah kolom item code" . "<br>";
+        }
+
         $add_kode_promo = "ALTER TABLE t_cart ADD column kode_promo varchar(255) after total";
         if ($this->db->query($add_kode_promo)) {
             echo "berhasil tambah kolom kode promo" . "<br>";
