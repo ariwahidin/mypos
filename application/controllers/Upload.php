@@ -15,7 +15,7 @@ class Upload extends CI_Controller
         $whs_code = $this->toko_m->get_toko()->row()->whs_code;
         $url = 'stock/getstocktoday?whs_code=' . $whs_code;
         $stock = get_curl($url);
-        if($stock['success'] == true){
+        if ($stock['success'] == true) {
             $status_upload = "sudah upload";
         }
 
@@ -46,7 +46,7 @@ class Upload extends CI_Controller
         (select whs_code from t_toko where is_active = 'y') as whs_code,
         t1.invoice as invoice,t4.nama_toko,
         t3.item_code,t3.barcode  ,t3.name as item_name, t2.qty, t2.price as price_item,
-        t2.discount_item, t2.total,t2.exp_date, t1.created as tanggal_transaksi
+        t2.discount_item, t2.total,t2.exp_date, t2.kode_promo, t1.created as tanggal_transaksi
         from t_sale t1
         inner join t_sale_detail t2 on t1.sale_id = t2.sale_id
         inner join p_item t3 on t2.item_id  = t3.item_id
@@ -64,7 +64,7 @@ class Upload extends CI_Controller
                 'post_sales_detail' => $sales_detail,
             ];
 
-            $url = my_api() . 'item/save_sale_detail';
+            $url = my_api() . 'item/save_report_sales_detail';
             $api = post_curl($url, $post);
 
             // var_dump($api['data']);

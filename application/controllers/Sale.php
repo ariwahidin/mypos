@@ -601,7 +601,7 @@ class Sale extends CI_Controller
 			$printer->text("\n");
 
 			$printer->setEmphasis(false);
-			$printer->setPrintLeftMargin($printernya->row()->margin_left);
+			$printer->setPrintLeftMargin((int)$printernya->row()->margin_left);
 
 			$printer->text($receipt->row()->toko_cabang . "\n");
 			$printer->text("DATE    : " . date('d-m-Y', strtotime($receipt->row()->tanggal_transaksi)) . "\n");

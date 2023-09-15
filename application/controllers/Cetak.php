@@ -31,7 +31,7 @@ class Cetak extends CI_Controller
                 $printer->bitImage($img, Escpos\Printer::IMG_DOUBLE_WIDTH | Escpos\Printer::IMG_DOUBLE_HEIGHT | Escpos\Printer::JUSTIFY_CENTER);
                 $printer->setJustification();
                 $printer->text("\n");
-                $printer->setPrintLeftMargin($printernya->row()->margin_left);
+                $printer->setPrintLeftMargin((int)$printernya->row()->margin_left);
                 $printer->text("Nama Toko" . "\n");
             } else {
                 $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
@@ -41,7 +41,7 @@ class Cetak extends CI_Controller
                 $printer->setJustification(); // Reset
             }
 
-            $printer->setPrintLeftMargin($printernya->row()->margin_left());
+            $printer->setPrintLeftMargin((int)$printernya->row()->margin_left);
             $printer->text("DATE    : " . date('d-m-Y h:i:s') . "\n");
             $printer->text("ORDER   : F23-2302230001" . "\n");
             $printer->text("CASHIER : Lina" . "\n");
@@ -111,7 +111,7 @@ class Cetak extends CI_Controller
                 $printer->bitImage($img, Escpos\Printer::IMG_DOUBLE_WIDTH | Escpos\Printer::IMG_DOUBLE_HEIGHT | Escpos\Printer::JUSTIFY_CENTER);
                 $printer->setJustification();
                 $printer->text("\n");
-                $printer->setPrintLeftMargin($printernya->row()->margin_left());
+                $printer->setPrintLeftMargin((int)$printernya->row()->margin_left);
                 $printer->text($toko->nama_toko . "\n");
             } else {
                 $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
@@ -121,7 +121,7 @@ class Cetak extends CI_Controller
                 $printer->setJustification(); // Reset
             }
 
-            $printer->setPrintLeftMargin($printernya->row()->margin_left);
+            $printer->setPrintLeftMargin((int)$printernya->row()->margin_left);
             $printer->text("DATE    : " . date('d-m-Y h:i:s', strtotime($sale->sale_created)) . "\n");
             $printer->text("ORDER   : " . $sale->invoice . "\n");
             $printer->text("CASHIER : " . $sale->nama_user . "\n");
