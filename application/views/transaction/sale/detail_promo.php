@@ -15,6 +15,7 @@
             </thead>
             <tbody>
                 <?php $no = 1;
+                // 
                 foreach ($promo->result() as $data) { ?>
                     <tr>
                         <td><?= $no++ ?></td>
