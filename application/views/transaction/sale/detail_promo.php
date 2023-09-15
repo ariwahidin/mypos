@@ -20,9 +20,9 @@
                         <td><?= $no++ ?></td>
                         <td><?= $data->kode_promo ?></td>
                         <td><?= $data->nama_promo ?></td>
-                        <td style="text-align: right;"><?= $data->min_belanja ?></td>
-                        <td><?= $data->min_qty ?></td>
-                        <td><?= $data->qty_bonus ?></td>
+                        <td style="text-align: right;"><?= number_format($data->min_belanja) ?></td>
+                        <td style="text-align: right;"><?= $data->min_qty ?></td>
+                        <td style="text-align: right;"><?= $data->qty_bonus ?></td>
                         <td><?= $data->is_active == 'y' ? 'active' : 'tidak aktif' ?></td>
                     </tr>
                 <?php } ?>
