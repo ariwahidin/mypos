@@ -638,10 +638,16 @@ class Sale_m extends CI_Model
         return $query;
     }
 
-    public function get_promo_active()
+    public function get_promo_active($kode_promo = null)
     {
-        $sql = "select id, kode_promo, nama_promo, is_active 
+        $sql = "select id, kode_promo, nama_promo, min_belanja, min_qty,
+        qty_bonus, is_active
         from p_promo where is_active = 'y'";
+
+        if ($kode_promo != null) {
+            $sql .= " and kode_promo = '$kode_promo'";
+        }
+
         $query = $this->db->query($sql);
         return $query;
     }

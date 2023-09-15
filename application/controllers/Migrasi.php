@@ -10,13 +10,22 @@ class Migrasi extends CI_Controller
         $this->load->model(['migrasi_m']);
     }
 
-    function updateTable(){
+    public function index()
+    {
+        $data = array();
+        $this->template->load('template', 'migrasi/migrasi');
+    }
+
+    function updateTable()
+    {
         $this->migrasi_m->up_tb_cart();
         $tb_promo = $this->migrasi_m->up_table_promo();
-        echo $tb_promo.'<br>';
+        echo $tb_promo;
         $tb_promo_detail = $this->migrasi_m->up_promo_detail();
-        echo $tb_promo_detail.'<br>';
+        echo $tb_promo_detail;
         $tb_sale = $this->migrasi_m->up_table_sale_detail();
         echo $tb_sale;
+        $this->migrasi_m->up_tb_printer();
+        echo "<br><a href=" . base_url('migrasi/index') . "> << Back</a>";
     }
 }

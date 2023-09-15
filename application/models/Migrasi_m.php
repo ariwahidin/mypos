@@ -47,9 +47,9 @@ class Migrasi_m extends CI_Model
           )";
 
         if ($this->db->query($sql)) {
-            $result = "table promo berhasil dibuat";
+            $result = "table promo berhasil dibuat"."<br>";
         } else {
-            $result = "gagal buat table promo";
+            $result = "gagal buat table promo"."<br>";
         }
         return $result;
     }
@@ -71,9 +71,9 @@ class Migrasi_m extends CI_Model
             PRIMARY KEY (`id`)
           )";
         if ($this->db->query($sql)) {
-            $result = "table promo detail berhasil dibuat";
+            $result = "table promo detail berhasil dibuat"."<br>";
         } else {
-            $result = "gagal buat table promo detail";
+            $result = "gagal buat table promo detail"."<br>";
         }
         return $result;
     }
@@ -83,10 +83,64 @@ class Migrasi_m extends CI_Model
     {
         $sql = "ALTER TABLE t_sale_detail ADD column kode_promo varchar(255) after total";
         if ($this->db->query($sql)) {
-            $result = "table t_sale detail berhasil di update";
+            $result = "table t_sale detail berhasil di update"."<br>";
         } else {
-            $result = "gagal update table t_sale detail";
+            $result = "gagal update table t_sale detail"."<br>";
         }
         return $result;
+    }
+
+    //update tb printer
+
+    public function up_tb_printer()
+    {
+        $sql1 = "ALTER TABLE tb_printer ADD column margin_left int after jumlah_print";
+        if ($this->db->query($sql1)) {
+            echo "tambah kolom margin_left berhasil" . "<br>";
+        } else {
+            echo "gagal tambah margin_left" . "<br>";
+        }
+
+        $sql2 = "ALTER TABLE tb_printer ADD column print_logo varchar(255) after margin_left";
+        if ($this->db->query($sql2)) {
+            echo "tambah kolom margin_left print_logo" . "<br>";
+        } else {
+            echo "gagal tambah print_logo" . "<br>";
+        }
+
+        $sql3 = "ALTER TABLE tb_printer ADD column alt_text varchar(255) after print_logo";
+        if ($this->db->query($sql3)) {
+            echo "tambah kolom alt_text berhasil" . "<br>";
+        } else {
+            echo "gagal tambah alt_text" . "<br>";
+        }
+
+        $sql4 = "ALTER TABLE tb_printer ADD column created_at datetime after alt_text";
+        if ($this->db->query($sql4)) {
+            echo "tambah kolom created_at berhasil" . "<br>";
+        } else {
+            echo "gagal tambah created_at" . "<br>";
+        }
+
+        $sql5 = "ALTER TABLE tb_printer ADD column created_by varchar(255) after created_at";
+        if ($this->db->query($sql5)) {
+            echo "tambah kolom created_by berhasil" . "<br>";
+        } else {
+            echo "gagal tambah created_by" . "<br>";
+        }
+
+        $sql6 = "ALTER TABLE tb_printer ADD column updated_at datetime after created_by";
+        if ($this->db->query($sql6)) {
+            echo "tambah kolom updated_at berhasil" . "<br>";
+        } else {
+            echo "gagal tambah updated_at" . "<br>";
+        }
+
+        $sql7 = "ALTER TABLE tb_printer ADD column updated_by varchar(255) after updated_at";
+        if ($this->db->query($sql7)) {
+            echo "tambah kolom updated_by berhasil" . "<br>";
+        } else {
+            echo "gagal tambah updated_by" . "<br>";
+        }
     }
 }

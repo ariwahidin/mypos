@@ -18,28 +18,30 @@ class Cetak extends CI_Controller
         $connector = new Escpos\PrintConnectors\WindowsPrintConnector($this->printer_m->get_printer()->row()->printer_name);
         $printer = new Escpos\Printer($connector, $profile);
         $img = Escpos\EscposImage::load("assets/dist/img/DgChocoGallerys.png", false);
-        $jumlah_print = $this->printer_m->get_printer()->row()->jumlah_print;
+
+        $printernya = $this->printer_m->get_printer();
+        $jumlah_print = $printernya->row()->jumlah_print;
 
         $printer->initialize();
 
         for ($i = 0; $i < $jumlah_print; $i++) {
 
-            if ($this->printer_m->getPrinterSettings()->print_logo == 'true') {
+            if ($printernya->row()->print_logo == 'true') {
                 $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
                 $printer->bitImage($img, Escpos\Printer::IMG_DOUBLE_WIDTH | Escpos\Printer::IMG_DOUBLE_HEIGHT | Escpos\Printer::JUSTIFY_CENTER);
                 $printer->setJustification();
                 $printer->text("\n");
-                $printer->setPrintLeftMargin($this->printer_m->get_margin_left());
+                $printer->setPrintLeftMargin($printernya->row()->margin_left);
                 $printer->text("Nama Toko" . "\n");
             } else {
                 $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
-                $printer->text($this->printer_m->getPrinterSettings()->alt_text . "\n");
+                $printer->text($printernya->row()->alt_text . "\n");
                 $printer->text("Nama Toko" . "\n");
                 $printer->text("\n");
                 $printer->setJustification(); // Reset
             }
 
-            $printer->setPrintLeftMargin($this->printer_m->get_margin_left());
+            $printer->setPrintLeftMargin($printernya->row()->margin_left());
             $printer->text("DATE    : " . date('d-m-Y h:i:s') . "\n");
             $printer->text("ORDER   : F23-2302230001" . "\n");
             $printer->text("CASHIER : Lina" . "\n");
@@ -91,35 +93,35 @@ class Cetak extends CI_Controller
         $toko = $this->db->query("SELECT * FROM t_toko WHERE id = '$id_toko'")->row();
         $sale = $this->sale_m->get_sale($id)->row();
         $sale_detail = $this->sale_m->get_sale_detail($id)->result();
-
+        $printernya = $this->printer_m->get_printer();
 
         $profile = Escpos\CapabilityProfile::load("simple");
-        $connector = new Escpos\PrintConnectors\WindowsPrintConnector($this->printer_m->get_printer()->row()->printer_name);
+        $connector = new Escpos\PrintConnectors\WindowsPrintConnector($printernya->row()->printer_name);
         $printer = new Escpos\Printer($connector, $profile);
         $img = Escpos\EscposImage::load("assets/dist/img/DgChocoGallerys.png", false);
-        $jumlah_print = $this->printer_m->get_printer()->row()->jumlah_print;
+        $jumlah_print = $printernya->row()->jumlah_print;
 
 
         $printer->initialize();
 
         for ($i = 0; $i < $jumlah_print; $i++) {
 
-            if ($this->printer_m->getPrinterSettings()->print_logo == 'true') {
+            if ($printernya->row()->print_logo == 'true') {
                 $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
                 $printer->bitImage($img, Escpos\Printer::IMG_DOUBLE_WIDTH | Escpos\Printer::IMG_DOUBLE_HEIGHT | Escpos\Printer::JUSTIFY_CENTER);
                 $printer->setJustification();
                 $printer->text("\n");
-                $printer->setPrintLeftMargin($this->printer_m->get_margin_left());
+                $printer->setPrintLeftMargin($printernya->row()->margin_left());
                 $printer->text($toko->nama_toko . "\n");
             } else {
                 $printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
-                $printer->text($this->printer_m->getPrinterSettings()->alt_text . "\n");
+                $printer->text($printernya->row()->alt_text . "\n");
                 $printer->text($toko->nama_toko . "\n");
                 $printer->text("\n");
                 $printer->setJustification(); // Reset
             }
 
-            $printer->setPrintLeftMargin($this->printer_m->get_margin_left());
+            $printer->setPrintLeftMargin($printernya->row()->margin_left);
             $printer->text("DATE    : " . date('d-m-Y h:i:s', strtotime($sale->sale_created)) . "\n");
             $printer->text("ORDER   : " . $sale->invoice . "\n");
             $printer->text("CASHIER : " . $sale->nama_user . "\n");

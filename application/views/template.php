@@ -314,6 +314,11 @@
 								<li <?= $this->uri->segment(1) == 'backup' ? 'class="active"' : '' ?>>
 									<a href="<?= site_url('backup') ?>"><i class="fa fa-circle-o"></i> <span>Backup Data</span></a>
 								</li>
+								<?php if ($this->session->userdata('username') == 'superadmin') { ?>
+									<li <?= $this->uri->segment(1) == 'migrasi' ? 'class="active"' : '' ?>>
+										<a href="<?= site_url('migrasi') ?>"><i class="fa fa-circle-o"></i> <span>Migrasi</span></a>
+									</li>
+								<?php } ?>
 							</ul>
 						</li>
 					<?php } ?>

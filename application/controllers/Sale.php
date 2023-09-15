@@ -55,7 +55,10 @@ class Sale extends CI_Controller
 	{
 		$kode_promo = $this->input->post('kode_promo');
 		$detail = $this->sale_m->getDetailPromo($kode_promo);
+		$promo = $this->sale_m->get_promo_active($kode_promo);
+
 		$data = array(
+			'promo' => $promo,
 			'detail' => $detail
 		);
 		$this->load->view('transaction/sale/detail_promo', $data);
@@ -578,11 +581,13 @@ class Sale extends CI_Controller
 		// var_dump($receipt->result());
 		// die;
 		$tax = $this->db->query("select tax + 1 as tax from tax")->row()->tax;
+		$printernya = $this->printer_m->get_printer();
 
 		$profile = Escpos\CapabilityProfile::load("simple");
-		$connector = new Escpos\PrintConnectors\WindowsPrintConnector($this->printer_m->get_printer()->row()->printer_name);
+		$connector = new Escpos\PrintConnectors\WindowsPrintConnector($printernya->row()->printer_name);
 		$printer = new Escpos\Printer($connector, $profile);
 		$img = Escpos\EscposImage::load("assets/dist/img/DgChocoGallerys.png", false);
+
 		$jumlah_print = 1;
 
 
@@ -596,7 +601,7 @@ class Sale extends CI_Controller
 			$printer->text("\n");
 
 			$printer->setEmphasis(false);
-			$printer->setPrintLeftMargin($this->printer_m->get_margin_left());
+			$printer->setPrintLeftMargin($printernya->row()->margin_left);
 
 			$printer->text($receipt->row()->toko_cabang . "\n");
 			$printer->text("DATE    : " . date('d-m-Y', strtotime($receipt->row()->tanggal_transaksi)) . "\n");

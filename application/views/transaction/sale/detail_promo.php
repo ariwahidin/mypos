@@ -6,6 +6,39 @@
         <table class="table table-bordered table-striped" id="tableDetail">
             <thead>
                 <th style="width: 10px">#</th>
+                <th>Kode promo</th>
+                <th>Nama promo</th>
+                <th>Min belanja</th>
+                <th>Min Qty</th>
+                <th>Qty Bonus</th>
+                <th>Status</th>
+            </thead>
+            <tbody>
+                <?php $no = 1;
+                foreach ($promo->result() as $data) { ?>
+                    <tr>
+                        <td><?= $no++ ?></td>
+                        <td><?= $data->kode_promo ?></td>
+                        <td><?= $data->nama_promo ?></td>
+                        <td style="text-align: right;"><?= $data->min_belanja ?></td>
+                        <td><?= $data->min_qty ?></td>
+                        <td><?= $data->qty_bonus ?></td>
+                        <td><?= $data->is_active == 'y' ? 'active' : 'tidak aktif' ?></td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="box box-info">
+    <div class="box-header">
+        <h3 class="box-title">Detail item promo</h3>
+    </div>
+    <div class="box-body">
+        <table class="table table-bordered table-striped" id="tableDetailItemPromo">
+            <thead>
+                <th style="width: 10px">#</th>
                 <th>Promo</th>
                 <th>Barcode</th>
                 <th>Item Name</th>
@@ -32,6 +65,6 @@
 </div>
 <script>
     $(document).ready(function() {
-        $('#tableDetail').DataTable()
+        $('#tableDetailItemPromo').DataTable()
     })
 </script>
