@@ -88,7 +88,9 @@
                         title: response.message,
                         showConfirmButton: false,
                         timer: 1500
-                    }).then(function() {})
+                    }).then(function() {
+                        window.location.href = "<?=base_url('sale/prepare')?>"
+                    })
                 } else {
                     hideLoading()
                     Swal.fire({

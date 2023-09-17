@@ -269,9 +269,9 @@
 								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
 							</a>
 							<ul class="treeview-menu">
-								<li class="<?= $this->uri->segment(2) == 'discount' ? 'active' : '' ?>">
+								<!-- <li class="<?= $this->uri->segment(2) == 'discount' ? 'active' : '' ?>">
 									<a href="<?= site_url('item/discount') ?>"><i class="fa fa-circle-o"></i> <span>Item Discount</span></a>
-								</li>
+								</li> -->
 								<li class="<?= $this->uri->segment(1) == 'item' && $this->uri->segment(2) != 'order_item' && $this->uri->segment(2) != 'discount' ? 'active' : '' ?>">
 									<a href="<?= site_url('item') ?>"><i class="fa fa-circle-o"></i> <span>Data Stock</span></a>
 								</li>
@@ -293,9 +293,9 @@
 								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
 							</a>
 							<ul class="treeview-menu">
-								<li <?= $this->uri->segment(1) == 'bonus' ? 'class="active"' : '' ?>>
+								<!-- <li <?= $this->uri->segment(1) == 'bonus' ? 'class="active"' : '' ?>>
 									<a href="<?= site_url('bonus') ?>"><i class="fa fa-circle-o"></i> <span>Setting Bonus</span></a>
-								</li>
+								</li> -->
 								<li <?= $this->uri->segment(1) == 'user' ? 'class="active"' : '' ?>>
 									<a href="<?= site_url('user') ?>"><i class="fa fa-circle-o"></i> <span>Users</span></a>
 								</li>
@@ -341,7 +341,7 @@
 
 		<footer class="main-footer">
 			<div class="pull-right hidden-xs">
-				<b>Version</b> 1.9
+				<b>Version</b> 2.0
 			</div>
 			<span>myPOS</span><strong> By <a href="#"> <strong> Handal Inti Boga</strong></a></strong>
 		</footer>

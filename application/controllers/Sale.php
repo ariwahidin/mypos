@@ -182,40 +182,43 @@ class Sale extends CI_Controller
 		if ($kode_promo->num_rows() > 0) {
 			if ($kode_promo->row()->kode_promo == 'P002') {
 				$kode_promo = $kode_promo->row()->kode_promo;
-				$promo = $this->db->query("select kode_promo, min_qty, nama_promo, qty_bonus from p_promo where kode_promo = 'P002'");
-				$min_qty = $promo->row()->min_qty;
-				$qty_bonus = $promo->row()->qty_bonus;
-				$sum_qty = $this->db->query("select sum(qty) as total_qty from t_cart where item_code = '$item_code' and user_id = '$user_id'");
-				$sum_qty = $sum_qty->row()->total_qty;
-				$predic_qty = $sum_qty + $qty_bonus;
-				$stock = $this->db->query("select sum(a.qty) as stock 
-				from p_item_detail a 
-				left join p_promo_detail b on a.item_code = b.item_code
-				where a.item_code = '$item_code'
-				and a.exp_date >= b.exp_date_from and a.exp_date <= b.exp_date_to
-				and date(now()) >= b.start_periode and date(now()) <= b.end_periode");
-				$stock = $stock->row()->stock;
-				// var_dump($predic_qty);
-				if ($predic_qty <= $stock) {
-					$item_bonus = $this->sale_m->getItemBonusNearEd($item_code, $kode_promo);
-					// var_dump($this->db->last_query());
-					if ($item_bonus->num_rows() > 0) {
-						$params = $item_bonus->row();
-						$cek_qty_cart_terpenuhi = $this->sale_m->cekQtyCartForPromo($item_code, $kode_promo);
-						$qty_cart = $cek_qty_cart_terpenuhi->row()->total_qty;
+				$cek_aktif = $this->db->query("select * from p_promo where kode_promo = '$kode_promo' and is_active = 'y'");
+				if ($cek_aktif->num_rows() > 0) {
+					$promo = $this->db->query("select kode_promo, min_qty, nama_promo, qty_bonus from p_promo where kode_promo = 'P002'");
+					$min_qty = $promo->row()->min_qty;
+					$qty_bonus = $promo->row()->qty_bonus;
+					$sum_qty = $this->db->query("select sum(qty) as total_qty from t_cart where item_code = '$item_code' and user_id = '$user_id'");
+					$sum_qty = $sum_qty->row()->total_qty;
+					$predic_qty = $sum_qty + $qty_bonus;
+					$stock = $this->db->query("select sum(a.qty) as stock 
+					from p_item_detail a 
+					left join p_promo_detail b on a.item_code = b.item_code
+					where a.item_code = '$item_code'
+					and a.exp_date >= b.exp_date_from and a.exp_date <= b.exp_date_to
+					and date(now()) >= b.start_periode and date(now()) <= b.end_periode");
+					$stock = $stock->row()->stock;
+					// var_dump($predic_qty);
+					if ($predic_qty <= $stock) {
+						$item_bonus = $this->sale_m->getItemBonusNearEd($item_code, $kode_promo);
+						// var_dump($this->db->last_query());
+						if ($item_bonus->num_rows() > 0) {
+							$params = $item_bonus->row();
+							$cek_qty_cart_terpenuhi = $this->sale_m->cekQtyCartForPromo($item_code, $kode_promo);
+							$qty_cart = $cek_qty_cart_terpenuhi->row()->total_qty;
 
-						if ($qty_cart >= $min_qty) {
-							$cek_promo_sudah_ada_dicart = $this->sale_m->getPromoIsExist($item_code, $kode_promo);
-							if ($cek_promo_sudah_ada_dicart->num_rows() < 1) {
-								// var_dump($item_code);
-								//lakukan menambahan item bonus ke dalam keranjang belanja
-								$this->sale_m->add_cart_item_bonus($params);
-								// var_dump($params);
-								// var_dump($this->db->error());
+							if ($qty_cart >= $min_qty) {
+								$cek_promo_sudah_ada_dicart = $this->sale_m->getPromoIsExist($item_code, $kode_promo);
+								if ($cek_promo_sudah_ada_dicart->num_rows() < 1) {
+									// var_dump($item_code);
+									//lakukan menambahan item bonus ke dalam keranjang belanja
+									$this->sale_m->add_cart_item_bonus($params);
+									// var_dump($params);
+									// var_dump($this->db->error());
+								}
+							} else {
+								//hapus item promo yang sudah ada dicart apa bila item utama kurang dari min qty promo
+								$this->sale_m->delete_cart_item_promo($item_code, $kode_promo);
 							}
-						} else {
-							//hapus item promo yang sudah ada dicart apa bila item utama kurang dari min qty promo
-							$this->sale_m->delete_cart_item_promo($item_code, $kode_promo);
 						}
 					}
 				}
@@ -241,44 +244,44 @@ class Sale extends CI_Controller
 		if ($kode_promo->num_rows() > 0) {
 			if ($kode_promo->row()->kode_promo == 'P005') {
 				$kode_promo = $kode_promo->row()->kode_promo;
-				$promo = $this->db->query("select kode_promo, min_qty, nama_promo, qty_bonus from p_promo where kode_promo = 'P005'");
-				$min_qty = $promo->row()->min_qty;
-				$qty_bonus = $promo->row()->qty_bonus;
-				$sum_qty = $this->db->query("select sum(qty) as total_qty from t_cart where item_code = '$item_code' and user_id = '$user_id'");
-				$sum_qty = $sum_qty->row()->total_qty;
-				$predic_qty = $sum_qty + $qty_bonus;
-
-				// get stocknya cukup atau tidak
-				$stock = $this->db->query("select sum(a.qty) as stock 
-				from p_item_detail a 
-				left join p_promo_detail b on a.item_code = b.item_code
-				where a.item_code = '$item_code'
-				and a.exp_date >= b.exp_date_from and a.exp_date <= b.exp_date_to
-				and date(now()) >= b.start_periode and date(now()) <= b.end_periode");
-				$stock = $stock->row()->stock;
-				// var_dump($predic_qty);
-				if ($predic_qty <= $stock) {
-
-					// ambil item yang exp date terdekat sesuai dengan yang disetting promo
-					$item_bonus = $this->sale_m->getItemBonusNearEd($item_code, $kode_promo, $id_item_detail);
-					// var_dump($this->db->last_query());
-					if ($item_bonus->num_rows() > 0) {
-						$params = $item_bonus->row();
-						$cek_qty_cart_terpenuhi = $this->sale_m->cekQtyCartForPromo($item_code, $kode_promo);
-						$qty_cart = $cek_qty_cart_terpenuhi->row()->total_qty;
-
-						if ($qty_cart >= $min_qty) {
-							$cek_promo_sudah_ada_dicart = $this->sale_m->getPromoIsExist($item_code, $kode_promo);
-							if ($cek_promo_sudah_ada_dicart->num_rows() < 1) {
-								// var_dump($item_code);
-								//lakukan menambahan item bonus ke dalam keranjang belanja
-								$this->sale_m->add_cart_item_bonus($params);
-								// var_dump($params);
-								// var_dump($this->db->error());
+				$cek_bogof_aktif = $this->db->query("select * from p_promo where kode_promo = '$kode_promo' and is_active = 'y'");
+				if ($cek_bogof_aktif->num_rows() > 0) {
+					$promo = $this->db->query("select kode_promo, min_qty, nama_promo, qty_bonus from p_promo where kode_promo = 'P005'");
+					$min_qty = $promo->row()->min_qty;
+					$qty_bonus = $promo->row()->qty_bonus;
+					$sum_qty = $this->db->query("select sum(qty) as total_qty from t_cart where item_code = '$item_code' and user_id = '$user_id'");
+					$sum_qty = $sum_qty->row()->total_qty;
+					$predic_qty = $sum_qty + $qty_bonus;
+					// get stocknya cukup atau tidak
+					$stock = $this->db->query("select sum(a.qty) as stock 
+					from p_item_detail a 
+					left join p_promo_detail b on a.item_code = b.item_code
+					where a.item_code = '$item_code'
+					and a.exp_date >= b.exp_date_from and a.exp_date <= b.exp_date_to
+					and date(now()) >= b.start_periode and date(now()) <= b.end_periode");
+					$stock = $stock->row()->stock;
+					// var_dump($predic_qty);
+					if ($predic_qty <= $stock) {
+						// ambil item yang exp date terdekat sesuai dengan yang disetting promo
+						$item_bonus = $this->sale_m->getItemBonusNearEd($item_code, $kode_promo, $id_item_detail);
+						// var_dump($this->db->last_query());
+						if ($item_bonus->num_rows() > 0) {
+							$params = $item_bonus->row();
+							$cek_qty_cart_terpenuhi = $this->sale_m->cekQtyCartForPromo($item_code, $kode_promo);
+							$qty_cart = $cek_qty_cart_terpenuhi->row()->total_qty;
+							if ($qty_cart >= $min_qty) {
+								$cek_promo_sudah_ada_dicart = $this->sale_m->getPromoIsExist($item_code, $kode_promo);
+								if ($cek_promo_sudah_ada_dicart->num_rows() < 1) {
+									// var_dump($item_code);
+									//lakukan menambahan item bonus ke dalam keranjang belanja
+									$this->sale_m->add_cart_item_bonus($params);
+									// var_dump($params);
+									// var_dump($this->db->error());
+								}
+							} else {
+								//hapus item promo yang sudah ada dicart apa bila item utama kurang dari min qty promo
+								$this->sale_m->delete_cart_item_promo($item_code, $kode_promo);
 							}
-						} else {
-							//hapus item promo yang sudah ada dicart apa bila item utama kurang dari min qty promo
-							$this->sale_m->delete_cart_item_promo($item_code, $kode_promo);
 						}
 					}
 				}

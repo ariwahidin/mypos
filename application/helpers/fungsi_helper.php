@@ -199,12 +199,13 @@ function get_curl($u)
 
 function get_nama_promo($item_code, $exp_date){
     $ci = &get_instance();
-    $sql = "select a.kode_promo,b.nama_promo , a.item_code
+    $sql = "select a.kode_promo,b.nama_promo , a.item_code, b.is_active
     from p_promo_detail a
     left join p_promo b on a.kode_promo = b.kode_promo
     where a.item_code = '$item_code'
     and date('$exp_date') >= a.exp_date_from and date('$exp_date') <= a.exp_date_to
-    and date(now()) >= a.start_periode and date(now()) <= a.end_periode";
+    and date(now()) >= a.start_periode and date(now()) <= a.end_periode
+    and b.is_active = 'y'";
     $query = $ci->db->query($sql);
     return $query;
 }

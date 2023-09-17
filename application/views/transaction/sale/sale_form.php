@@ -601,7 +601,7 @@
         var kode_promo = $(this).data('kode_promo')
 
         add_cart(item_id, id_detail_item, harga_jual, qty, exp_date, discount, kode_promo)
-        // $('#modal-item-found').modal('hide')
+        $('#modal-item-found').modal('hide')
         // $('#barcode').focus()
     })
 
