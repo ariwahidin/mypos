@@ -27,7 +27,7 @@ if ($cart->num_rows() > 0) {
             <td class="text-center">
                 <?= $data->qty ?>
                 &nbsp;
-                <button <?= $data->kode_promo == 'P005' || $data->kode_promo == 'P003' || $data->kode_promo == 'P002' ? 'disabled' : '' ?> id="update_qty" data-toggle="modal" data-target="#modal_edit_qty" data-id_item_detail="<?= $data->item_id_detail ?>" data-cartid="<?= $data->cart_id ?>" data-stock="" data-qty="<?= $data->qty ?>" class="btn btn-xs btn-primary">
+                <button <?= $data->kode_promo == 'P005' || $data->kode_promo == 'P002' ? 'disabled' : '' ?> id="update_qty" data-toggle="modal" data-target="#modal_edit_qty" data-id_item_detail="<?= $data->item_id_detail ?>" data-cartid="<?= $data->cart_id ?>" data-stock="" data-qty="<?= $data->qty ?>" class="btn btn-xs btn-primary">
                     <i class="fa fa-pencil"></i>
                 </button>
             </td>
