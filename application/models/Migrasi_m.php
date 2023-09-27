@@ -143,4 +143,14 @@ class Migrasi_m extends CI_Model
             echo "gagal tambah updated_by" . "<br>";
         }
     }
+
+    public function addColumMultipleInPromo(){
+        $sql = "ALTER TABLE p_promo ADD column is_multiple ENUM('y','n') DEFAULT 'n' AFTER is_active";
+        $query = $this->db->query($sql);
+        if($query){
+            echo "tambah kolom is_multiple di table promo berhasil";
+        }else{
+            echo "gagal tambah kolom is_multiple";
+        }
+    }
 }

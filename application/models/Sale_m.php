@@ -50,10 +50,11 @@ class Sale_m extends CI_Model
             $this->db->where($params);
         }
         $this->db->where('user_id', $this->session->userdata('userid'));
+        $this->db->order_by('t_cart.created_at', 'DESC');
         $query = $this->db->get();
         // var_dump($this->db->last_query());
         // var_dump($this->db->error());
-        // die;
+        // echo $this->db->last_query();
         return $query;
     }
 
@@ -517,10 +518,24 @@ class Sale_m extends CI_Model
 
     public function get_promo_tebus_murah()
     {
-        $sql = "select id, nama_promo, min_belanja, is_active 
+        $sql = "select id, nama_promo, min_belanja, is_active, is_multiple 
         from p_promo where kode_promo = 'P001'";
         $query = $this->db->query($sql);
         return $query;
+    }
+
+    public function qtyTebusMurah(){
+        $sql = "select sum(qty) as qty from t_cart where kode_promo = 'P001'";
+        $query = $this->db->query($sql);
+        return $query->row()->qty;
+    }
+
+    public function getTotalAmountTebusMurah(){
+        $user_id = $this->session->userdata('userid');
+        $sql = "select case when sum(total) is null then 0 else sum(total) end as total_belanja 
+        from t_cart where user_id = '$user_id' and kode_promo = 'P001'";
+        $query = $this->db->query($sql);
+        return $query->row()->total_belanja;
     }
 
     public function get_item_promo_tebus_murah()

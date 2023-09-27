@@ -26,6 +26,7 @@ class Migrasi extends CI_Controller
         $tb_sale = $this->migrasi_m->up_table_sale_detail();
         echo $tb_sale;
         $this->migrasi_m->up_tb_printer();
+        $this->migrasi_m->addColumMultipleInPromo();
         echo "<br><a href=" . base_url('migrasi/index') . "> << Back</a>";
     }
 }

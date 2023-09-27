@@ -209,3 +209,8 @@ function get_nama_promo($item_code, $exp_date){
     $query = $ci->db->query($sql);
     return $query;
 }
+
+function cekMultipleActive($kode_promo){
+    $ci = &get_instance();
+    $sql = "select qty_bonus from p_promo where kode_promo = '$kode_promo' and is_multiple = 'y'";
+} 

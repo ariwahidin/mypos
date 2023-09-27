@@ -20,7 +20,7 @@ if ($cart->num_rows() > 0) {
                 <?php } ?>
                 <?= number_format($data->discount_item) ?>
                 &nbsp;
-                <button <?= $data->kode_promo == 'P005' || $data->kode_promo == 'P003' || $data->kode_promo == 'P002' ? 'disabled' : '' ?> style="display: inline;" id="update_disc" data-toggle="modal" data-target="#modal_edit_disc" data-cartid="<?= $data->cart_id ?>" data-disc="<?= $data->discount_percent ?>" class="btn btn-xs btn-success">
+                <button <?= $data->kode_promo == 'P005' || $data->kode_promo == 'P004' || $data->kode_promo == 'P003' || $data->kode_promo == 'P002' || $data->kode_promo == 'P001' ? 'disabled' : '' ?> style="display: inline;" id="update_disc" data-toggle="modal" data-target="#modal_edit_disc" data-cartid="<?= $data->cart_id ?>" data-disc="<?= $data->discount_percent ?>" class="btn btn-xs btn-success">
                     <i class="fa fa-pencil"></i>
                 </button>
             </td>

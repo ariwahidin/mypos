@@ -11,16 +11,6 @@
     </ol>
 </section>
 <section class="content">
-    <!-- <div class="row">
-        <div class="col col-md-12">
-            <div class="callout callout-info">
-                <h4>Tebus harga aktif</h4>
-                <p>Tawarkan product tebus harga kepada pelanggan dengan minimal belanja <?= number_format($min_belanja_tebus_murah) ?>
-                    <button onclick="cek_tebus_murah()" style="margin-left: 10px; display: inline" class="btn btn-primary">Tawarkan</button>
-                </p>
-            </div>
-        </div>
-    </div> -->
     <div class="row">
         <div class="col-lg-8">
             <div class="row">
@@ -391,7 +381,7 @@
                             <input type="hidden" id="input_edit_qty_cart_id">
                         </div>
                         <div class="col-md-6">
-                            <label for="qty_item">Stock Item</label>
+                            <label for="qty_item">Stock</label>
                             <input type="number" id="qty_stock" class="form-control" readonly>
                         </div>
                     </div>
@@ -488,30 +478,12 @@
         setInterval(extendSession, 300000); // 300000 milidetik = 5 menit
     });
 
-
-
-    $(document).on('keyup', '#input_edit_disc', function(e) {
-        if (e.target.value == '') {
-            e.target.value = 0;
-        } else {
-            e.target.value = parseFloat(e.target.value);
-        }
-    });
-
-    $(document).on('keyup', '#qty_edit', function(e) {
-        e.target.value = parseFloat(e.target.value);
-    });
-
     function total_item() {
-        var total_belanja = 0;
-        if (get_total_belanja() > 0) {
-            total_belanja = get_total_belanja()
+        let total_belanja = 0;
+        let total_belanja_final = get_total_belanja();
+        if (total_belanja_final > 0) {
+            total_belanja = total_belanja_final;
         }
-        // var total_item = document.querySelectorAll('.total_item');
-        // for (var i = 0; i < total_item.length; i++) {
-        //     total_belanja += is_number(total_item[i].innerText);
-        // }
-        // return get_total_belanja()
         return Math.round(total_belanja);
     }
 
@@ -522,16 +494,13 @@
 
     function sugest_total_bayar() {
         var subtotal = (total_item() + is_number($('#service').val())) - is_number($('#discount').val());
-        // var tax_value = Math.round(parseFloat('<?= $tax ?>') * subtotal);
         var grand_total = Math.round(subtotal);
         var total_bayar = 0;
-
         return number_with_commas(grand_total);
     }
 
     function total_bayar() {
         var subtotal = (total_item() + is_number($('#service').val())) - is_number($('#discount').val());
-        // var tax_value = Math.round(parseFloat('<?= $tax ?>') * subtotal);
         var grand_total = Math.round(subtotal);
         $('#subtotal').text(number_with_commas(subtotal))
         $('#total_bayar').text(number_with_commas(grand_total));
@@ -553,26 +522,6 @@
         $('#modal-prepare-bayar').modal('show')
     }
 
-    // function check_event() {
-    //     $.ajax({
-    //         type: 'POST',
-    //         url: '<?= site_url('sale/check_event') ?>',
-    //         data: {},
-    //         dataType: 'json',
-    //         success: function(result) {
-    //             if (result.success == true) {
-    //                 $('#cart_table').load('<?= site_url('sale/cart_data') ?>', function() {
-    //                     sugest_total_bayar()
-    //                     total_bayar()
-    //                     calculate()
-    //                 })
-    //             } else {
-    //                 // alert('tidak ada bonus')
-    //             }
-    //         }
-    //     })
-    // }
-
     $(document).on('keyup change', '#discount, #service, #cash, #type_bayar', function() {
         total_bayar();
     })
@@ -585,10 +534,8 @@
         var exp_date = $(this).data('exp_date')
         var discount = $(this).data('discount')
         var kode_promo = $(this).data('kode_promo')
-
         add_cart(item_id, id_detail_item, harga_jual, qty, exp_date, discount, kode_promo)
         $('#modal-item').modal('hide')
-
     })
 
     $(document).on('click', '#item_found_select', function() {
@@ -599,7 +546,6 @@
         var exp_date = $(this).data('exp_date')
         var discount = $(this).data('discount')
         var kode_promo = $(this).data('kode_promo')
-
         add_cart(item_id, id_detail_item, harga_jual, qty, exp_date, discount, kode_promo)
         $('#modal-item-found').modal('hide')
         // $('#barcode').focus()
@@ -613,32 +559,44 @@
         var exp_date = $(this).data('exp_date')
         var discount = $(this).data('discount')
         var kode_promo = $(this).data('kode_promo')
-
+        $('#boxLoading').css("display", "block")
         add_cart(item_id, id_detail_item, harga_jual, qty, exp_date, discount, kode_promo).then(function(success) {
                 // Ini akan dijalankan setelah Promise terpenuhi (add_cart() selesai)
                 if (success) {
-                    $('#modal-item-tebus-harga').modal('hide')
-                    Swal.fire({
-                        title: 'Berhasil ditambahkan',
-                        text: "Check lagi?",
-                        icon: 'success',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Check lagi',
-                        cancelButtonText: 'Lanjut bayar'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Swal.fire(
-                            //     'Deleted!',
-                            //     'Your file has been deleted.',
-                            //     'success'
-                            // )
-                        } else {
-                            showConfirmPay()
+                    $.ajax({
+                        url: "<?= base_url('sale/cek_tebus_murah') ?>",
+                        method: "POST",
+                        data: {},
+                        async: false,
+                        dataType: "JSON",
+                        success: function(response) {
+                            $('#promoCount').text(response.promo_count)
+                            $('#boxLoading').css("display", "none")
+                            if (response.success == false) {
+                                $('#modal-item-tebus-harga').modal('hide')
+                                Swal.fire({
+                                    title: 'Berhasil ditambahkan',
+                                    text: "Check lagi?",
+                                    icon: 'success',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#d33',
+                                    cancelButtonColor: '#3085d6',
+                                    confirmButtonText: 'Check lagi',
+                                    cancelButtonText: 'Lanjut bayar'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        // Swal.fire(
+                                        //     'Deleted!',
+                                        //     'Your file has been deleted.',
+                                        //     'success'
+                                        // )
+                                    } else {
+                                        showConfirmPay()
+                                    }
+                                })
+                            }
                         }
                     })
-                    // showConfirmPay()
                 } else {
                     Swal.fire('Terjadi kesalahan');
                 }
@@ -802,6 +760,7 @@
         var stock = 0
         var cart_id = $(this).data('cartid')
         var id_item_detail = $(this).data('id_item_detail')
+
         $.ajax({
             url: "<?= base_url('sale/cekStock') ?>",
             method: "POST",
@@ -827,11 +786,11 @@
         $('#qty_edit').val(qty)
         $('#qty_stock').val(stock)
         $('#input_edit_qty_cart_id').val(cart_id);
+
         $("#modal_edit_qty").on('shown.bs.modal', function() {
             $('#qty_edit').focus();
-            $('#qty_edit').on('keyup', function() {
-                // console.log($(this).val())
-                // console.log(parseFloat(stock_awal) + parseFloat(qty_awal) - parseFloat($(this).val()))
+            $('#qty_edit').on('keyup', function(e) {
+                e.target.value = isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value);
                 if (!isNaN(stock_awal) && !isNaN(qty_awal)) {
                     stock_akhir = parseFloat(stock_awal) + parseFloat(qty_awal) - parseFloat($(this).val());
                     if (!isNaN(stock_akhir)) {
@@ -839,11 +798,11 @@
                     }
                 }
             })
-
             $('#btn_save_edit_qty').attr({
                 "data-qty": qty,
                 "data-stock": stock,
             });
+
         });
     })
 
@@ -857,31 +816,95 @@
         } else if (parseFloat(stock) < 0) {
             Swal.fire('Stock tidak mencukupi')
         } else {
-            $.ajax({
-                type: 'POST',
-                url: '<?= site_url('sale/process') ?>',
-                data: {
-                    'edit_qty': true,
-                    'cart_id': cart_id,
-                    'qty': qty,
-                },
-                dataType: 'json',
-                success: function(result) {
-                    if (result.success == true) {
-                        $('#cart_table').load('<?= site_url('sale/cart_data') ?>', function() {
-                            calculate()
-                        })
-                        $('#modal_edit_qty').modal('hide');
-                    } else if (result.success == false && result.stock == false) {
-                        Swal.fire('Stock tidak mencukupi')
-                    } else {
-                        Swal.fire('Data item cart tidak ter-update')
-                        $('#modal_edit_qty').modal('hide');
-                    }
+            let urlEdit = "<?= site_url('sale/editQty') ?>";
+            let postData = {
+                'edit_qty': true,
+                'cart_id': cart_id,
+                'qty': qty,
+            }
+            let postSet = {
+                method: 'POST',
+                body: JSON.stringify(postData)
+            }
+            let callFunc = (response) => {
+                // console.log(response);
+                let res = JSON.parse(response);
+                if (res.success == true) {
+                    loadCartData();
+                    $('#modal_edit_qty').modal('hide');
+                } else if (res.success == false && res.stock == false) {
+                    Swal.fire('Stock tidak mencukupi')
+                } else {
+                    Swal.fire('Data item cart tidak ter-update')
+                    $('#modal_edit_qty').modal('hide');
                 }
-            })
+            };
+            editQty(urlEdit, postSet, callFunc);
+
+
+
+            // $.ajax({
+            //     type: 'POST',
+            //     url: '<?= site_url('sale/editQty') ?>',
+            //     data: {
+            //         'edit_qty': true,
+            //         'cart_id': cart_id,
+            //         'qty': qty,
+            //     },
+            //     dataType: 'json',
+            //     success: function(result) {
+            //         if (result.success == true) {
+            //             $('#cart_table').load('<?= site_url('sale/cart_data') ?>', function() {
+            //                 calculate()
+            //             })
+            //             $('#modal_edit_qty').modal('hide');
+            //         } else if (result.success == false && result.stock == false) {
+            //             Swal.fire('Stock tidak mencukupi')
+            //         } else {
+            //             Swal.fire('Data item cart tidak ter-update')
+            //             $('#modal_edit_qty').modal('hide');
+            //         }
+            //     }
+            // })
         }
     })
+
+    let editQty = async (endpoint = null, postset = null, cFunction = null) => {
+        let res = await fetch(endpoint, postset);
+        if (res.status == 200) {
+            data = await res.text();
+            return cFunction(data);
+        }
+    };
+
+    async function loadCartData() {
+        // Pilih elemen dengan ID 'cart_table'
+        var cartTable = document.getElementById('cart_table');
+
+        // Tentukan URL yang akan dimuat
+        var url = '<?= site_url('sale/cart_data') ?>';
+
+        try {
+            // Lakukan permintaan dengan fetch
+            var response = await fetch(url);
+
+            if (response.status === 200) {
+                // Respons berhasil diterima
+                // Isi elemen 'cart_table' dengan konten dari respons
+                var data = await response.text();
+                cartTable.innerHTML = data;
+
+                // Panggil fungsi calculate() setelah konten dimuat
+                calculate();
+            } else {
+                // Tangani kasus jika respons tidak berhasil
+                console.error('Gagal memuat data:', response.status);
+            }
+        } catch (error) {
+            // Tangani kesalahan jika ada
+            console.error('Terjadi kesalahan:', error);
+        }
+    }
 
 
     $(document).on('click', '#update_ed', function() {
@@ -971,12 +994,14 @@
     })
 
 
-    $(document).on('keyup', '#qty_edit', function(e) {
-        // console.log(e.keyCode);
-        if (e.keyCode == '13') {
-            $('#btn_save_edit_qty').click()
-        }
-    })
+    // $(document).on('keyup', '#qty_edit', function(e) {
+    //     console.log(e.keyCode);
+
+    //     e.target.value = isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value);
+    //     if (e.keyCode == '13') {
+    //         $('#btn_save_edit_qty').click()
+    //     }
+    // })
 
     $(document).on('keyup', '#input_edit_ed', function(e) {
         // console.log(e.keyCode);
@@ -1249,51 +1274,6 @@
         })
     })
 
-    // function show_table(result) {
-    //     console.log(result);
-    //     var tbodyRef = document.getElementById("tbody_item_");
-
-    //     for (var i = 0; i < result.item.length; i++) {
-    //         var button = document.createElement('button');
-    //         button.innerHTML = 'Select';
-    //         button.classList.add('btn', 'btn-primary', 'btn-sm');
-    //         button.setAttribute('data-id_item_detail', (result.item[i].id));
-    //         button.setAttribute('data-stock', (result.item[i].qty));
-    //         button.setAttribute('data-item_id', (result.item[i].item_id));
-    //         button.setAttribute('data-exp_date', (result.item[i].exp_date));
-    //         button.setAttribute('data-barcode', (result.item[i].barcode));
-    //         button.setAttribute('data-harga_jual', (result.item[i].harga_jual));
-    //         button.setAttribute('data-discount', (result.item[i].discount));
-    //         button.setAttribute('data-kode_promo', (result.item[i].kode_promo));
-    //         button.setAttribute('onclick', 'tambah_keranjang(this)');
-    //         var newRow = tbodyRef.insertRow();
-    //         var newCell1 = newRow.insertCell();
-    //         var newCell2 = newRow.insertCell();
-    //         // var newCell3 = newRow.insertCell();
-    //         var newCell4 = newRow.insertCell();
-    //         var newCell5 = newRow.insertCell();
-    //         var newCellDiscount = newRow.insertCell();
-    //         var newCell6 = newRow.insertCell();
-
-
-    //         var newText1 = document.createTextNode(result.item[i].barcode);
-    //         var newText2 = document.createTextNode(result.item[i].item_name);
-    //         // var newText3 = document.createTextNode('');
-    //         var newText4 = document.createTextNode(result.item[i].qty);
-    //         var newText5 = document.createTextNode(date_format(result.item[i].exp_date));
-    //         var newTextDiscount = document.createTextNode(result.item[i].discount);
-    //         var newText6 = button;
-    //         newCell1.appendChild(newText1);
-    //         newCell2.appendChild(newText2);
-    //         // newCell3.appendChild(newText3);
-    //         newCell4.appendChild(newText4);
-    //         newCell5.appendChild(newText5);
-    //         newCellDiscount.appendChild(newTextDiscount);
-    //         newCell6.appendChild(newText6);
-    //         // tbodyRef.appendChild("<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>");
-    //     }
-    // }
-
     function date_format(date_time) {
         // Parse the MySQL date string and create a Date object
         let date = new Date(date_time);
@@ -1306,25 +1286,6 @@
         // Return the formatted date string
         return `${day}-${month}-${year}`;
     }
-
-    // function tambah_keranjang(e) {
-    //     var id_detail_item = e.getAttribute('data-id_item_detail');
-    //     var stock = e.getAttribute('data-stock');
-    //     var item_id = e.getAttribute('data-item_id');
-    //     var exp_date = e.getAttribute('data-exp_date');
-    //     var harga_jual = e.getAttribute('data-harga_jual');
-    //     var discount = e.getAttribute('data-discount');
-    //     var kode_promo = e.getAttribute('data-kode_promo');
-    //     var qty = 1;
-
-    //     add_cart(item_id, id_detail_item, harga_jual, qty, exp_date, discount, kode_promo)
-
-    //     $('#barcode').focus()
-    //     $('#modal-item-found').modal('hide');
-
-    // }
-
-
 
     function add_cart(item_id, id_detail_item, harga_jual, qty, exp_date, discount, kode_promo) {
         return new Promise(function(resolve, reject) {
@@ -1369,43 +1330,22 @@
 
     function cek_tebus_murah() {
         var tebus_murah = false;
-        var total_belanja = get_total_belanja()
-
-        if (total_belanja > 0) {
-            $.ajax({
-                url: "<?= base_url('sale/cek_tebus_murah') ?>",
-                method: "POST",
-                data: {
-                    total_belanja
-                },
-                async: false,
-                dataType: "JSON",
-                success: function(response) {
-                    if (response.success == true) {
-                        tebus_murah = true
-                        $('#modalItemTebusHarga').load("<?= base_url('sale/get_item_tebus_murah') ?>", {}, function() {
-                            $('#modal-item-tebus-harga').modal('show')
-                        })
-                    }
+        $.ajax({
+            url: "<?= base_url('sale/cek_tebus_murah') ?>",
+            method: "POST",
+            data: {},
+            async: false,
+            dataType: "JSON",
+            success: function(response) {
+                if (response.success == true) {
+                    tebus_murah = true
+                    $('#modalItemTebusHarga').load("<?= base_url('sale/get_item_tebus_murah') ?>", {}, function() {
+                        $('#modal-item-tebus-harga').modal('show')
+                        $('#promoCount').text(response.promo_count)
+                    })
                 }
-            })
-        }
-
-
-
-
-        // var min_belanja = "<?= $min_belanja_tebus_murah ?>";
-        // console.log("min belanja : " + min_belanja)
-        // console.log("total belanja : " + total_belanja)
-
-        // if (parseFloat(total_belanja) > parseFloat(min_belanja)) {
-        //     $('#modalItemTebusHarga').load("<?= base_url('sale/get_item_tebus_murah') ?>", {}, function() {
-        //         $('#modal-item-tebus-harga').modal('show')
-        //     })
-        //     tebus_murah = true
-        // }
-        console.log("tebus murah : " + tebus_murah)
-
+            }
+        })
         return tebus_murah;
     }
 

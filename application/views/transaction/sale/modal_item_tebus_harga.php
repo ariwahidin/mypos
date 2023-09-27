@@ -1,18 +1,18 @@
 <div class="modal flip" id="modal-item-tebus-harga">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+        <div class="modal-content box">
+            <div style="display: none;" class="overlay" id="boxLoading">
+                <i class="fa fa-refresh fa-spin"></i>
+            </div>
             <div class="modal-header">
                 <div class="callout callout-success">
                     <h4 style="font-size: 26px;">Tebus murah aktif, tawarkan produk ini kepada pelanggan
+                        <br>
+                        <span style="color: yellow;" id="promoCount">1</span> x kesempatan
                         <button style="display: inline; margin-left: 5px;" onclick="lanjutBayar()" class="btn btn-sm btn-primary pull-right">Lanjut bayar</button>
                         <button style="display: inline;" class="btn btn-sm btn-danger pull-right" data-dismiss="modal" aria-label="Close">Tutup</button>
                     </h4>
-                    <!-- <p>Tawarkan product tebus murah kepada pelanggan</p> -->
                 </div>
-                <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button> -->
-                <!-- <h4 class="modal-title">Data item tebus harga</h4> -->
             </div>
             <div class="modal-body table-responsive">
                 <table class="table table-bordered table-striped" id="table_item_tebus_harga">
@@ -52,7 +52,7 @@
         $('#table_item_tebus_harga').DataTable()
     })
 
-    function lanjutBayar(){
+    function lanjutBayar() {
         $('#modal-item-tebus-harga').modal('hide')
         showConfirmPay()
     }
