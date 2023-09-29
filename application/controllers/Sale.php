@@ -191,25 +191,37 @@ class Sale extends CI_Controller
 							$qty_cart = $cek_qty_cart_terpenuhi->row()->total_qty;
 							if ($qty_cart >= $min_qty) {
 								$cek_promo_sudah_ada_dicart = $this->sale_m->getPromoIsExist($item_code, $kode_promo);
-								if ($cek_promo_sudah_ada_dicart->num_rows() < 1) {
+								$item_id_detail = $params->id;
+								$qty_cart = $this->db->query("select sum(qty) as total_qty from t_cart where item_id_detail = '$item_id_detail' and user_id = '$user_id'")->row()->total_qty;
+								$stock = $this->db->query("select sum(qty) as total_stock from p_item_detail where id = '$item_id_detail'")->row()->total_stock;
+								$qty_cart_utama = $this->db->query("select sum(qty) as qty_cart from t_cart where item_id_detail = '$item_id_detail' and kode_promo != 'P002' and user_id = '$user_id'")->row()->qty_cart;
+								
+								
+								if ($cek_promo_sudah_ada_dicart->num_rows() < 1 && $promo->row()->is_multiple != 'y') {
 									//lakukan menambahan item bonus ke dalam keranjang belanja
 									$this->sale_m->add_cart_item_bonus($params);
 								}
-								// jika berlaku kelipatan aktif
+								
+								
+								if ($qty_cart_utama % 2 == 0) {
+									$qty_bonus = $qty_cart_utama / 2;
+								} else {
+									$qty_bonus = floor(($qty_cart_utama - 1) / 2);
+								}
+
+								$params->qty_bonus = $qty_bonus;
+								
+								if ($cek_promo_sudah_ada_dicart->num_rows() < 1 && $promo->row()->is_multiple == 'y') {
+									//lakukan menambahan item bonus ke dalam keranjang belanja
+									$this->sale_m->add_cart_item_bonus($params);
+								}
+
+								// lakukan edit qty;
 								if ($cek_promo_sudah_ada_dicart->num_rows() > 0 && $promo->row()->is_multiple == 'y') {
-									$item_id_detail = $params->id;
 									// var_dump($params);
-									$qty_cart = $this->db->query("select sum(qty) as total_qty from t_cart where item_id_detail = '$item_id_detail' and user_id = '$user_id'")->row()->total_qty;
 									// var_dump($qty_cart);
-									$stock = $this->db->query("select sum(qty) as total_stock from p_item_detail where id = '$item_id_detail'")->row()->total_stock;
 									// var_dump($stock);
-									
-									$qty_cart_utama = $this->db->query("select sum(qty) as qty_cart from t_cart where item_id_detail = '$item_id_detail' and kode_promo != 'P002' and user_id = '$user_id'")->row()->qty_cart;
-									if ($qty_cart_utama % 2 == 0) {
-										$qty_bonus = $qty_cart_utama / 2;
-									} else {
-										$qty_bonus = floor(($qty_cart_utama - 1) / 2);
-									}
+
 
 									$qty_predic = $qty_cart_utama + $qty_bonus;
 									if ($qty_predic < $stock) {
@@ -233,6 +245,7 @@ class Sale extends CI_Controller
 	public function cekPromoBogof($item_code, $id_item_detail)
 	{
 		$user_id = $this->session->userdata('userid');
+
 		// cek apakah ada item promo bogof di cart dan apakah exp date sesuai dengan settingan promo
 		$kode_promo = $this->db->query("select b.kode_promo, a.item_code, a.item_expired,
         b.exp_date_from, b.exp_date_to, b.start_periode, b.end_periode
@@ -521,8 +534,6 @@ class Sale extends CI_Controller
 							);
 							$this->db->where($where);
 							$this->db->update('t_cart', $data);
-
-
 						} else {
 							// jika total belanja < min belanja jadikan harga normal tanpa discount
 							$discount_item = $price * (0 / 100);

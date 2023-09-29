@@ -25,7 +25,7 @@ class Version extends CI_Controller
             var_dump($api);
             $response = array(
                 'icon' => 'success',
-                'message' => 'Berhasil Update Data',
+                'message' => 'Data tersedia',
                 'success' => true
             );
         } else {
