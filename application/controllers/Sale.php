@@ -203,11 +203,12 @@ class Sale extends CI_Controller
 									// var_dump($qty_cart);
 									$stock = $this->db->query("select sum(qty) as total_stock from p_item_detail where id = '$item_id_detail'")->row()->total_stock;
 									// var_dump($stock);
+									
 									$qty_cart_utama = $this->db->query("select sum(qty) as qty_cart from t_cart where item_id_detail = '$item_id_detail' and kode_promo != 'P002'")->row()->qty_cart;
 									if ($qty_cart_utama % 2 == 0) {
 										$qty_bonus = $qty_cart_utama / 2;
 									} else {
-										$qty_bonus = ($qty_cart_utama - 1) / 2;
+										$qty_bonus = floor(($qty_cart_utama - 1) / 2);
 									}
 
 									$qty_predic = $qty_cart_utama + $qty_bonus;
