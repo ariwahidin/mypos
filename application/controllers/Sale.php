@@ -199,12 +199,12 @@ class Sale extends CI_Controller
 								if ($cek_promo_sudah_ada_dicart->num_rows() > 0 && $promo->row()->is_multiple == 'y') {
 									$item_id_detail = $params->id;
 									// var_dump($params);
-									$qty_cart = $this->db->query("select sum(qty) as total_qty from t_cart where item_id_detail = '$item_id_detail'")->row()->total_qty;
+									$qty_cart = $this->db->query("select sum(qty) as total_qty from t_cart where item_id_detail = '$item_id_detail' and user_id = '$user_id'")->row()->total_qty;
 									// var_dump($qty_cart);
 									$stock = $this->db->query("select sum(qty) as total_stock from p_item_detail where id = '$item_id_detail'")->row()->total_stock;
 									// var_dump($stock);
 									
-									$qty_cart_utama = $this->db->query("select sum(qty) as qty_cart from t_cart where item_id_detail = '$item_id_detail' and kode_promo != 'P002'")->row()->qty_cart;
+									$qty_cart_utama = $this->db->query("select sum(qty) as qty_cart from t_cart where item_id_detail = '$item_id_detail' and kode_promo != 'P002' and user_id = '$user_id'")->row()->qty_cart;
 									if ($qty_cart_utama % 2 == 0) {
 										$qty_bonus = $qty_cart_utama / 2;
 									} else {
