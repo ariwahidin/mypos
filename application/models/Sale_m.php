@@ -491,7 +491,6 @@ class Sale_m extends CI_Model
         and t3.user_id = '$user_id'
         )ss
         group by ss.barcode";
-
         $query = $this->db->query($sql);
         return $query;
     }

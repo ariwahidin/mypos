@@ -994,14 +994,13 @@
     })
 
 
-    // $(document).on('keyup', '#qty_edit', function(e) {
-    //     console.log(e.keyCode);
-
-    //     e.target.value = isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value);
-    //     if (e.keyCode == '13') {
-    //         $('#btn_save_edit_qty').click()
-    //     }
-    // })
+    $(document).on('keyup', '#qty_edit', function(e) {
+        // console.log(e.keyCode);
+        // e.target.value = isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value);
+        if (e.keyCode == '13') {
+            $('#btn_save_edit_qty').click()
+        }
+    })
 
     $(document).on('keyup', '#input_edit_ed', function(e) {
         // console.log(e.keyCode);

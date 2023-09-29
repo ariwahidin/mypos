@@ -148,9 +148,26 @@ class Migrasi_m extends CI_Model
         $sql = "ALTER TABLE p_promo ADD column is_multiple ENUM('y','n') DEFAULT 'n' AFTER is_active";
         $query = $this->db->query($sql);
         if($query){
-            echo "tambah kolom is_multiple di table promo berhasil";
+            echo "tambah kolom is_multiple di table promo berhasil<br>";
         }else{
-            echo "gagal tambah kolom is_multiple";
+            echo "gagal tambah kolom is_multiple<br>";
         }
+    }
+
+    public function create_tb_version()
+    {
+        $sql = "CREATE TABLE `tb_version` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `version` varchar(255) DEFAULT NULL,
+            `update_by` varchar(255) DEFAULT NULL,
+            `update_at` datetime DEFAULT NULL,
+            PRIMARY KEY (`id`)
+          )";
+        if ($this->db->query($sql)) {
+            $result = "table tb_version berhasil dibuat"."<br>";
+        } else {
+            $result = "gagal buat tb_version"."<br>";
+        }
+        echo $result;
     }
 }

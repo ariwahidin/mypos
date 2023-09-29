@@ -533,10 +533,6 @@ class Item extends CI_Controller
         $api = get_curl($url);
 
         if ($api['success'] == true) {
-
-            // //delete item discount sebelum di timpa item discount baru
-            // $delete = $this->item_m->deleteAllItemDiscount();
-
             $item = $api['item'];
             $promo = $api['promo'];
             $updateMasterPromo = $this->item_m->updateMasterPromo($promo);

@@ -53,7 +53,7 @@ if ($cart->num_rows() > 0) {
                 class="btn btn-xs btn-primary">
                     <i class="fa fa-pencil"></i> Update
                 </button> -->
-                <button <?= $data->kode_promo == 'P005' ? 'disabled' : '' ?> id="del_cart" data-cartid="<?= $data->cart_id ?>" class="btn btn-xs btn-danger">
+                <button <?= $data->kode_promo == 'P005' || $data->kode_promo == 'P002' ? 'disabled' : '' ?> id="del_cart" data-cartid="<?= $data->cart_id ?>" class="btn btn-xs btn-danger">
                     <i class="fa fa-trash"></i> Delete
                 </button>
             </td>

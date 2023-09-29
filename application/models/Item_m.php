@@ -551,6 +551,7 @@ class Item_m extends CI_Model
                 'qty_bonus' => $value['qty_bonus'],
                 'is_disc_show' => $value['is_disc_show'],
                 'is_active' => $value['is_active'],
+                'is_multiple' => $value['is_multiple'],
                 'created_by' => $value['created_by'],
                 'created' => $value['created_at']
             );

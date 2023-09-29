@@ -319,6 +319,9 @@
 										<a href="<?= site_url('migrasi') ?>"><i class="fa fa-circle-o"></i> <span>Migrasi</span></a>
 									</li>
 								<?php } ?>
+								<li <?= $this->uri->segment(1) == 'version' ? 'class="active"' : '' ?>>
+									<a href="<?= site_url('version') ?>"><i class="fa fa-circle-o"></i> <span>Version</span></a>
+								</li>
 							</ul>
 						</li>
 					<?php } ?>

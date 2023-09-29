@@ -42,7 +42,6 @@ class Sale extends CI_Controller
         inner join p_item t3 on t2.item_code = t3.item_code 
         where now() > t1.start_periode and now() < t1.end_periode and t1.is_active = 'y'";
 		$item_bonus_active = $this->db->query($sql);
-
 		$promo = $this->sale_m->get_promo_active();
 		$data = array(
 			'item_bonus_acitve' => $item_bonus_active,
@@ -56,7 +55,6 @@ class Sale extends CI_Controller
 		$kode_promo = $this->input->post('kode_promo');
 		$detail = $this->sale_m->getDetailPromo($kode_promo);
 		$promo = $this->sale_m->get_promo_active($kode_promo);
-
 		$data = array(
 			'promo' => $promo,
 			'detail' => $detail
@@ -132,23 +130,10 @@ class Sale extends CI_Controller
 	function get_item_detail()
 	{
 		$item = $this->sale_m->get_item_detail($_POST['barcode']);
-
 		$data = array(
 			'item' => $item
 		);
-
 		$this->load->view('transaction/sale/modal_item_data', $data);
-		// if ($item->num_rows() > 0) {
-		// 	$params = array(
-		// 		'item' => $item->result(),
-		// 		'success' => true
-		// 	);
-		// } else {
-		// 	$params = array(
-		// 		'success' => false,
-		// 	);
-		// }
-		// echo json_encode($params);
 	}
 
 	function md_show_item()
@@ -170,7 +155,7 @@ class Sale extends CI_Controller
 	public function cekPromoPerItem($item_code, $id_item_detail = null)
 	{
 		$user_id = $this->session->userdata('userid');
-		$kode_promo = $this->db->query("select b.kode_promo, a.item_code, a.item_expired,
+		$kode_promo = $this->db->query("select distinct b.kode_promo, a.item_code, a.item_expired,
         b.exp_date_from, b.exp_date_to, b.start_periode, b.end_periode
         from t_cart a 
         left join p_promo_detail b on a.item_code = b.item_code
@@ -180,11 +165,11 @@ class Sale extends CI_Controller
         and a.item_expired >= b.exp_date_from and a.item_expired  <= b.exp_date_to
         and date(now()) >= b.start_periode and date(now()) <= b.end_periode");
 		if ($kode_promo->num_rows() > 0) {
-			if ($kode_promo->row()->kode_promo == 'P002') {
-				$kode_promo = $kode_promo->row()->kode_promo;
+			$kode_promo = $kode_promo->row()->kode_promo;
+			if ($kode_promo == 'P002') {
 				$cek_aktif = $this->db->query("select * from p_promo where kode_promo = '$kode_promo' and is_active = 'y'");
 				if ($cek_aktif->num_rows() > 0) {
-					$promo = $this->db->query("select kode_promo, min_qty, nama_promo, qty_bonus from p_promo where kode_promo = 'P002'");
+					$promo = $this->db->query("select kode_promo, min_qty, nama_promo, qty_bonus, is_multiple from p_promo where kode_promo = 'P002'");
 					$min_qty = $promo->row()->min_qty;
 					$qty_bonus = $promo->row()->qty_bonus;
 					$sum_qty = $this->db->query("select sum(qty) as total_qty from t_cart where item_code = '$item_code' and user_id = '$user_id'");
@@ -209,6 +194,27 @@ class Sale extends CI_Controller
 								if ($cek_promo_sudah_ada_dicart->num_rows() < 1) {
 									//lakukan menambahan item bonus ke dalam keranjang belanja
 									$this->sale_m->add_cart_item_bonus($params);
+								}
+								// jika berlaku kelipatan aktif
+								if ($cek_promo_sudah_ada_dicart->num_rows() > 0 && $promo->row()->is_multiple == 'y') {
+									$item_id_detail = $params->id;
+									// var_dump($params);
+									$qty_cart = $this->db->query("select sum(qty) as total_qty from t_cart where item_id_detail = '$item_id_detail'")->row()->total_qty;
+									// var_dump($qty_cart);
+									$stock = $this->db->query("select sum(qty) as total_stock from p_item_detail where id = '$item_id_detail'")->row()->total_stock;
+									// var_dump($stock);
+									$qty_cart_utama = $this->db->query("select sum(qty) as qty_cart from t_cart where item_id_detail = '$item_id_detail' and kode_promo != 'P002'")->row()->qty_cart;
+									if ($qty_cart_utama % 2 == 0) {
+										$qty_bonus = $qty_cart_utama / 2;
+									} else {
+										$qty_bonus = ($qty_cart_utama - 1) / 2;
+									}
+
+									$qty_predic = $qty_cart_utama + $qty_bonus;
+									if ($qty_predic < $stock) {
+										$id_cart = $this->db->query("select cart_id from t_cart where item_id_detail = '$item_id_detail' and kode_promo = 'P002' and user_id = '$user_id'")->row()->cart_id;
+										$this->db->query("UPDATE t_cart SET qty = '$qty_bonus' WHERE cart_id = '$id_cart'");
+									}
 								}
 							} else {
 								//hapus item promo yang sudah ada dicart apa bila item utama kurang dari min qty promo
@@ -281,7 +287,6 @@ class Sale extends CI_Controller
 									$qty_bonus = $cek_qty_bonus->row()->total_qty;
 									$new_qty_bonus = $qty_utama;
 									$predic_qty = $qty_utama + $new_qty_bonus;
-
 									if ($predic_qty > $stock) {
 										// alert stock tidak cukup
 									} else {
@@ -303,7 +308,6 @@ class Sale extends CI_Controller
 	public function editQty()
 	{
 		$post = json_decode(file_get_contents("php://input"), true);
-		// var_dump($post);
 		if (isset($post['edit_qty'])) {
 			$qty = $post['qty'];
 			$cart_id = $post['cart_id'];
@@ -318,8 +322,6 @@ class Sale extends CI_Controller
 			} else {
 				$sql = "update t_cart set qty = '$qty', total = (price - discount_item) * qty where cart_id = '$cart_id'";
 				$this->db->query($sql);
-				//cek promo
-
 				if ($this->db->affected_rows() > 0) {
 					$this->cekPromoPerItem($item_code);
 					$this->cekPromoTebusMurahIsAccurate();
@@ -334,10 +336,7 @@ class Sale extends CI_Controller
 
 	public function process()
 	{
-		// var_dump( $_POST );
-		// die;
 		$data = $this->input->post(null, true);
-
 		if (isset($_POST['add_cart'])) {
 
 			$item_id_detail = $data['item_id_detail'];
@@ -354,7 +353,6 @@ class Sale extends CI_Controller
 				't_cart.kode_promo' => $data['kode_promo']
 			);
 
-
 			$check_cart = $this->sale_m->get_cart($params);
 			$stock_cukup = $this->sale_m->cek_stok_cukup($data);
 
@@ -364,8 +362,6 @@ class Sale extends CI_Controller
 				} else {
 					$this->sale_m->add_cart($data);
 				}
-
-				// $this->sale_m->add_cart( $data );
 				if ($this->db->affected_rows() > 0) {
 					$this->cekPromoPerItem($item_code, $item_id_detail);
 					$this->cekPromoTebusMurahIsAccurate();
@@ -375,7 +371,6 @@ class Sale extends CI_Controller
 				}
 				echo json_encode($params);
 			} else {
-
 				$params = array(
 					'success' => false,
 					'stock_cukup' => false,
@@ -414,30 +409,22 @@ class Sale extends CI_Controller
 		// }
 
 		if (isset($_POST['edit_disc'])) {
-			// var_dump($data);
-			// die;
 			$discount_percent = $data['disc'];
 			$cart_id = $data['cart_id'];
 			$query = $this->db->query("select * from t_cart where cart_id = '$cart_id'");
 			$harga_jual = $query->row()->price;
-			// $item_id = $query->row()->item_id;
 			$disc_item = ((float)$harga_jual * ($discount_percent / 100));
 			$this->db->query("update t_cart set discount_percent = '$discount_percent', discount_item = '$disc_item', total = (price - '$disc_item') * qty where cart_id = '$cart_id'");
-			// var_dump($this->db->last_query());
-			// die;
 			if ($this->db->affected_rows() > 0) {
 				$this->cekPromoTebusMurahIsAccurate();
 				$params = array('success' => true);
 			} else {
 				$params = array('success' => false);
 			}
-
 			echo json_encode($params);
 		}
 
 		if (isset($_POST['edit_ed'])) {
-			// var_dump($data);
-			// die;
 			$ed = $data['ed'];
 			$exp = str_replace("/", "-", $ed);
 			$date_expired = date('Y-m-d', strtotime($exp));
@@ -448,15 +435,11 @@ class Sale extends CI_Controller
 			} else {
 				$params = array('success' => false);
 			}
-
 			echo json_encode($params);
 		}
 
 		if (isset($_POST['edit_cart'])) {
-			// var_dump($data);
-			// die;
 			$this->sale_m->edit_cart($data);
-
 			if ($this->db->affected_rows() > 0) {
 				$params = array('success' => true);
 			} else {
@@ -466,12 +449,9 @@ class Sale extends CI_Controller
 		}
 
 		if (isset($_POST['process_payment'])) {
-			// var_dump( $data );
-			// die;
 			$sale_id = $this->sale_m->add_sale($data);
 			$cart = $this->sale_m->get_cart()->result();
 			$row = [];
-
 			foreach ($cart as $c => $value) {
 				array_push($row, array(
 					'sale_id' => $sale_id,
@@ -487,10 +467,8 @@ class Sale extends CI_Controller
 				));
 				$this->db->query("update p_item_detail set qty = qty - '$value->qty' where id = '$value->item_id_detail'");
 			}
-
 			$this->sale_m->add_sale_detail($row);
 			$this->sale_m->del_cart(['user_id' => $this->session->userdata('userid')]);
-
 			if ($this->db->affected_rows() > 0) {
 				$params = array('success' => true, 'sale_id' => $sale_id);
 			} else {
@@ -516,13 +494,16 @@ class Sale extends CI_Controller
 					// hitung total belanja melebihi min belanja di luar item promo
 					$total_belanja = $this->db->query("select sum(total) as total_belanja from t_cart where user_id = '$user_id' and item_code != '$item_code'");
 					if ($total_belanja->num_rows() > 0) {
+
+
+
+
 						$min_belanja = $cek_promo->row()->min_belanja;
 						$price = $cek_cart->row()->price;
 						$qty = $cek_cart->row()->qty;
 						$discount = $item_promo->row()->discount;
 						$total_belanja = $total_belanja->row()->total_belanja;
 						// var_dump($total_belanja);
-						// var_dump($min_belanja);
 						if ($total_belanja >= $min_belanja) {
 							// jika total belanja > min belanja update item promo berikan kode promo dan rubah discountnya
 							$discount_item = $price * ($discount / 100);
@@ -539,6 +520,8 @@ class Sale extends CI_Controller
 							);
 							$this->db->where($where);
 							$this->db->update('t_cart', $data);
+
+
 						} else {
 							// jika total belanja < min belanja jadikan harga normal tanpa discount
 							$discount_item = $price * (0 / 100);
@@ -579,7 +562,6 @@ class Sale extends CI_Controller
 			$item_code = $this->db->query("select item_code from t_cart where cart_id = '$cart_id'")->row()->item_code;
 			$this->sale_m->del_cart(['cart_id' => $cart_id]);
 		}
-
 		if ($this->db->affected_rows() > 0) {
 			if (isset($item_code)) {
 				$this->cekPromoPerItem($item_code);
@@ -610,37 +592,22 @@ class Sale extends CI_Controller
 	public function print_receipt_today()
 	{
 		$this->cetakStrukDaily();
-		// $receipt = $this->sale_m->get_sales_today_per_user();
-		// $tax = $this->db->query("select tax + 1 as tax from tax")->row()->tax;
-		// $data = array(
-		// 	'tax' => $tax,
-		// 	'receipt' => $receipt
-		// );
-		// $this->load->view('report/print_receipt_today', $data);
 	}
 
 
 	function cetakStrukDaily()
 	{
 		$receipt = $this->sale_m->get_sales_today_per_user();
-
-		// var_dump($receipt->result());
-		// die;
 		$tax = $this->db->query("select tax + 1 as tax from tax")->row()->tax;
 		$printernya = $this->printer_m->get_printer();
-
 		$profile = Escpos\CapabilityProfile::load("simple");
 		$connector = new Escpos\PrintConnectors\WindowsPrintConnector($printernya->row()->printer_name);
 		$printer = new Escpos\Printer($connector, $profile);
 		$img = Escpos\EscposImage::load("assets/dist/img/DgChocoGallerys.png", false);
-
 		$jumlah_print = 1;
-
-
 		$printer->initialize();
 
 		for ($i = 0; $i < $jumlah_print; $i++) {
-
 			$printer->setJustification(Escpos\Printer::JUSTIFY_CENTER);
 			$printer->bitImage($img, Escpos\Printer::IMG_DOUBLE_WIDTH | Escpos\Printer::IMG_DOUBLE_HEIGHT | Escpos\Printer::JUSTIFY_CENTER);
 			$printer->setJustification(); // Reset
@@ -797,7 +764,7 @@ class Sale extends CI_Controller
 	{
 		$total_belanja = $this->sale_m->get_total_belanja()->row()->total_belanja;
 		$total_belanja = $total_belanja - $this->sale_m->getTotalAmountTebusMurah();
-		// print_r($total_belanja);
+
 		$tebus_murah = $this->sale_m->get_promo_tebus_murah()->row();
 		if ($tebus_murah->is_active == 'y') {
 			if ($total_belanja >= $tebus_murah->min_belanja) {
@@ -809,9 +776,7 @@ class Sale extends CI_Controller
 				if ($cek_tebus_murah_is_exists_in_cart->num_rows() > 0) {
 					// Jika berlaku kelipatan aktif
 					if ($tebus_murah->is_multiple == 'y') {
-
 						// Cek jika amoountnya masih kelipatan 
-
 						if ($promoCount > 0) {
 							$response = array(
 								'success' => true,
@@ -848,6 +813,7 @@ class Sale extends CI_Controller
 
 	public function cekPromoTebusMurahIsAccurate()
 	{
+		$user_id = $this->session->userdata('userid');
 		$cek_item_tebus_murah_in_cart = $this->sale_m->cek_item_tebus_murah_in_cart();
 		if ($cek_item_tebus_murah_in_cart->num_rows() > 0) {
 			$total_belanja = $this->sale_m->cekTotalBelanjaWithOutTebusMurah()->row()->total_belanja;
@@ -855,6 +821,12 @@ class Sale extends CI_Controller
 			if ($total_belanja < $amount_tebus_murah) {
 				// jika amount kurang dari ketentuan, hapus item tebus murah
 				$this->sale_m->delete_item_tebus_murah();
+			} else {
+				$qty_tebus_murah = $this->db->query("select sum(qty) as qty from t_cart where kode_promo = 'P001' and user_id = '$user_id'")->row()->qty;
+				$total_amount_tebus_murah = $qty_tebus_murah * $amount_tebus_murah;
+				if ($total_belanja < $total_amount_tebus_murah) {
+					$this->sale_m->delete_item_tebus_murah();
+				}
 			}
 		}
 	}
@@ -878,8 +850,6 @@ class Sale extends CI_Controller
 
 	public function cekStock()
 	{
-		// var_dump($_POST);
-		// die;
 		$id_item_detail = $this->input->post('id_item_detail');
 		$qty_stock = $this->sale_m->getStock($id_item_detail)->row()->stock;
 		$qty_cart = $this->sale_m->getQtyCart($id_item_detail)->row()->qty;
