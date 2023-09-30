@@ -6,14 +6,15 @@
     </h1>
 </section>
 <section class="content">
+
     <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-8">
-            <div class="callout" style="text-align: center;">
-                <h3>Tekan Enter Atau Klik Mulai Transaksi Untuk Memulai Transaksi Baru</h3>
+        <div class="col col-md-12">
+            <div class="box box-default box-solid">
+                <div class="box-header">
+                    <h4>Tekan <strong>ENTER</strong> atau klik <strong>Mulai Transaksi</strong> untuk memulai transaksi baru</h4>
+                </div>
             </div>
         </div>
-        <div class="col-md-2"></div>
     </div>
 
     <?php if ($promo->num_rows() > 0) { ?>
@@ -37,8 +38,8 @@
                                 foreach ($promo->result() as $data) { ?>
                                     <tr>
                                         <td><?= $no++  ?></td>
-                                        <td><?= $data->nama_promo ?></td>
-                                        <td><?= $data->is_active == 'y' ? 'active' : '' ?></td>
+                                        <td><?= ucfirst($data->nama_promo) ?></td>
+                                        <td><?= $data->is_active == 'y' ? 'Active' : '' ?></td>
                                         <td>
                                             <button onclick="loadDetail(this)" data-kode_promo="<?= $data->kode_promo ?>" class="btn btn-xs btn-info">detail</button>
                                         </td>
@@ -67,7 +68,9 @@
 
     function loadDetail(button) {
         var kode_promo = $(button).data('kode_promo')
-        $('#detailPromo').load("<?= base_url('sale/loadDetailPromo') ?>", {kode_promo}, function() {
+        $('#detailPromo').load("<?= base_url('sale/loadDetailPromo') ?>", {
+            kode_promo
+        }, function() {
 
         })
     }
@@ -89,7 +92,7 @@
                         showConfirmButton: false,
                         timer: 1500
                     }).then(function() {
-                        window.location.href = "<?=base_url('sale/prepare')?>"
+                        window.location.href = "<?= base_url('sale/prepare') ?>"
                     })
                 } else {
                     hideLoading()
