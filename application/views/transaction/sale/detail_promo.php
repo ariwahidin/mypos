@@ -37,13 +37,12 @@
 
 <div class="box box-info">
     <div class="box-header">
-        <h3 class="box-title">Detail item promo</h3>
+        <h3 class="box-title">Detail item promo <strong><?= ucfirst($detail->row()->nama_promo) ?></strong></h3>
     </div>
     <div class="box-body table-responsive">
         <table class="table table-bordered table-striped" id="tableDetailItemPromo">
             <thead>
                 <th style="width: 10px">#</th>
-                <th>Promo</th>
                 <th>Barcode</th>
                 <th>Item Name</th>
                 <th>Disc.(%)</th>
@@ -55,8 +54,7 @@
                 foreach ($detail->result() as $data) { ?>
                     <tr>
                         <td><?= $no++ ?></td>
-                        <td><?= ucfirst($data->nama_promo) ?></td>
-                        <td style="text-align: right;"><?= $data->barcode ?></td>
+                        <td><?= $data->barcode ?></td>
                         <td><?= $data->name ?></td>
                         <td style="text-align: right; color: green;"><?= $data->discount ?></td>
                         <td style="text-align: right;"><?= date('d-M-Y', strtotime($data->start_periode)) . " s/d " . date('d-M-Y', strtotime($data->end_periode)) ?></td>
