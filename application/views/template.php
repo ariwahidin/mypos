@@ -287,15 +287,12 @@
 							</ul>
 						</li>
 
-						<li class="treeview <?= $this->uri->segment(1) == 'bonus' || $this->uri->segment(1) == 'user' || $this->uri->segment(1) == 'tax' || $this->uri->segment(1) == 'toko' || $this->uri->segment(1) == 'payment' || $this->uri->segment(1) == 'printer' || $this->uri->segment(1) == 'backup' ? 'active' : '' ?>">
+						<li class="treeview <?= $this->uri->segment(1) == 'bonus' || $this->uri->segment(1) == 'user' || $this->uri->segment(1) == 'tax' || $this->uri->segment(1) == 'toko' || $this->uri->segment(1) == 'payment' || $this->uri->segment(1) == 'printer' || $this->uri->segment(1) == 'backup' || $this->uri->segment(1) == 'version' ? 'active' : '' ?>">
 							<a href="#">
 								<i class="fa fa-folder"></i> <span>Other</span>
 								<span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
 							</a>
 							<ul class="treeview-menu">
-								<!-- <li <?= $this->uri->segment(1) == 'bonus' ? 'class="active"' : '' ?>>
-									<a href="<?= site_url('bonus') ?>"><i class="fa fa-circle-o"></i> <span>Setting Bonus</span></a>
-								</li> -->
 								<li <?= $this->uri->segment(1) == 'user' ? 'class="active"' : '' ?>>
 									<a href="<?= site_url('user') ?>"><i class="fa fa-circle-o"></i> <span>Users</span></a>
 								</li>
@@ -344,7 +341,7 @@
 
 		<footer class="main-footer">
 			<div class="pull-right hidden-xs">
-				<b>Version</b> 2.1
+				<b>Version</b> <?= currentVersion() ?>
 			</div>
 			<span>myPOS</span><strong> By <a href="#"> <strong> Handal Inti Boga</strong></a></strong>
 		</footer>
